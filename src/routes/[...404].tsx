@@ -1,5 +1,3 @@
-import { A } from '@solidjs/router'
-
 export default function NotFound() {
   return (
     <main class='flex min-h-lvh flex-col items-center justify-center gap-4 bg-background p-4 text-foreground'>
