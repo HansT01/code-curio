@@ -1,19 +1,28 @@
+export interface CurioInfo {
+  id: string
+  title: string
+}
+
+let cachedInfo: CurioInfo[] | null = null
 const getCurioInfo = async () => {
   'use server'
+  if (cachedInfo) return cachedInfo
   const context = import.meta.glob('./curio/*.tsx')
   const keys = Object.keys(context)
-  const info = await Promise.all(
+  const info: CurioInfo[] = await Promise.all(
     keys.map(async (key) => {
-      const { curioInfo } = (await context[key]()) as any
-      return curioInfo.id
+      const { info } = (await context[key]()) as any
+      return info
     }),
   )
-  console.log(info)
+  cachedInfo = info
+  return info
 }
 
 export default function Home() {
-  const handleButton = () => {
-    getCurioInfo()
+  const handleButton = async () => {
+    const info = await getCurioInfo()
+    console.log(info)
   }
   return (
     <main class='flex min-h-lvh flex-col items-center gap-4 bg-background p-4 text-foreground'>

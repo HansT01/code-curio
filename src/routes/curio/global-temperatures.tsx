@@ -1,6 +1,7 @@
 import { getCurioID } from '~/util'
+import { CurioInfo } from '..'
 
-export const curioInfo = {
+export const info: CurioInfo = {
   id: getCurioID(import.meta.url),
   title: 'Global Temperatures',
 }
