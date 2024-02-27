@@ -1,5 +1,5 @@
 import p5 from 'p5'
-import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Show, createEffect, createSignal } from 'solid-js'
 import CustomCursor from '../custom-cursor'
 
 const P5Demo = () => {
@@ -9,23 +9,23 @@ const P5Demo = () => {
   let amplitude = 75
   let period = 500
 
-  const [width, setWidth] = createSignal(0)
+  const [width, setWidth] = createSignal(600)
   const [height, setHeight] = createSignal(400)
 
   let parentRef: HTMLDivElement | undefined = undefined
 
-  onMount(() => {
-    const resize = () => {
-      if (parentRef !== undefined) {
-        setWidth(parentRef.clientWidth)
-      }
-    }
-    resize()
-    window.addEventListener('resize', resize)
-    onCleanup(() => {
-      window.removeEventListener('resize', resize)
-    })
-  })
+  // onMount(() => {
+  //   const resize = () => {
+  //     if (parentRef !== undefined) {
+  //       setWidth(parentRef.clientWidth)
+  //     }
+  //   }
+  //   resize()
+  //   window.addEventListener('resize', resize)
+  //   onCleanup(() => {
+  //     window.removeEventListener('resize', resize)
+  //   })
+  // })
 
   const [cursorVisible, setCursorVisible] = createSignal(false)
 
@@ -77,7 +77,7 @@ const P5Demo = () => {
   }
 
   return (
-    <div class='bg-red-200' ref={parentRef}>
+    <div ref={parentRef}>
       <Show when={cursorVisible()}>
         <CustomCursor />
       </Show>
