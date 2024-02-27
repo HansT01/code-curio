@@ -1,34 +1,11 @@
 import { Component, For, JSX, Suspense, createResource, createSignal } from 'solid-js'
 import { getCurios } from '~/util/curio'
 
-interface TagProps {
-  onClick?: () => void
-  removeable?: boolean
-  children: JSX.Element
-}
-
-const Tag: Component<TagProps> = (props) => {
-  return (
-    <button class='flex items-center gap-3 rounded-lg border-2 px-3 py-1 hover:border-primary' onclick={props.onClick}>
-      <p class=''>{props.children}</p>
-      {/* <X class='-mr-1' size={16} /> */}
-    </button>
-  )
-}
-
-const TagFilters = () => {
-  return (
-    <div class='flex flex-col gap-4'>
-      <div class='flex items-center gap-4'>
-        <h2 class='font-semibold'>Filters</h2>
-        {/* <Pencil class='size-4' /> */}
-      </div>
-      <div class=''>
-        <Tag>p5.js</Tag>
-      </div>
-    </div>
-  )
-}
+// interface TagProps {
+//   onClick?: () => void
+//   removeable?: boolean
+//   children: JSX.Element
+// }
 
 const CurioList = () => {
   const [curios] = createResource(getCurios)
@@ -74,7 +51,21 @@ const SidebarNavigation: Component<Props> = (props) => {
       >
         <div class='flex flex-grow flex-col gap-4 px-8 py-6'>
           <h1 class='text-6xl font-bold tracking-tight'>Code Curio</h1>
-          <TagFilters />
+          <div class='flex flex-col gap-4'>
+            <div class='flex items-center gap-4'>
+              <h2 class='font-semibold'>Filters</h2>
+              {/* <Pencil class='size-4' /> */}
+            </div>
+            <div class=''>
+              <button
+                class='flex items-center gap-3 rounded-lg border-2 px-3 py-1 hover:border-primary'
+                // onclick={props.onClick}
+              >
+                <p class=''>p5.js</p>
+                {/* <X class='-mr-1' size={16} /> */}
+              </button>
+            </div>
+          </div>
           <CurioList />
         </div>
         <div
