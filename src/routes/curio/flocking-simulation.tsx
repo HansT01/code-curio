@@ -1,3 +1,4 @@
+import { clientOnly } from '@solidjs/start'
 import { CurioInfo, getCurioID } from '~/util/curio'
 
 export const info: CurioInfo = {
@@ -6,6 +7,8 @@ export const info: CurioInfo = {
   created: new Date(2024, 2, 27),
   tags: ['ai', 'algorithms', 'animation', 'interactive', 'p5.js', 'simulation'],
 }
+
+const FlockingSimulationCanvas = clientOnly(() => import('~/components/p5/flocking-simulation'))
 
 export default function FlockingSimulation() {
   return (
@@ -25,6 +28,7 @@ export default function FlockingSimulation() {
         placerat sollicitudin, ultricies at lectus. Phasellus convallis magna id nulla vulputate, in pulvinar urna
         imperdiet.
       </p>
+      <FlockingSimulationCanvas />
     </main>
   )
 }

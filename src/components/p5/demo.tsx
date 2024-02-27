@@ -2,7 +2,7 @@ import p5 from 'p5'
 import { Show, createEffect, createSignal } from 'solid-js'
 import CustomCursor from '../custom-cursor'
 
-const P5Demo = () => {
+const DemoCanvas = () => {
   let dx: number, yValues: number[], w: number
   let xSpacing = 16
   let theta = 0
@@ -86,4 +86,4 @@ const P5Demo = () => {
   )
 }
 
-export default P5Demo
+export default DemoCanvas
