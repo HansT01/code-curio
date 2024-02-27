@@ -20,7 +20,7 @@ const FlockingSimulationCanvas = () => {
   onMount(() => {
     const resize = () => {
       if (parentRef !== undefined) {
-        setDimensions({ ...dimensions(), width: parentRef.clientWidth })
+        setDimensions({ ...dimensions(), width: Math.min(parentRef.clientWidth, 854) })
       }
     }
     resize()
@@ -169,6 +169,10 @@ const FlockingSimulationCanvas = () => {
 
       createEffect(() => {
         p.resizeCanvas(dimensions().width, dimensions().height)
+      })
+
+      onCleanup(() => {
+        p.remove()
       })
     }
     new p5(sketch, ref)
