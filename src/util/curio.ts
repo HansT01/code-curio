@@ -25,7 +25,6 @@ export const getCurios = async () => {
   if (cache !== null) {
     return cache
   }
-  console.log('getCurios')
   const context = import.meta.glob('/src/routes/curio/*.tsx')
   const keys = Object.keys(context)
   const info: CurioInfo[] = await Promise.all(
