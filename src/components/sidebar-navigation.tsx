@@ -31,35 +31,10 @@ const TagButton: Component<TagButtonProps> = (props) => {
   )
 }
 
-interface SidebarNavigationProps {
-  children: JSX.Element
-}
-
-const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
-  const [sidebarWidth, setSidebarWidth] = createSignal(500)
-  const [isResizing, setIsResizing] = createSignal(false)
+const CurioList: Component = () => {
   const [showFitlers, setShowFilters] = createSignal(false)
   const [filteredTags, setFilteredTags] = createSignal<Tag[]>([])
   const [curios] = createResource(getCurios)
-
-  const handleMouseDown = () => {
-    setIsResizing(true)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isResizing()) {
-      const newWidth = e.clientX
-      setSidebarWidth(newWidth)
-    }
-  }
-
-  const handleMouseUp = () => {
-    setIsResizing(false)
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', handleMouseUp)
-  }
 
   const toggleTag = (tag: Tag) => {
     if (filteredTags().includes(tag)) {
@@ -80,6 +55,86 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
   }
 
   return (
+    <div class='flex flex-col gap-4'>
+      <div class='flex flex-col gap-4'>
+        <div class='flex items-center gap-4'>
+          <h2 class='text-xl'>Filters</h2>
+          <button class='cursor-pointer p-1' onclick={() => setShowFilters((showFilters) => !showFilters)}>
+            <Pencil class='size-4 ' />
+          </button>
+        </div>
+        <Show when={showFitlers()}>
+          <div class='flex flex-wrap gap-2'>
+            <For each={validTags}>
+              {(tag) => (
+                <TagButton onClick={() => toggleTag(tag)} highlight={filteredTags().includes(tag)}>
+                  {tag}
+                </TagButton>
+              )}
+            </For>
+          </div>
+        </Show>
+      </div>
+      <Show when={filteredTags().length > 0}>
+        <div class='flex flex-wrap gap-2'>
+          <For each={filteredTags()}>
+            {(tag) => (
+              <TagButton removable onClick={() => unselectTag(tag)}>
+                {tag}
+              </TagButton>
+            )}
+          </For>
+        </div>
+      </Show>
+      <Suspense>
+        <For each={curios()}>
+          {(curio) => (
+            <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
+              <div class='flex flex-col gap-0 rounded-xl bg-primary px-4 py-2 text-primary-foreground'>
+                <h3>{curio.title}</h3>
+                <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
+                <Show when={curio.tags.length > 0}>
+                  <div class='mt-1 flex flex-wrap gap-2'>
+                    <For each={curio.tags}>{(tag) => <TagButton onClick={() => selectTag(tag)}>{tag}</TagButton>}</For>
+                  </div>
+                </Show>
+              </div>
+            </Show>
+          )}
+        </For>
+      </Suspense>
+    </div>
+  )
+}
+
+interface SidebarNavigationProps {
+  children: JSX.Element
+}
+
+const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
+  const [sidebarWidth, setSidebarWidth] = createSignal(500)
+  const [isResizing, setIsResizing] = createSignal(false)
+
+  const handleMouseDown = () => {
+    setIsResizing(true)
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isResizing()) {
+      const newWidth = e.clientX
+      setSidebarWidth(newWidth)
+    }
+  }
+
+  const handleMouseUp = () => {
+    setIsResizing(false)
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
+  }
+
+  return (
     <div class='flex'>
       <div
         style={{ width: `${sidebarWidth()}px` }}
@@ -87,60 +142,14 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
       >
         <div class='flex shrink flex-grow flex-col gap-4 px-8 py-6'>
           <h1 class='text-4xl'>Code Curio</h1>
-          <div class='flex flex-col gap-4'>
-            <div class='flex items-center gap-4'>
-              <h2 class='text-xl'>Filters</h2>
-              <button class='cursor-pointer p-1' onclick={() => setShowFilters((showFilters) => !showFilters)}>
-                <Pencil class='size-4 ' />
-              </button>
-            </div>
-            <Show when={showFitlers()}>
-              <div class='flex flex-wrap gap-2'>
-                <For each={validTags}>
-                  {(tag) => (
-                    <TagButton onClick={() => toggleTag(tag)} highlight={filteredTags().includes(tag)}>
-                      {tag}
-                    </TagButton>
-                  )}
-                </For>
-              </div>
-            </Show>
-          </div>
-          <Show when={filteredTags().length > 0}>
-            <div class='flex flex-wrap gap-2'>
-              <For each={filteredTags()}>
-                {(tag) => (
-                  <TagButton removable onClick={() => unselectTag(tag)}>
-                    {tag}
-                  </TagButton>
-                )}
-              </For>
-            </div>
-          </Show>
-          <Suspense>
-            <For each={curios()}>
-              {(curio) => (
-                <div class='flex flex-col gap-0 rounded-xl bg-primary px-4 py-2 text-primary-foreground'>
-                  <h3>{curio.title}</h3>
-                  <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
-                  <Show when={curio.tags.length > 0}>
-                    <div class='mt-1 flex flex-wrap gap-2'>
-                      <For each={curio.tags}>
-                        {(tag) => <TagButton onClick={() => selectTag(tag)}>{tag}</TagButton>}
-                      </For>
-                    </div>
-                  </Show>
-                </div>
-              )}
-            </For>
-          </Suspense>
+          <CurioList />
         </div>
       </div>
       <div
         style={{
           'margin-left': `${sidebarWidth()}px`,
         }}
-        class='fixed h-dvh w-1 cursor-col-resize select-none bg-accent text-accent-foreground'
+        class='fixed h-dvh w-2 cursor-col-resize select-none bg-accent text-accent-foreground'
         onmousedown={handleMouseDown}
       />
       <div
