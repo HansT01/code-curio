@@ -152,7 +152,7 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
   return (
     <div class='flex'>
       <div
-        style={{ width: `${sidebarWidth()}px` }}
+        style={{ width: `${sidebarWidth() - 4}px` }}
         class='fixed left-0 flex h-dvh overflow-y-auto bg-background text-foreground'
       >
         <div class='flex shrink flex-grow flex-col gap-4 px-8 py-6'>
@@ -162,13 +162,14 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
       </div>
       <div
         style={{
-          'margin-left': `${sidebarWidth()}px`,
+          'margin-left': `${sidebarWidth() - 4}px`,
+          'width': '9px',
         }}
-        class='fixed h-dvh w-2 cursor-col-resize select-none bg-accent text-accent-foreground'
+        class='fixed h-dvh cursor-col-resize select-none bg-accent text-accent-foreground'
         onmousedown={handleMouseDown}
       />
       <div
-        style={{ 'margin-left': `${sidebarWidth() + 4}px` }}
+        style={{ 'margin-left': `${sidebarWidth() + 5}px` }}
         class='h-dvh flex-grow overflow-y-auto bg-primary text-primary-foreground'
       >
         {props.children}
