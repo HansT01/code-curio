@@ -18,6 +18,7 @@ const P5Demo = () => {
       p.setup = () => {
         const canvas = p.createCanvas(710, 400)
         canvas.parent(ref)
+        canvas.style('visibility', 'visible')
         w = p.width + 16
         dx = (p.TWO_PI / period) * xSpacing
         yValues = new Array(p.floor(w / xSpacing))
