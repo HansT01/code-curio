@@ -4,7 +4,7 @@ export const info: CurioInfo = {
   id: getCurioID(import.meta.url),
   title: 'Flocking Simulation',
   created: new Date(2024, 2, 27),
-  tags: [],
+  tags: ['ai', 'algorithms', 'animation', 'interactive', 'p5.js', 'simulation'],
 }
 
 export default function FlockingSimulation() {

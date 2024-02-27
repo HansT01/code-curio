@@ -7,7 +7,7 @@ import SidebarNavigation from './components/sidebar-navigation'
 
 export default function App() {
   return (
-    <div class='dark'>
+    <div class=''>
       <Router
         root={(props) => (
           <SidebarNavigation>
