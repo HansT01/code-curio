@@ -1,5 +1,4 @@
-import { getCurioID } from '~/util'
-import { CurioInfo } from '../(home)'
+import { CurioInfo, getCurioID } from '~/util/curio'
 
 export const info: CurioInfo = {
   id: getCurioID(import.meta.url),

@@ -1,4 +1,43 @@
-import { Component, JSX, createSignal } from 'solid-js'
+import { Component, For, JSX, Suspense, createResource, createSignal } from 'solid-js'
+import { getCurios } from '~/util/curio'
+
+interface TagProps {
+  onClick?: () => void
+  removeable?: boolean
+  children: JSX.Element
+}
+
+const Tag: Component<TagProps> = (props) => {
+  return (
+    <button class='flex items-center gap-3 rounded-lg border-2 px-3 py-1 hover:border-primary' onclick={props.onClick}>
+      <p class=''>{props.children}</p>
+      {/* <X class='-mr-1' size={16} /> */}
+    </button>
+  )
+}
+
+const TagFilters = () => {
+  return (
+    <div class='flex flex-col gap-4'>
+      <div class='flex items-center gap-4'>
+        <h2 class='font-semibold'>Filters</h2>
+        {/* <Pencil class='size-4' /> */}
+      </div>
+      <div class=''>
+        <Tag>p5.js</Tag>
+      </div>
+    </div>
+  )
+}
+
+const CurioList = () => {
+  const [curios] = createResource(getCurios)
+  return (
+    <Suspense>
+      <For each={curios()}>{(curio) => <p>{curio.title}</p>}</For>
+    </Suspense>
+  )
+}
 
 interface Props {
   children: JSX.Element
@@ -33,9 +72,13 @@ const SidebarNavigation: Component<Props> = (props) => {
         style={{ width: `${sidebarWidth()}px` }}
         class='fixed left-0 flex h-dvh overflow-y-auto bg-background text-foreground'
       >
-        <div class='flex-grow'></div>
+        <div class='flex flex-grow flex-col gap-4 px-8 py-6'>
+          <h1 class='text-6xl font-bold tracking-tight'>Code Curio</h1>
+          <TagFilters />
+          <CurioList />
+        </div>
         <div
-          class='bg-accent text-accent-foreground h-dvh w-1 cursor-col-resize select-none'
+          class='h-dvh w-1 cursor-col-resize select-none bg-accent text-accent-foreground'
           onmousedown={handleMouseDown}
         />
       </div>
