@@ -94,7 +94,7 @@ const CurioList: Component = () => {
                 <h3>{curio.title}</h3>
                 <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
                 <Show when={curio.tags.length > 0}>
-                  <div class='mt-1 flex flex-wrap gap-2'>
+                  <div class='my-1 flex flex-wrap gap-2'>
                     <For each={curio.tags}>{(tag) => <TagButton onClick={() => selectTag(tag)}>{tag}</TagButton>}</For>
                   </div>
                 </Show>

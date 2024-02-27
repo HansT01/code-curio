@@ -19,8 +19,13 @@ export interface CurioInfo {
   tags: Tag[]
 }
 
+let cache: CurioInfo[] | null = null
 export const getCurios = async () => {
-  // 'use server'
+  'use server'
+  if (cache !== null) {
+    return cache
+  }
+  console.log('getCurios')
   const context = import.meta.glob('/src/routes/curio/*.tsx')
   const keys = Object.keys(context)
   const info: CurioInfo[] = await Promise.all(
@@ -29,6 +34,7 @@ export const getCurios = async () => {
       return info
     }),
   )
+  cache = info
   return info
 }
 
