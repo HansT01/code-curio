@@ -13,7 +13,6 @@
     "lucide-solid": "^0.340.0",
     "postcss": "^8.4.26",
     "solid-js": "^1.8.15",
-    "solid-start-netlify": "^0.3.10",
     "tailwindcss": "^3.3.3",
     "vinxi": "^0.2.1"
   },
