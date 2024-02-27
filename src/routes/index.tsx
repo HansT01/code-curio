@@ -1,7 +1,12 @@
+import { clientOnly } from '@solidjs/start'
+
+const Sketch = clientOnly(() => import('~/components/p5-sketch'))
+
 export default function Home() {
   return (
-    <main class='flex min-h-dvh flex-col gap-8 p-8'>
+    <main class='flex flex-col gap-8 p-8'>
       <h1 class='text-6xl font-thin'>Welcome to Code Curio!</h1>
+      <Sketch />
       <p class='whitespace-pre-wrap'>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris maximus venenatis magna eget ornare. Integer
         efficitur odio nunc, vitae mattis diam vehicula vel. Nullam eu elementum tellus, eget mattis quam. Duis euismod

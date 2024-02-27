@@ -13,6 +13,7 @@
     "clsx": "^2.1.0",
     "dayjs": "^1.11.10",
     "lucide-solid": "^0.340.0",
+    "p5": "^1.9.0",
     "postcss": "^8.4.26",
     "solid-js": "^1.8.15",
     "tailwind-merge": "^2.2.1",
@@ -23,6 +24,7 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@types/p5": "^1.7.6",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11"
   }

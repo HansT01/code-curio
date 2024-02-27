@@ -1,3 +1,4 @@
+import { A } from '@solidjs/router'
 import dayjs from 'dayjs'
 import { Pencil, X } from 'lucide-solid'
 import { Component, For, JSX, Show, Suspense, createResource, createSignal } from 'solid-js'
@@ -5,7 +6,7 @@ import { cn } from '~/util/cn'
 import { Tag, getCurios, validTags } from '~/util/curio'
 
 interface TagButtonProps {
-  onClick?: () => void
+  onClick?: (e: MouseEvent) => void
   removable?: boolean
   highlight?: boolean
   children: JSX.Element
@@ -90,15 +91,28 @@ const CurioList: Component = () => {
         <For each={curios()}>
           {(curio) => (
             <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
-              <div class='flex flex-col gap-0 rounded-xl bg-primary px-4 py-2 text-primary-foreground'>
-                <h3>{curio.title}</h3>
-                <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
-                <Show when={curio.tags.length > 0}>
-                  <div class='my-1 flex flex-wrap gap-2'>
-                    <For each={curio.tags}>{(tag) => <TagButton onClick={() => selectTag(tag)}>{tag}</TagButton>}</For>
-                  </div>
-                </Show>
-              </div>
+              <A href={`/curio/${curio.id}`}>
+                <div class='flex flex-col gap-0 rounded-xl bg-primary px-4 py-2 text-primary-foreground'>
+                  <h3>{curio.title}</h3>
+                  <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
+                  <Show when={curio.tags.length > 0}>
+                    <div class='my-1 flex flex-wrap gap-2'>
+                      <For each={curio.tags}>
+                        {(tag) => (
+                          <TagButton
+                            onClick={(e) => {
+                              e.preventDefault()
+                              selectTag(tag)
+                            }}
+                          >
+                            {tag}
+                          </TagButton>
+                        )}
+                      </For>
+                    </div>
+                  </Show>
+                </div>
+              </A>
             </Show>
           )}
         </For>
@@ -154,7 +168,7 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
       />
       <div
         style={{ 'margin-left': `${sidebarWidth() + 4}px` }}
-        class='h-dvh flex-grow overflow-y-scroll bg-primary text-primary-foreground'
+        class='h-dvh flex-grow overflow-y-auto bg-primary text-primary-foreground'
       >
         {props.children}
       </div>
