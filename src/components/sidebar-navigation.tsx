@@ -139,6 +139,7 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
     if (isResizing()) {
       const newWidth = e.clientX
       setSidebarWidth(newWidth)
+      window.dispatchEvent(new Event('resize'))
     }
   }
 

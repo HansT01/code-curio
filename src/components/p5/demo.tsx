@@ -1,5 +1,6 @@
 import p5 from 'p5'
-import { createSignal } from 'solid-js'
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import CustomCursor from '../custom-cursor'
 
 const P5Demo = () => {
   let dx: number, yValues: number[], w: number
@@ -7,34 +8,56 @@ const P5Demo = () => {
   let theta = 0
   let amplitude = 75
   let period = 500
-  let x = 50
-  let y = 50
 
-  const [width, setWidth] = createSignal(200)
-  const [height, setHeight] = createSignal(200)
+  const [width, setWidth] = createSignal(0)
+  const [height, setHeight] = createSignal(400)
+
+  let parentRef: HTMLDivElement | undefined = undefined
+
+  onMount(() => {
+    const resize = () => {
+      if (parentRef !== undefined) {
+        setWidth(parentRef.clientWidth)
+      }
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    onCleanup(() => {
+      window.removeEventListener('resize', resize)
+    })
+  })
+
+  const [cursorVisible, setCursorVisible] = createSignal(false)
 
   const createSketch = (ref: HTMLDivElement) => {
     const sketch = (p: p5) => {
       p.setup = () => {
-        const canvas = p.createCanvas(710, 400)
+        const canvas = p.createCanvas(width(), height())
         canvas.parent(ref)
         canvas.style('visibility', 'visible')
+        canvas.mouseOut(() => {
+          setCursorVisible(false)
+        })
+        canvas.mouseOver(() => {
+          setCursorVisible(true)
+        })
         w = p.width + 16
         dx = (p.TWO_PI / period) * xSpacing
         yValues = new Array(p.floor(w / xSpacing))
       }
+
       p.draw = () => {
         p.background(0)
         calcWave()
         renderWave()
       }
 
-      function calcWave() {
-        // Increment theta (try different values for
-        // 'angular velocity' here)
-        theta += 0.02
+      createEffect(() => {
+        p.resizeCanvas(width(), height())
+      })
 
-        // For every x value, calculate a y value with sine function
+      function calcWave() {
+        theta += 0.02
         let x = theta
         for (let i = 0; i < yValues.length; i++) {
           yValues[i] = p.sin(x) * amplitude
@@ -45,7 +68,6 @@ const P5Demo = () => {
       function renderWave() {
         p.noStroke()
         p.fill(255)
-        // A simple way to draw the wave with an ellipse at each location
         for (let x = 0; x < yValues.length; x++) {
           p.ellipse(x * xSpacing, p.height / 2 + yValues[x], 16, 16)
         }
@@ -54,7 +76,14 @@ const P5Demo = () => {
     new p5(sketch, ref)
   }
 
-  return <div ref={(el) => createSketch(el)} />
+  return (
+    <div class='bg-red-200' ref={parentRef}>
+      <Show when={cursorVisible()}>
+        <CustomCursor />
+      </Show>
+      <div class='[&>canvas]:cursor-none [&>canvas]:rounded-2xl' ref={(el) => createSketch(el)} />
+    </div>
+  )
 }
 
 export default P5Demo
