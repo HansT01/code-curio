@@ -6,6 +6,8 @@
   :root {
     --background: hsl(0 0% 100%);
     --foreground: hsl(222.2 84% 4.9%);
+    --accent: hsl(0, 0%, 87%);
+    --accent-foreground: var(--foreground);
     --primary: hsl(221.2 83.2% 53.3%);
     --primary-foreground: hsl(210 40% 98%);
     --secondary: hsl(210 40% 96.1%);
@@ -14,6 +16,8 @@
   .dark {
     --background: hsl(222.2 84% 4.9%);
     --foreground: hsl(210 40% 98%);
+    --accent: hsl(223, 83%, 11%);
+    --accent-foreground: var(--foreground);
     --primary: hsl(217.2 91.2% 59.8%);
     --primary-foreground: hsl(222.2 47.4% 11.2%);
     --secondary: hsl(217.2 32.6% 17.5%);
