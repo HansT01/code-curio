@@ -31,27 +31,6 @@ const TagButton: Component<TagButtonProps> = (props) => {
   )
 }
 
-const CurioList = () => {
-  const [curios] = createResource(getCurios)
-  return (
-    <Suspense>
-      <For each={curios()}>
-        {(curio) => (
-          <div class='flex flex-col gap-0 rounded-xl bg-primary px-4 py-2 text-primary-foreground'>
-            <h3>{curio.title}</h3>
-            <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
-            <Show when={curio.tags.length > 0}>
-              <div class='mt-1 flex flex-wrap gap-2'>
-                <For each={curio.tags}>{(tag) => <TagButton>{tag}</TagButton>}</For>
-              </div>
-            </Show>
-          </div>
-        )}
-      </For>
-    </Suspense>
-  )
-}
-
 interface SidebarNavigationProps {
   children: JSX.Element
 }
@@ -61,6 +40,7 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
   const [isResizing, setIsResizing] = createSignal(false)
   const [showFitlers, setShowFilters] = createSignal(false)
   const [filteredTags, setFilteredTags] = createSignal<Tag[]>([])
+  const [curios] = createResource(getCurios)
 
   const handleMouseDown = () => {
     setIsResizing(true)
@@ -81,10 +61,16 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
     document.removeEventListener('mouseup', handleMouseUp)
   }
 
-  const selectTag = (tag: Tag) => {
+  const toggleTag = (tag: Tag) => {
     if (filteredTags().includes(tag)) {
       unselectTag(tag)
     } else {
+      selectTag(tag)
+    }
+  }
+
+  const selectTag = (tag: Tag) => {
+    if (!filteredTags().includes(tag)) {
       setFilteredTags((tags) => [...tags, tag])
     }
   }
@@ -112,7 +98,7 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
               <div class='flex flex-wrap gap-2'>
                 <For each={validTags}>
                   {(tag) => (
-                    <TagButton onClick={() => selectTag(tag)} highlight={filteredTags().includes(tag)}>
+                    <TagButton onClick={() => toggleTag(tag)} highlight={filteredTags().includes(tag)}>
                       {tag}
                     </TagButton>
                   )}
@@ -131,7 +117,23 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
               </For>
             </div>
           </Show>
-          <CurioList />
+          <Suspense>
+            <For each={curios()}>
+              {(curio) => (
+                <div class='flex flex-col gap-0 rounded-xl bg-primary px-4 py-2 text-primary-foreground'>
+                  <h3>{curio.title}</h3>
+                  <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
+                  <Show when={curio.tags.length > 0}>
+                    <div class='mt-1 flex flex-wrap gap-2'>
+                      <For each={curio.tags}>
+                        {(tag) => <TagButton onClick={() => selectTag(tag)}>{tag}</TagButton>}
+                      </For>
+                    </div>
+                  </Show>
+                </div>
+              )}
+            </For>
+          </Suspense>
         </div>
       </div>
       <div
