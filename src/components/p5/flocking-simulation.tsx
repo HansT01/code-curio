@@ -1,18 +1,34 @@
 import p5 from 'p5'
-import { createSignal } from 'solid-js'
+import { createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 
 const FlockingSimulationCanvas = () => {
-  const [width, setWidth] = createSignal(640)
-  const [height, setHeight] = createSignal(360)
+  const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
+  const [config, setConfig] = createSignal({
+    maxVelocity: 3,
+    protectedRange: 8,
+    visualRange: 40,
+    separationFactor: 0.02,
+    alignmentFactor: 0.02,
+    cohesionFactor: 0.0002,
+    edgeMargin: 100,
+    edgeFactor: 0.05,
+    mouseFactor: 0.01,
+  })
 
-  const [maxVelocity, setMaxVelocity] = createSignal(2)
-  const [protectedRange, setProtectedRange] = createSignal(4)
-  const [visualRange, setVisualRange] = createSignal(15)
-  const [separationFactor, setSeparationFactor] = createSignal(0.02)
-  const [alignmentFactor, setAlignmentFactor] = createSignal(0.02)
-  const [cohesionFactor, setCohesionFactor] = createSignal(0.0002)
-  const [turnMargin, setTurnMargin] = createSignal(100)
-  const [turnFactor, setTurnFactor] = createSignal(0.05)
+  let parentRef: HTMLDivElement | undefined = undefined
+
+  onMount(() => {
+    const resize = () => {
+      if (parentRef !== undefined) {
+        setDimensions({ ...dimensions(), width: parentRef.clientWidth })
+      }
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    onCleanup(() => {
+      window.removeEventListener('resize', resize)
+    })
+  })
 
   const createSketch = (ref: HTMLDivElement) => {
     const sketch = (p: p5) => {
@@ -27,15 +43,25 @@ const FlockingSimulationCanvas = () => {
         }
 
         edge() {
-          if (this.position.x < turnMargin()) {
-            this.velocity.add(turnFactor(), 0)
-          } else if (this.position.x > p.width - turnMargin()) {
-            this.velocity.sub(turnFactor(), 0)
+          if (this.position.x < config().edgeMargin) {
+            this.velocity.add(config().edgeFactor, 0)
+          } else if (this.position.x > p.width - config().edgeMargin) {
+            this.velocity.sub(config().edgeFactor, 0)
           }
-          if (this.position.y < turnMargin()) {
-            this.velocity.add(0, turnFactor())
-          } else if (this.position.y > p.height - turnMargin()) {
-            this.velocity.sub(0, turnFactor())
+          if (this.position.y < config().edgeMargin) {
+            this.velocity.add(0, config().edgeFactor)
+          } else if (this.position.y > p.height - config().edgeMargin) {
+            this.velocity.sub(0, config().edgeFactor)
+          }
+        }
+
+        mouse() {
+          const distance = p.dist(this.position.x, this.position.y, p.mouseX, p.mouseY)
+          if (distance < config().visualRange) {
+            this.velocity.add(
+              (this.position.x - p.mouseX) * config().mouseFactor,
+              (this.position.y - p.mouseY) * config().mouseFactor,
+            )
           }
         }
 
@@ -47,12 +73,12 @@ const FlockingSimulationCanvas = () => {
               continue
             }
             const distance = p.dist(this.position.x, this.position.y, boid.position.x, boid.position.y)
-            if (distance < protectedRange()) {
+            if (distance < config().protectedRange) {
               xDelta += this.position.x - boid.position.x
               yDelta += this.position.y - boid.position.y
             }
           }
-          this.velocity.add(xDelta * separationFactor(), yDelta * separationFactor())
+          this.velocity.add(xDelta * config().separationFactor, yDelta * config().separationFactor)
         }
 
         alignment(boids: Boid[]) {
@@ -64,7 +90,7 @@ const FlockingSimulationCanvas = () => {
               continue
             }
             const distance = p.dist(this.position.x, this.position.y, boid.position.x, boid.position.y)
-            if (distance < visualRange()) {
+            if (distance < config().visualRange) {
               xVelAvg += boid.velocity.x
               yVelAvg += boid.velocity.y
               neighbors += 1
@@ -74,7 +100,7 @@ const FlockingSimulationCanvas = () => {
             xVelAvg /= neighbors
             yVelAvg /= neighbors
           }
-          this.velocity.add(xVelAvg * alignmentFactor(), yVelAvg * alignmentFactor())
+          this.velocity.add(xVelAvg * config().alignmentFactor, yVelAvg * config().alignmentFactor)
         }
 
         cohesion(boids: Boid[]) {
@@ -86,7 +112,7 @@ const FlockingSimulationCanvas = () => {
               continue
             }
             const distance = p.dist(this.position.x, this.position.y, boid.position.x, boid.position.y)
-            if (distance < visualRange()) {
+            if (distance < config().visualRange) {
               xPosAvg += boid.position.x
               yPosAvg += boid.position.y
               neighbors += 1
@@ -97,8 +123,8 @@ const FlockingSimulationCanvas = () => {
             yPosAvg /= neighbors
           }
           this.velocity.add(
-            (xPosAvg - this.position.x) * cohesionFactor(),
-            (yPosAvg - this.position.y) * cohesionFactor(),
+            (xPosAvg - this.position.x) * config().cohesionFactor,
+            (yPosAvg - this.position.y) * config().cohesionFactor,
           )
         }
 
@@ -107,21 +133,24 @@ const FlockingSimulationCanvas = () => {
           this.alignment(boids)
           this.cohesion(boids)
           this.edge()
-          this.velocity.setMag(p.min(this.velocity.mag(), maxVelocity()))
+          this.mouse()
+          this.velocity.setMag(p.min(this.velocity.mag(), config().maxVelocity))
           this.position.add(this.velocity)
         }
 
         show() {
-          p.strokeWeight(3)
-          p.stroke(255)
-          p.point(this.position.x, this.position.y)
+          p.push()
+          p.translate(this.position.x, this.position.y)
+          p.rotate(this.velocity.heading())
+          p.triangle(-10, -5, -10, 5, 10, 0)
+          p.pop()
         }
       }
 
       let flock: Boid[] = []
 
       p.setup = () => {
-        const canvas = p.createCanvas(width(), height())
+        const canvas = p.createCanvas(dimensions().width, dimensions().height)
         canvas.parent(ref)
         canvas.style('visibility', 'visible')
 
@@ -138,18 +167,15 @@ const FlockingSimulationCanvas = () => {
         }
       }
 
-      p.mouseClicked = () => {
-        flock = []
-        for (let i = 0; i < 100; i++) {
-          flock.push(new Boid())
-        }
-      }
+      createEffect(() => {
+        p.resizeCanvas(dimensions().width, dimensions().height)
+      })
     }
     new p5(sketch, ref)
   }
 
   return (
-    <div class='flex flex-col gap-8'>
+    <div class='flex flex-col gap-8' ref={parentRef}>
       <button class=''></button>
       <div class='[&>canvas]:rounded-2xl' ref={(el) => createSketch(el)} />
     </div>
