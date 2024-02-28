@@ -7,16 +7,14 @@ import SidebarNavigation from './components/sidebar-navigation'
 
 export default function App() {
   return (
-    <div class=''>
-      <Router
-        root={(props) => (
-          <SidebarNavigation>
-            <Suspense>{props.children}</Suspense>
-          </SidebarNavigation>
-        )}
-      >
-        <FileRoutes />
-      </Router>
-    </div>
+    <Router
+      root={(props) => (
+        <SidebarNavigation>
+          <Suspense>{props.children}</Suspense>
+        </SidebarNavigation>
+      )}
+    >
+      <FileRoutes />
+    </Router>
   )
 }
