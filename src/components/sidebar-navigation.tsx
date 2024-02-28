@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router'
 import dayjs from 'dayjs'
 import { Pencil, X } from 'lucide-solid'
-import { Component, For, JSX, Show, Suspense, createResource, createSignal } from 'solid-js'
+import { Component, For, JSX, Show, Suspense, createEffect, createResource, createSignal } from 'solid-js'
 import { cn } from '~/util/cn'
 import { Tag, getCurios, validTags } from '~/util/curio'
 
@@ -54,6 +54,11 @@ const CurioList: Component = () => {
   const unselectTag = (tag: Tag) => {
     setFilteredTags((tags) => tags.filter((item) => item !== tag))
   }
+
+  createEffect(() => {
+    console.log('Curio updates')
+    console.log(curios())
+  })
 
   return (
     <div class='flex flex-col gap-4'>
