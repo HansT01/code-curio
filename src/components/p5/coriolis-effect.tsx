@@ -10,7 +10,7 @@ class Particle {
   constructor(p: p5, radius: number) {
     this.p = p
     this.radius = radius
-    this.position = p.createVector(...this.fromSpherical(radius, p.random(2 * p.PI), p.random(2 * p.PI)))
+    this.position = p.createVector(...this.fromSpherical(radius, p.randomGaussian(0, p.PI / 4), p.random(2 * p.PI)))
     this.velocity = p5.Vector.random3D()
     this.velocity.setMag(0)
   }
