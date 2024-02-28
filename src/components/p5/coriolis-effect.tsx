@@ -10,18 +10,18 @@ class Particle {
   constructor(p: p5, radius: number) {
     this.p = p
     this.radius = radius
-    this.position = p.createVector(...this.fromSpherical(radius, 0, p.PI / 2))
+    this.position = p.createVector(...this.fromSpherical(radius, p.random(2 * p.PI), p.random(2 * p.PI)))
     this.velocity = p5.Vector.random3D()
-    this.velocity.setMag(p.random(3, 6))
+    this.velocity.setMag(0)
   }
 
   update(particles: Particle[]) {
-    this.stabilizeVelocity()
+    this.alignToSurface()
     this.position.add(this.velocity)
     this.position.setMag(this.radius)
   }
 
-  stabilizeVelocity() {
+  alignToSurface() {
     const mag = this.velocity.mag()
     // @ts-ignore
     this.velocity = p5.Vector.cross(this.position, p5.Vector.cross(this.velocity, this.position))
@@ -29,9 +29,10 @@ class Particle {
   }
 
   fromSpherical(radius: number, phi: number, theta: number) {
-    const x = radius * this.p.sin(phi) * this.p.cos(theta)
-    const y = radius * this.p.sin(phi) * this.p.sin(theta)
-    const z = radius * this.p.cos(phi)
+    phi += this.p.PI / 2
+    const x = radius * this.p.sin(phi) * this.p.sin(theta)
+    const y = radius * this.p.cos(phi)
+    const z = radius * this.p.sin(phi) * this.p.cos(theta)
     return [x, y, z] as const
   }
 
@@ -91,7 +92,9 @@ const CoriolisEffectCanvas = () => {
         canvas.parent(ref)
         canvas.style('visibility', 'visible')
 
-        particles.push(new Particle(p, sphereRadius))
+        for (let i = 0; i < 300; i++) {
+          particles.push(new Particle(p, sphereRadius))
+        }
       }
 
       p.draw = () => {
