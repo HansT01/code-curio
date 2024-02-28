@@ -1,4 +1,6 @@
+import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
+import GithubIcon from '~/components/icons/github'
 import { CurioInfo, getCurioID } from '~/util/curio'
 
 export const info: CurioInfo = {
@@ -12,21 +14,24 @@ const FlockingSimulationCanvas = clientOnly(() => import('~/components/p5/flocki
 
 export default function FlockingSimulation() {
   return (
-    <main class='flex flex-col gap-8 p-8'>
-      <h1 class='text-6xl font-thin'>Flocking Simulator</h1>
+    <main class='flex flex-col gap-6 p-8'>
+      <h1 class='text-6xl font-thin'>Flocking Simulation</h1>
+      <div class='flex flex-wrap'>
+        <A
+          target='_blank'
+          href='https://github.com/HansT01/code-curio/blob/main/src/components/p5/flocking-simulation.tsx'
+        >
+          <div class='flex items-center gap-2 rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'>
+            <GithubIcon />
+            View Source Code
+          </div>
+        </A>
+      </div>
       <p class='whitespace-pre-wrap'>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris maximus venenatis magna eget ornare. Integer
-        efficitur odio nunc, vitae mattis diam vehicula vel. Nullam eu elementum tellus, eget mattis quam. Duis euismod
-        leo id elit venenatis placerat sit amet et ligula. Curabitur id dolor sit amet enim placerat semper. Sed risus
-        dui, venenatis a justo in, tristique elementum sem. Interdum et malesuada fames ac ante ipsum primis in
-        faucibus.
-        <br />
-        <br />
-        Nam aliquam euismod enim non tincidunt. Integer faucibus et nibh aliquam rutrum. Nam blandit massa sed velit
-        finibus vulputate. Phasellus fringilla mollis dictum. Pellentesque tristique tellus eu ex tristique, vitae
-        tempus odio vulputate. Aenean gravida elementum diam elementum malesuada. Suspendisse leo dui, aliquet in
-        placerat sollicitudin, ultricies at lectus. Phasellus convallis magna id nulla vulputate, in pulvinar urna
-        imperdiet.
+        A flocking simulation, often referred to as "boids," is a computer-generated model that simulates the flocking
+        behavior of birds or other animals. It involves creating a group of simulated entities (boids) that follow
+        simple rules, such as separation, alignment, and cohesion, to mimic the natural movement patterns observed in
+        flocks or herds.
       </p>
       <FlockingSimulationCanvas />
     </main>
