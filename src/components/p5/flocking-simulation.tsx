@@ -29,6 +29,9 @@ class Boid {
   }
 
   mouse() {
+    if (this.p.mouseX < 0 || this.p.mouseX > this.p.width || this.p.mouseY < 0 || this.p.mouseY > this.p.height) {
+      return
+    }
     const distance = this.p.dist(this.position.x, this.position.y, this.p.mouseX, this.p.mouseY)
     if (distance < this.config().visualRange) {
       this.velocity.add(
