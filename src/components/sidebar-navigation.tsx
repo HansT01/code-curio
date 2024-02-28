@@ -159,7 +159,7 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
         class='fixed left-0 flex h-dvh overflow-y-auto bg-background text-foreground'
       >
         <div class='flex shrink flex-grow flex-col gap-4 px-8 py-6'>
-          <h1 class='text-4xl'>Code Curio</h1>
+          <h1 class='text-4xl font-thin'>Code Curio</h1>
           <CurioList />
         </div>
       </div>
