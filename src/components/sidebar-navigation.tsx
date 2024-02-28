@@ -58,10 +58,13 @@ const CurioList: Component = () => {
   return (
     <div class='flex flex-col gap-4'>
       <div class='flex flex-col gap-4'>
-        <div class='flex items-center gap-4'>
-          <h2 class='text-xl'>Filters</h2>
-          <button class='cursor-pointer p-1' onclick={() => setShowFilters((showFilters) => !showFilters)}>
-            <Pencil class='size-4 ' />
+        <div>
+          <button
+            class='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground'
+            onclick={() => setShowFilters((showFilters) => !showFilters)}
+          >
+            <Pencil size={20} />
+            Filters
           </button>
         </div>
         <Show when={showFitlers()}>
