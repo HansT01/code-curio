@@ -70,6 +70,17 @@ const CoriolisEffectCanvas = () => {
     })
   })
 
+  createEffect(() => {
+    const canvases = document.querySelectorAll<HTMLCanvasElement>('canvas.p5Canvas')
+    canvases.forEach((canvas) => {
+      if (canvas.style.visibility === 'hidden') {
+        canvas.style.display = 'none'
+      } else {
+        canvas.style.display = 'block'
+      }
+    })
+  })
+
   const createSketch = (ref: HTMLDivElement) => {
     const sketch = (p: p5) => {
       const sphereRadius = 200
