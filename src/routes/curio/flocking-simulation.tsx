@@ -1,10 +1,10 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import GithubIcon from '~/components/icons/github'
-import { CurioInfo, getCurioID } from '~/util/curio'
+import { CurioInfo } from '~/util/curio'
 
 export const info: CurioInfo = {
-  id: getCurioID(import.meta.url),
+  id: 'flocking-simulation',
   title: 'Flocking Simulation',
   created: new Date(2024, 2, 27),
   tags: ['ai', 'algorithms', 'animation', 'interactive', 'p5.js', 'simulation'],
