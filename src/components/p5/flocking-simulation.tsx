@@ -157,6 +157,112 @@ const FlockingSimulationCanvas = () => {
         }
       }
 
+      class Quadtree {
+        boundary: Rectangle
+        capacity: number
+        boids: Boid[]
+        divided: boolean
+        northeast: Quadtree | undefined
+        northwest: Quadtree | undefined
+        southeast: Quadtree | undefined
+        southwest: Quadtree | undefined
+
+        constructor(boundary: Rectangle, capacity: number) {
+          this.boundary = boundary
+          this.capacity = capacity
+          this.boids = []
+          this.divided = false
+        }
+
+        subdivide() {
+          const x = this.boundary.x
+          const y = this.boundary.y
+          const w = this.boundary.w / 2
+          const h = this.boundary.h / 2
+          const ne = new Rectangle(x + w, y - h, w, h)
+          const nw = new Rectangle(x - w, y - h, w, h)
+          const se = new Rectangle(x + w, y + h, w, h)
+          const sw = new Rectangle(x - w, y + h, w, h)
+          this.northeast = new Quadtree(ne, this.capacity)
+          this.northwest = new Quadtree(nw, this.capacity)
+          this.southeast = new Quadtree(se, this.capacity)
+          this.southwest = new Quadtree(sw, this.capacity)
+          this.divided = true
+        }
+
+        insert(point: Boid) {
+          if (!this.boundary.contains(point)) {
+            return false
+          }
+          if (this.boids.length < this.capacity) {
+            this.boids.push(point)
+            return true
+          } else {
+            if (!this.divided) {
+              this.subdivide()
+            }
+            if (this.northeast!.insert(point)) return true
+            if (this.northwest!.insert(point)) return true
+            if (this.southeast!.insert(point)) return true
+            if (this.southwest!.insert(point)) return true
+          }
+        }
+
+        query(range: Rectangle, found?: Boid[]) {
+          if (!found) {
+            found = []
+          }
+          if (!this.boundary.intersects(range)) {
+            return found
+          } else {
+            for (let p of this.boids) {
+              if (range.contains(p)) {
+                found.push(p)
+              }
+            }
+            if (this.divided) {
+              this.northwest!.query(range, found)
+              this.northeast!.query(range, found)
+              this.southwest!.query(range, found)
+              this.southeast!.query(range, found)
+            }
+            return found
+          }
+        }
+      }
+
+      class Rectangle {
+        x: number
+        y: number
+        w: number
+        h: number
+
+        constructor(x: number, y: number, w: number, h: number) {
+          this.x = x
+          this.y = y
+          this.w = w
+          this.h = h
+        }
+
+        contains(boid: Boid) {
+          return (
+            boid.position.x >= this.x - this.w &&
+            boid.position.x <= this.x + this.w &&
+            boid.position.y >= this.y - this.h &&
+            boid.position.y <= this.y + this.h
+          )
+        }
+
+        intersects(range: Rectangle) {
+          return !(
+            range.x - range.w > this.x + this.w ||
+            range.x + range.w < this.x - this.w ||
+            range.y - range.h > this.y + this.h ||
+            range.y + range.h < this.y - this.h
+          )
+        }
+      }
+
       let flock: Boid[] = []
 
       p.setup = () => {
@@ -171,8 +277,14 @@ const FlockingSimulationCanvas = () => {
 
       p.draw = () => {
         p.background(51)
+        const quadtree = new Quadtree(new Rectangle(0, 0, p.width, p.height), 4)
         for (let boid of flock) {
-          boid.update(flock)
+          quadtree.insert(boid)
+        }
+        for (let boid of flock) {
+          const range = new Rectangle(boid.position.x, boid.position.y, config().visualRange, config().visualRange)
+          const neighbors = quadtree.query(range)
+          boid.update(neighbors)
           boid.show()
         }
       }
