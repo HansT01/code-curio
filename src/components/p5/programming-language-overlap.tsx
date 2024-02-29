@@ -5,14 +5,16 @@ import { getCoOccurenceMatrix } from '~/util/data'
 class LanguageBubble {
   p: p5
   config: Accessor<typeof defaultConfig>
+  name: string
   index: number
   weights: number[]
   position: p5.Vector
   velocity: p5.Vector
 
-  constructor(p: p5, config: Accessor<typeof defaultConfig>, index: number, weights: number[]) {
+  constructor(p: p5, config: Accessor<typeof defaultConfig>, name: string, index: number, weights: number[]) {
     this.p = p
     this.config = config
+    this.name = name
     this.index = index
     this.weights = weights
     this.position = p.createVector(p.random(p.width), p.random(p.height))
@@ -27,10 +29,15 @@ class LanguageBubble {
         continue
       }
       const offset = p5.Vector.sub(neighbor.position, this.position)
-      offset.setMag(this.weights[neighbor.index])
+      offset.setMag(
+        this.p.max(
+          this.weights[neighbor.index] / this.weights[this.index],
+          neighbor.weights[this.index] / neighbor.weights[neighbor.index],
+        ) ** 2,
+      )
       totalOffset.add(offset)
     }
-    totalOffset.div(this.weights[this.index])
+    // totalOffset.div(this.weights[this.index])
     totalOffset.mult(this.config().attractionFactor)
     this.velocity.add(totalOffset)
   }
@@ -55,9 +62,18 @@ class LanguageBubble {
     this.velocity.mult(0.99)
   }
 
+  center() {
+    const offset = this.p.createVector(this.p.width / 2, this.p.height / 2)
+    offset.sub(this.position)
+    offset.normalize()
+    offset.mult(this.config().radialAccelerationFactor)
+    this.velocity.add(offset)
+  }
+
   update(neighbors: LanguageBubble[]) {
     this.attraction(neighbors)
     this.repulsion(neighbors)
+    this.center()
     this.decelerate()
     this.position.add(this.velocity)
   }
@@ -66,12 +82,16 @@ class LanguageBubble {
     const diameter = this.weights[this.index] ** 0.333 * 2
     this.p.fill(255)
     this.p.ellipse(this.position.x, this.position.y, diameter, diameter)
+    this.p.textSize(8)
+    this.p.fill(0)
+    this.p.text(this.name, this.position.x, this.position.y)
   }
 }
 
 const defaultConfig = {
   attractionFactor: 0.01,
-  repulsionFactor: 2,
+  repulsionFactor: 1,
+  radialAccelerationFactor: 0.01,
 }
 
 const ProgrammingLanguageOverlap = () => {
@@ -125,7 +145,7 @@ const ProgrammingLanguageOverlap = () => {
       onMount(() => {
         getCoOccurenceMatrix().then((matrix) => {
           for (let i = 0; i < matrix.data.length; i++) {
-            bubbles.push(new LanguageBubble(p, config, i, matrix.data[i]))
+            bubbles.push(new LanguageBubble(p, config, matrix.columns[i], i, matrix.data[i]))
           }
         })
       })
