@@ -130,26 +130,27 @@ interface SidebarNavigationProps {
 
 const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
   const [sidebarWidth, setSidebarWidth] = createSignal(500)
-  const [isResizing, setIsResizing] = createSignal(false)
 
-  const handleMouseDown = () => {
-    setIsResizing(true)
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
+  const handleMouseResize = (e: MouseEvent) => {
+    let newWidth: number
+    newWidth = e.clientX
+    setSidebarWidth(newWidth)
+    window.dispatchEvent(new Event('resize'))
+  }
+  const handleTouchResize = (e: TouchEvent) => {
+    let newWidth: number
+    newWidth = e.touches[0].clientX
+    setSidebarWidth(newWidth)
+    window.dispatchEvent(new Event('resize'))
   }
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isResizing()) {
-      const newWidth = e.clientX
-      setSidebarWidth(newWidth)
-      window.dispatchEvent(new Event('resize'))
-    }
+  const handleResizeStart = () => {
+    document.addEventListener('mousemove', handleMouseResize)
+    document.addEventListener('touchmove', handleTouchResize)
   }
-
-  const handleMouseUp = () => {
-    setIsResizing(false)
-    document.removeEventListener('mousemove', handleMouseMove)
-    document.removeEventListener('mouseup', handleMouseUp)
+  const handleResizeEnd = () => {
+    document.removeEventListener('mousemove', handleMouseResize)
+    document.removeEventListener('touchmove', handleTouchResize)
   }
 
   return (
@@ -171,7 +172,10 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
           'width': '9px',
         }}
         class='fixed h-dvh cursor-col-resize select-none bg-secondary text-secondary-fg'
-        onmousedown={handleMouseDown}
+        onMouseDown={handleResizeStart}
+        onTouchStart={handleResizeStart}
+        onMouseUp={handleResizeEnd}
+        onTouchEnd={handleResizeEnd}
       />
       <div
         style={{ 'margin-left': `${sidebarWidth() + 5}px` }}
