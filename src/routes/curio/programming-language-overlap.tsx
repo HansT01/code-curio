@@ -1,5 +1,5 @@
 import { A } from '@solidjs/router'
-import { promises as fs } from 'fs'
+import { clientOnly } from '@solidjs/start'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -10,18 +10,9 @@ export const info: CurioInfo = {
   tags: [],
 }
 
-const jsonThing = async () => {
-  'use server'
-  const path = process.cwd() + '/src/data/languages-co-occurence.json'
-  const file = await fs.readFile(path, 'utf8')
-  const data = JSON.parse(file)
-  return data
-}
+const ProgrammingLanguageOverlapCanvas = clientOnly(() => import('~/components/p5/flocking-simulation'))
 
 export default function ProgrammingLanguageOverlap() {
-  const handleClick = () => {
-    jsonThing().then((data) => console.log(data))
-  }
   return (
     <main class='flex flex-col gap-6 p-8'>
       <h1 class='text-6xl font-thin'>Programming Language Overlap</h1>
@@ -33,12 +24,7 @@ export default function ProgrammingLanguageOverlap() {
           </button>
         </A>
       </div>
-      <button
-        class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-        onClick={handleClick}
-      >
-        Press Me
-      </button>
+      <ProgrammingLanguageOverlapCanvas />
     </main>
   )
 }
