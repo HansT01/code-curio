@@ -17,13 +17,13 @@ module.exports = {
     extend: {
       colors: {
         'background': 'var(--background)',
-        'foreground': 'var(--foreground)',
+        'background-fg': 'var(--background-fg)',
         'accent': 'var(--accent)',
-        'accent-foreground': 'var(--accent-foreground)',
+        'accent-fg': 'var(--accent-fg)',
         'primary': 'var(--primary)',
-        'primary-foreground': 'var(--primary-foreground)',
+        'primary-fg': 'var(--primary-fg)',
         'secondary': 'var(--secondary)',
-        'secondary-foreground': 'var(--secondary-foreground)',
+        'secondary-fg': 'var(--secondary-fg)',
       },
     },
   },

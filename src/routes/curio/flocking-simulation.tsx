@@ -21,7 +21,7 @@ export default function FlockingSimulation() {
           target='_blank'
           href='https://github.com/HansT01/code-curio/blob/main/src/components/p5/flocking-simulation.tsx'
         >
-          <div class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground'>
+          <div class='text-primary-fg hover:text-secondary-fg flex items-center gap-2 rounded-lg bg-primary px-4 py-3 hover:bg-secondary'>
             <GithubIcon />
             View Source Code
           </div>

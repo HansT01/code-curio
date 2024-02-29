@@ -237,13 +237,13 @@ const CoriolisEffectCanvas = () => {
     <div class='flex flex-col items-start gap-8' ref={parentRef}>
       <div class='flex flex-wrap gap-4'>
         <button
-          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground'
+          class='text-primary-fg hover:text-secondary-fg cursor-pointer rounded-lg bg-primary px-4 py-3 hover:bg-secondary'
           onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
         >
           Toggle Trail
         </button>
         <button
-          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground'
+          class='text-primary-fg hover:text-secondary-fg cursor-pointer rounded-lg bg-primary px-4 py-3 hover:bg-secondary'
           onClick={() => setConfig({ ...config(), transparentSphere: !config().transparentSphere })}
         >
           Toggle Transparency

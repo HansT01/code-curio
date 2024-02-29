@@ -7,12 +7,12 @@
 @layer base {
   :root {
     --background: #e8d8c4;
-    --foreground: #561c24;
+    --background-fg: #561c24;
     --accent: #c7b7a3;
-    --accent-foreground: #561c24;
+    --accent-fg: #561c24;
     --primary: #561c24;
-    --primary-foreground: #ffffff;
+    --primary-fg: #ffffff;
     --secondary: #6d2932;
-    --secondary-foreground: #ffffff;
+    --secondary-fg: #ffffff;
   }
 }
