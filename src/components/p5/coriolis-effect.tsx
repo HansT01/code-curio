@@ -192,7 +192,7 @@ const CoriolisEffectCanvas = () => {
         p.fill(154, 208, 194)
         p.sphere(sphereRadius)
         const radius = sphereRadius + 50
-        const quadtree = new Octree<Particle>(new Box(0, 0, 0, radius, radius, radius), 8)
+        const quadtree = new Octree<Particle>(new Box(0, 0, 0, radius, radius, radius), 5)
         for (let particle of particles) {
           quadtree.insert(particle)
         }

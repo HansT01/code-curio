@@ -179,7 +179,7 @@ const FlockingSimulationCanvas = () => {
 
       p.draw = () => {
         p.background(50)
-        const quadtree = new Quadtree<Boid>(new Rectangle(0, 0, p.width, p.height), 4)
+        const quadtree = new Quadtree<Boid>(new Rectangle(0, 0, p.width, p.height), 5)
         for (let boid of flock) {
           quadtree.insert(boid)
         }
