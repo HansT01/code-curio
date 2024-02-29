@@ -237,13 +237,13 @@ const CoriolisEffectCanvas = () => {
     <div class='flex flex-col items-start gap-8' ref={parentRef}>
       <div class='flex flex-wrap gap-4'>
         <button
-          class='cursor-pointer rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'
+          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground'
           onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
         >
           Toggle Trail
         </button>
         <button
-          class='cursor-pointer rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'
+          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground'
           onClick={() => setConfig({ ...config(), transparentSphere: !config().transparentSphere })}
         >
           Toggle Transparency
@@ -261,7 +261,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.separationFactor * 5}
             value={defaultConfig.separationFactor}
             step={defaultConfig.separationFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
             onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -276,7 +276,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.centrifugalFactor * 5}
             value={defaultConfig.centrifugalFactor}
             step={defaultConfig.centrifugalFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
             onChange={(e) => setConfig({ ...config(), centrifugalFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -291,7 +291,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.coriolisFactor * 5}
             value={defaultConfig.coriolisFactor}
             step={defaultConfig.coriolisFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
             onChange={(e) => setConfig({ ...config(), coriolisFactor: parseFloat(e.target.value) })}
           />
         </div>

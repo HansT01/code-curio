@@ -216,7 +216,7 @@ const FlockingSimulationCanvas = () => {
             max={defaultConfig.separationFactor * 5}
             value={defaultConfig.separationFactor}
             step={defaultConfig.separationFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
             onchange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -231,7 +231,7 @@ const FlockingSimulationCanvas = () => {
             max={defaultConfig.alignmentFactor * 5}
             value={defaultConfig.alignmentFactor}
             step={defaultConfig.alignmentFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
             onchange={(e) => setConfig({ ...config(), alignmentFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -246,7 +246,7 @@ const FlockingSimulationCanvas = () => {
             max={defaultConfig.cohesionFactor * 5}
             value={defaultConfig.cohesionFactor}
             step={defaultConfig.cohesionFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
             onchange={(e) => setConfig({ ...config(), cohesionFactor: parseFloat(e.target.value) })}
           />
         </div>

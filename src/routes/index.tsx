@@ -2,6 +2,9 @@ export default function Home() {
   return (
     <main class='flex flex-col gap-8 p-8'>
       <h1 class='text-6xl font-thin'>Welcome to Code Curio!</h1>
+      <div class='flex'>
+        <input type='text' class='border-primary' />
+      </div>
       <p class='whitespace-pre-wrap'>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris maximus venenatis magna eget ornare. Integer
         efficitur odio nunc, vitae mattis diam vehicula vel. Nullam eu elementum tellus, eget mattis quam. Duis euismod

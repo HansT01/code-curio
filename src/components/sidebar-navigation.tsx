@@ -16,10 +16,10 @@ const TagButton: Component<TagButtonProps> = (props) => {
   return (
     <button
       class={cn(
-        'flex items-center gap-1 rounded-lg bg-accent px-3 py-1 text-accent-foreground hover:bg-secondary hover:text-secondary-foreground',
+        'flex items-center gap-1 rounded-lg bg-secondary px-3 py-1 text-secondary-foreground hover:bg-accent hover:text-accent-foreground',
         {
-          'bg-primary': props.highlight,
-          'text-primary-foreground': props.highlight,
+          'bg-background': props.highlight,
+          'text-foreground': props.highlight,
         },
       )}
       onclick={props.onClick}
@@ -60,7 +60,7 @@ const CurioList: Component = () => {
       <div class='flex flex-col gap-4'>
         <div>
           <button
-            class='flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:bg-secondary hover:text-secondary-foreground'
+            class='flex cursor-pointer items-center gap-2 rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'
             onclick={() => setShowFilters((showFilters) => !showFilters)}
           >
             <Pencil size={20} />
@@ -95,7 +95,7 @@ const CurioList: Component = () => {
           {(curio) => (
             <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
               <A href={`/curio/${curio.id}`}>
-                <div class='flex flex-col gap-0 rounded-xl bg-primary px-4 py-2 text-primary-foreground'>
+                <div class='flex flex-col gap-0 rounded-xl bg-background px-4 py-2 text-foreground'>
                   <h3>{curio.title}</h3>
                   <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
                   <Show when={curio.tags.length > 0}>
@@ -156,7 +156,7 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
     <div class='flex'>
       <div
         style={{ width: `${sidebarWidth() - 4}px` }}
-        class='fixed left-0 flex h-dvh overflow-y-auto bg-background text-foreground'
+        class='fixed left-0 flex h-dvh overflow-y-auto bg-primary text-primary-foreground'
       >
         <div class='flex shrink flex-grow flex-col gap-4 px-8 py-6'>
           <h1 class='text-4xl font-thin'>Code Curio</h1>
@@ -168,12 +168,12 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
           'margin-left': `${sidebarWidth() - 4}px`,
           'width': '9px',
         }}
-        class='fixed h-dvh cursor-col-resize select-none bg-accent text-accent-foreground'
+        class='fixed h-dvh cursor-col-resize select-none bg-secondary text-secondary-foreground'
         onmousedown={handleMouseDown}
       />
       <div
         style={{ 'margin-left': `${sidebarWidth() + 5}px` }}
-        class='h-dvh flex-grow overflow-y-auto bg-primary text-primary-foreground'
+        class='h-dvh flex-grow overflow-y-auto bg-background text-foreground'
       >
         {props.children}
       </div>

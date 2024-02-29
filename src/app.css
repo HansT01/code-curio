@@ -6,13 +6,13 @@
 
 @layer base {
   :root {
-    --background: #561c24;
-    --foreground: #ffffff;
-    --accent: #6d2932;
-    --accent-foreground: var(--foreground);
-    --primary: #e8d8c4;
-    --primary-foreground: #561c24;
-    --secondary: #c7b7a3;
-    --secondary-foreground: #561c24;
+    --background: #e8d8c4;
+    --foreground: #561c24;
+    --accent: #c7b7a3;
+    --accent-foreground: #561c24;
+    --primary: #561c24;
+    --primary-foreground: #ffffff;
+    --secondary: #6d2932;
+    --secondary-foreground: #ffffff;
   }
 }
