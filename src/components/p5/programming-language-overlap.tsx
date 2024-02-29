@@ -101,6 +101,8 @@ class LanguageBubble {
 
   show() {
     this.p.push()
+    this.p.stroke(0)
+    this.p.strokeWeight(1)
     this.p.fill(255)
     this.p.ellipse(this.position.x, this.position.y, this.radius * 2, this.radius * 2)
     this.p.pop()
@@ -116,9 +118,20 @@ class LanguageBubble {
   }
 
   showEdges(neighbors: LanguageBubble[]) {
-    this.p.stroke(0)
     for (let neighbor of neighbors) {
+      if (neighbor === this) {
+        continue
+      }
+      const weight =
+        this.p.max(
+          this.weights[neighbor.index] / this.weights[this.index],
+          neighbor.weights[this.index] / neighbor.weights[neighbor.index],
+        ) ** 2
+      this.p.push()
+      this.p.stroke(255, weight * 255)
+      this.p.strokeWeight(5)
       this.p.line(this.position.x, this.position.y, neighbor.position.x, neighbor.position.y)
+      this.p.push()
     }
   }
 }
