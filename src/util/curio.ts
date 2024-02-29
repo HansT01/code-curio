@@ -9,6 +9,7 @@ export const validTags = [
   'animation',
   'ai',
   'machine-learning',
+  'physics',
 ] as const
 export type Tag = (typeof validTags)[number]
 
