@@ -1,3 +1,4 @@
+import { Minus, Plus } from 'lucide-solid'
 import p5, { Camera } from 'p5'
 import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
@@ -143,6 +144,8 @@ const defaultConfig = {
 const CoriolisEffectCanvas = () => {
   const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
   const [config, setConfig] = createSignal(defaultConfig)
+  const [countIndex, setCountIndex] = createSignal(3)
+  const count = [1, 5, 20, 50, 100, 200]
 
   let parentRef: HTMLDivElement | undefined = undefined
 
@@ -223,6 +226,10 @@ const CoriolisEffectCanvas = () => {
       }
 
       createEffect(() => {
+        resetParticles(count[countIndex()])
+      })
+
+      createEffect(() => {
         p.resizeCanvas(dimensions().width, dimensions().height)
       })
 
@@ -235,6 +242,30 @@ const CoriolisEffectCanvas = () => {
 
   return (
     <div class='flex flex-col items-start gap-8' ref={parentRef}>
+      <div class='flex flex-col items-start'>
+        <label for='particle-count' class='mb-2'>
+          Particle Count
+        </label>
+        <div class='flex' id='particle-count'>
+          <button
+            class='hover:text-secondary-fg text-primary-fg h-full divide-secondary rounded-l-lg  bg-primary px-2 py-3 hover:bg-secondary'
+            onClick={() => {
+              setCountIndex((index) => (index > 0 ? index - 1 : index))
+            }}
+          >
+            <Minus />
+          </button>
+          <div class='text-secondary-fg h-full w-16 bg-secondary py-3 text-center'>{count[countIndex()]}</div>
+          <button
+            class='hover:text-secondary-fg text-primary-fg h-full divide-secondary rounded-r-lg  bg-primary px-2 py-3 hover:bg-secondary'
+            onClick={() => {
+              setCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
+            }}
+          >
+            <Plus />
+          </button>
+        </div>
+      </div>
       <div class='flex flex-wrap gap-4'>
         <button
           class='text-primary-fg hover:text-secondary-fg cursor-pointer rounded-lg bg-primary px-4 py-3 hover:bg-secondary'
