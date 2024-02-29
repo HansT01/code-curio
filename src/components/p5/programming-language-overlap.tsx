@@ -127,8 +127,11 @@ class LanguageBubble {
           this.weights[neighbor.index] / this.weights[this.index],
           neighbor.weights[this.index] / neighbor.weights[neighbor.index],
         ) ** 2
+      const threshold = 0.2
+      const normalizedWeight = (weight - threshold) / (1 - threshold)
+
       this.p.push()
-      this.p.stroke(255, weight * 255)
+      this.p.stroke(255, normalizedWeight * 255)
       this.p.strokeWeight(5)
       this.p.line(this.position.x, this.position.y, neighbor.position.x, neighbor.position.y)
       this.p.push()
