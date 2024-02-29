@@ -10,7 +10,7 @@ export const info: CurioInfo = {
   tags: [],
 }
 
-const ProgrammingLanguageOverlapCanvas = clientOnly(() => import('~/components/p5/flocking-simulation'))
+const ProgrammingLanguageOverlapCanvas = clientOnly(() => import('~/components/p5/programming-language-overlap'))
 
 export default function ProgrammingLanguageOverlap() {
   return (

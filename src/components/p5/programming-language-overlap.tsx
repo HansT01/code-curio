@@ -1,7 +1,78 @@
 import p5 from 'p5'
-import { createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { getCoOccurenceMatrix } from '~/util/data'
 
-const defaultConfig = {}
+class LanguageBubble {
+  p: p5
+  config: Accessor<typeof defaultConfig>
+  index: number
+  weights: number[]
+  position: p5.Vector
+  velocity: p5.Vector
+
+  constructor(p: p5, config: Accessor<typeof defaultConfig>, index: number, weights: number[]) {
+    this.p = p
+    this.config = config
+    this.index = index
+    this.weights = weights
+    this.position = p.createVector(p.random(p.width), p.random(p.height))
+    this.velocity = p5.Vector.random2D()
+    this.velocity.setMag(0)
+  }
+
+  attraction(neighbors: LanguageBubble[]) {
+    const totalOffset = this.p.createVector(0, 0)
+    for (let neighbor of neighbors) {
+      if (neighbor === this) {
+        continue
+      }
+      const offset = p5.Vector.sub(neighbor.position, this.position)
+      offset.setMag(this.weights[neighbor.index])
+      totalOffset.add(offset)
+    }
+    totalOffset.div(this.weights[this.index])
+    totalOffset.mult(this.config().attractionFactor)
+    this.velocity.add(totalOffset)
+  }
+
+  repulsion(neighbors: LanguageBubble[]) {
+    const totalOffset = this.p.createVector(0, 0)
+    for (let neighbor of neighbors) {
+      if (neighbor === this) {
+        continue
+      }
+      const offset = p5.Vector.sub(this.position, neighbor.position)
+      offset.div(offset.magSq())
+      offset.mult(this.weights[neighbor.index])
+      totalOffset.add(offset)
+    }
+    totalOffset.div(this.weights[this.index])
+    totalOffset.mult(this.config().repulsionFactor)
+    this.velocity.add(totalOffset)
+  }
+
+  decelerate() {
+    this.velocity.mult(0.99)
+  }
+
+  update(neighbors: LanguageBubble[]) {
+    this.attraction(neighbors)
+    this.repulsion(neighbors)
+    this.decelerate()
+    this.position.add(this.velocity)
+  }
+
+  show() {
+    const diameter = this.weights[this.index] ** 0.333 * 2
+    this.p.fill(255)
+    this.p.ellipse(this.position.x, this.position.y, diameter, diameter)
+  }
+}
+
+const defaultConfig = {
+  attractionFactor: 0.01,
+  repulsionFactor: 2,
+}
 
 const ProgrammingLanguageOverlap = () => {
   const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
@@ -35,6 +106,8 @@ const ProgrammingLanguageOverlap = () => {
 
   const createSketch = (ref: HTMLDivElement) => {
     const sketch = (p: p5) => {
+      const bubbles: LanguageBubble[] = []
+
       p.setup = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height)
         canvas.parent(ref)
@@ -43,7 +116,19 @@ const ProgrammingLanguageOverlap = () => {
 
       p.draw = () => {
         p.background(50)
+        for (let bubble of bubbles) {
+          bubble.update(bubbles)
+          bubble.show()
+        }
       }
+
+      onMount(() => {
+        getCoOccurenceMatrix().then((matrix) => {
+          for (let i = 0; i < matrix.data.length; i++) {
+            bubbles.push(new LanguageBubble(p, config, i, matrix.data[i]))
+          }
+        })
+      })
 
       createEffect(() => {
         p.resizeCanvas(dimensions().width, dimensions().height)
