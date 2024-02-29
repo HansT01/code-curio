@@ -1,5 +1,6 @@
 import p5 from 'p5'
 import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Camera2D } from '~/util/camera'
 import { getCoOccurenceMatrix } from '~/util/data'
 
 class LanguageBubble {
@@ -37,7 +38,6 @@ class LanguageBubble {
       )
       totalOffset.add(offset)
     }
-    // totalOffset.div(this.weights[this.index])
     totalOffset.mult(this.config().attractionFactor)
     this.velocity.add(totalOffset)
   }
@@ -83,6 +83,7 @@ class LanguageBubble {
     this.p.fill(255)
     this.p.ellipse(this.position.x, this.position.y, diameter, diameter)
     this.p.textSize(8)
+    this.p.textAlign(this.p.CENTER, this.p.CENTER)
     this.p.fill(0)
     this.p.text(this.name, this.position.x, this.position.y)
   }
@@ -127,6 +128,12 @@ const ProgrammingLanguageOverlap = () => {
   const createSketch = (ref: HTMLDivElement) => {
     const sketch = (p: p5) => {
       const bubbles: LanguageBubble[] = []
+      const camera = new Camera2D(p, true)
+
+      p.mousePressed = () => camera.mousePressed()
+      p.mouseDragged = () => camera.mouseDragged()
+      p.mouseReleased = () => camera.mouseReleased()
+      p.mouseWheel = (e: WheelEvent) => camera.mouseWheel(e)
 
       p.setup = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height)
@@ -136,6 +143,8 @@ const ProgrammingLanguageOverlap = () => {
 
       p.draw = () => {
         p.background(50)
+        p.translate(camera.x, camera.y)
+        p.scale(camera.zoom)
         for (let bubble of bubbles) {
           bubble.update(bubbles)
           bubble.show()
@@ -147,6 +156,16 @@ const ProgrammingLanguageOverlap = () => {
           for (let i = 0; i < matrix.data.length; i++) {
             bubbles.push(new LanguageBubble(p, config, matrix.columns[i], i, matrix.data[i]))
           }
+        })
+      })
+
+      onMount(() => {
+        const preventContextMenu = (e: MouseEvent) => {
+          e.preventDefault()
+        }
+        ref.addEventListener('contextmenu', preventContextMenu)
+        onCleanup(() => {
+          ref.removeEventListener('contextmenu', preventContextMenu)
         })
       })
 
