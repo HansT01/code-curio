@@ -12,7 +12,7 @@ export const info: CurioInfo = {
 
 const jsonThing = async () => {
   'use server'
-  const path = process.cwd() + '/src/data/lang-co-occurence.json'
+  const path = process.cwd() + '/src/data/languages-co-occurence.json'
   const file = await fs.readFile(path, 'utf8')
   const data = JSON.parse(file)
   return data
