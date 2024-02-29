@@ -21,6 +21,12 @@ export class Camera2D {
     this.preventLeftPan = preventLeftPan
   }
 
+  mouseInWorld() {
+    const x = (this.p.mouseX - this.x) / this.zoom
+    const y = (this.p.mouseY - this.y) / this.zoom
+    return [x, y] as const
+  }
+
   mousePressed() {
     if (this.p.mouseX < 0 || this.p.mouseX > this.p.width || this.p.mouseY < 0 || this.p.mouseY > this.p.height) {
       return

@@ -9,8 +9,10 @@ class LanguageBubble {
   name: string
   index: number
   weights: number[]
+  radius: number
   position: p5.Vector
   velocity: p5.Vector
+  isDragging: boolean
 
   constructor(p: p5, config: Accessor<typeof defaultConfig>, name: string, index: number, weights: number[]) {
     this.p = p
@@ -18,9 +20,16 @@ class LanguageBubble {
     this.name = name
     this.index = index
     this.weights = weights
+    this.radius = weights[index] ** 0.333
     this.position = p.createVector(p.random(p.width), p.random(p.height))
     this.velocity = p5.Vector.random2D()
     this.velocity.setMag(0)
+    this.isDragging = false
+  }
+
+  contains(x: number, y: number) {
+    const distance = this.p.dist(x, y, this.position.x, this.position.y)
+    return distance < this.radius
   }
 
   attraction(neighbors: LanguageBubble[]) {
@@ -58,16 +67,28 @@ class LanguageBubble {
     this.velocity.add(totalOffset)
   }
 
-  decelerate() {
-    this.velocity.mult(0.99)
-  }
-
   center() {
     const offset = this.p.createVector(this.p.width / 2, this.p.height / 2)
     offset.sub(this.position)
     offset.normalize()
     offset.mult(this.config().radialAccelerationFactor)
     this.velocity.add(offset)
+  }
+
+  decelerate() {
+    this.velocity.mult(0.99)
+  }
+
+  drag(x: number, y: number) {
+    if (!this.isDragging) {
+      return
+    }
+    if (this.p.mouseIsPressed && this.p.mouseButton === this.p.LEFT) {
+      this.velocity.setMag(0)
+      this.position.set(x, y)
+    } else {
+      this.isDragging = false
+    }
   }
 
   update(neighbors: LanguageBubble[]) {
@@ -79,9 +100,8 @@ class LanguageBubble {
   }
 
   show() {
-    const diameter = this.weights[this.index] ** 0.333 * 2
     this.p.fill(255)
-    this.p.ellipse(this.position.x, this.position.y, diameter, diameter)
+    this.p.ellipse(this.position.x, this.position.y, this.radius * 2, this.radius * 2)
     this.p.textSize(8)
     this.p.textAlign(this.p.CENTER, this.p.CENTER)
     this.p.fill(0)
@@ -130,7 +150,22 @@ const ProgrammingLanguageOverlap = () => {
       const bubbles: LanguageBubble[] = []
       const camera = new Camera2D(p, true)
 
-      p.mousePressed = () => camera.mousePressed()
+      p.mousePressed = () => {
+        camera.mousePressed()
+        const [x, y] = camera.mouseInWorld()
+        let closest = null
+        let closestDistance = null
+        for (let bubble of bubbles) {
+          let distance = p.dist(x, y, bubble.position.x, bubble.position.y)
+          if (closestDistance === null || distance < bubble.radius) {
+            closest = bubble
+            closestDistance = distance
+          }
+        }
+        if (closest !== null) {
+          closest.isDragging = true
+        }
+      }
       p.mouseDragged = () => camera.mouseDragged()
       p.mouseReleased = () => camera.mouseReleased()
       p.mouseWheel = (e: WheelEvent) => camera.mouseWheel(e)
@@ -146,7 +181,11 @@ const ProgrammingLanguageOverlap = () => {
         p.translate(camera.x, camera.y)
         p.scale(camera.zoom)
         for (let bubble of bubbles) {
-          bubble.update(bubbles)
+          if (bubble.isDragging) {
+            bubble.drag(...camera.mouseInWorld())
+          } else {
+            bubble.update(bubbles)
+          }
           bubble.show()
         }
       }
