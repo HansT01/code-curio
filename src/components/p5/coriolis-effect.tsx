@@ -1,5 +1,6 @@
 import p5 from 'p5'
 import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
 
 class Particle {
@@ -8,6 +9,8 @@ class Particle {
   radius: number
   position: p5.Vector
   velocity: p5.Vector
+  history: CircularQueue<p5.Vector>
+  count: number
 
   constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number) {
     this.p = p
@@ -16,6 +19,8 @@ class Particle {
     this.position = p.createVector(...this.fromSpherical(radius, p.randomGaussian(0, p.PI / 4), p.random(2 * p.PI)))
     this.velocity = p5.Vector.random3D()
     this.velocity.setMag(0)
+    this.history = new CircularQueue(10)
+    this.count = 0
   }
 
   separation(particles: Particle[]) {
@@ -56,16 +61,14 @@ class Particle {
     this.velocity.add(acceleration)
   }
 
-  update(particles: Particle[]) {
-    this.separation(particles)
-    this.centrifuge()
-    this.coriolis()
-    this.alignToSurface()
-    if (this.velocity.mag() > this.config().maxVelocity) {
-      this.velocity.setMag(this.config().maxVelocity)
+  trackHistory() {
+    if (this.count % 10 === 0) {
+      if (this.history.isFull()) {
+        this.history.dequeue()
+      }
+      this.history.enqueue(this.position.copy())
     }
-    this.position.add(this.velocity)
-    this.position.setMag(this.radius)
+    this.count++
   }
 
   alignToSurface() {
@@ -92,21 +95,47 @@ class Particle {
     return [radius, phi, theta] as const
   }
 
+  update(particles: Particle[]) {
+    this.trackHistory()
+    this.separation(particles)
+    this.centrifuge()
+    this.coriolis()
+    this.alignToSurface()
+    if (this.velocity.mag() > this.config().maxVelocity) {
+      this.velocity.setMag(this.config().maxVelocity)
+    }
+    this.position.add(this.velocity)
+    this.position.setMag(this.radius)
+  }
+
   show() {
-    this.p.push()
-    this.p.translate(this.position.x, this.position.y, this.position.z)
-    this.p.noStroke()
-    this.p.fill(255)
-    this.p.sphere(5)
-    this.p.pop()
+    if (this.config().trailMode) {
+      let prev = this.position
+      let index = 0
+      for (let position of this.history.reverseIter()) {
+        this.p.strokeWeight(4)
+        this.p.stroke(255, (255 * (this.history.capacity - index)) / this.history.capacity)
+        this.p.line(prev.x, prev.y, prev.z, position.x, position.y, position.z)
+        prev = position
+        index++
+      }
+    } else {
+      this.p.push()
+      this.p.translate(this.position.x, this.position.y, this.position.z)
+      this.p.noStroke()
+      this.p.fill(255)
+      this.p.sphere(5)
+      this.p.pop()
+    }
   }
 }
 
 const defaultConfig = {
+  trailMode: true,
   maxVelocity: 3,
   separationFactor: 20,
   centrifugalFactor: 1,
-  coriolisFactor: 200,
+  coriolisFactor: 100,
 }
 
 const CoriolisEffectCanvas = () => {
@@ -149,7 +178,8 @@ const CoriolisEffectCanvas = () => {
         canvas.parent(ref)
         canvas.style('visibility', 'visible')
 
-        for (let i = 0; i < 500; i++) {
+        // particles.push(new Particle(p, config, sphereRadius))
+        for (let i = 0; i < 50; i++) {
           particles.push(new Particle(p, config, sphereRadius))
         }
       }
@@ -157,6 +187,7 @@ const CoriolisEffectCanvas = () => {
       p.draw = () => {
         p.background(50)
         p.orbitControl()
+        p.strokeWeight(1)
         p.stroke(241, 250, 218)
         p.fill(154, 208, 194)
         p.sphere(sphereRadius)
@@ -192,7 +223,13 @@ const CoriolisEffectCanvas = () => {
   }
 
   return (
-    <div class='flex flex-col gap-8' ref={parentRef}>
+    <div class='flex flex-col items-start gap-8' ref={parentRef}>
+      <button
+        class='cursor-pointer rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'
+        onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
+      >
+        Toggle Trail
+      </button>
       <div class='flex flex-wrap gap-4'>
         <div class='flex flex-col items-start'>
           <label for='separation-factor' class='mb-2'>
@@ -206,7 +243,7 @@ const CoriolisEffectCanvas = () => {
             value={defaultConfig.separationFactor}
             step={defaultConfig.separationFactor / 20}
             class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
-            onchange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
+            onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
           />
         </div>
         <div class='flex flex-col items-start'>
@@ -221,7 +258,7 @@ const CoriolisEffectCanvas = () => {
             value={defaultConfig.centrifugalFactor}
             step={defaultConfig.centrifugalFactor / 20}
             class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
-            onchange={(e) => setConfig({ ...config(), centrifugalFactor: parseFloat(e.target.value) })}
+            onChange={(e) => setConfig({ ...config(), centrifugalFactor: parseFloat(e.target.value) })}
           />
         </div>
         <div class='flex flex-col items-start'>
@@ -236,7 +273,7 @@ const CoriolisEffectCanvas = () => {
             value={defaultConfig.coriolisFactor}
             step={defaultConfig.coriolisFactor / 20}
             class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-background'
-            onchange={(e) => setConfig({ ...config(), coriolisFactor: parseFloat(e.target.value) })}
+            onChange={(e) => setConfig({ ...config(), coriolisFactor: parseFloat(e.target.value) })}
           />
         </div>
       </div>
