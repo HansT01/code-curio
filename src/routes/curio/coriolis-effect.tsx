@@ -6,7 +6,7 @@ import { CurioInfo } from '~/util/curio'
 export const info: CurioInfo = {
   id: 'coriolis-effect',
   title: 'Coriolis Effect',
-  created: new Date(2024, 2, 27),
+  created: new Date(2024, 2, 28),
   tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics', 'simulation'],
 }
 
