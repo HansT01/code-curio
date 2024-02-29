@@ -293,7 +293,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.separationFactor * 5}
             value={defaultConfig.separationFactor}
             step={defaultConfig.separationFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
+            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
             onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -308,7 +308,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.centrifugalFactor * 5}
             value={defaultConfig.centrifugalFactor}
             step={defaultConfig.centrifugalFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
+            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
             onChange={(e) => setConfig({ ...config(), centrifugalFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -323,7 +323,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.coriolisFactor * 5}
             value={defaultConfig.coriolisFactor}
             step={defaultConfig.coriolisFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
+            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
             onChange={(e) => setConfig({ ...config(), coriolisFactor: parseFloat(e.target.value) })}
           />
         </div>
