@@ -1,4 +1,4 @@
-import p5 from 'p5'
+import p5, { Camera } from 'p5'
 import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
@@ -31,7 +31,7 @@ class Particle {
         continue
       }
       const distance = this.position.dist(particle.position)
-      if (distance < 20 && distance > 0) {
+      if (distance < this.config().separationRange && distance > 0) {
         const offset = p5.Vector.sub(this.position, particle.position)
         offset.normalize()
         offset.div(distance)
@@ -132,7 +132,9 @@ class Particle {
 
 const defaultConfig = {
   trailMode: true,
+  transparentSphere: false,
   maxVelocity: 3,
+  separationRange: 40,
   separationFactor: 20,
   centrifugalFactor: 1,
   coriolisFactor: 100,
@@ -172,25 +174,27 @@ const CoriolisEffectCanvas = () => {
     const sketch = (p: p5) => {
       const sphereRadius = 200
       const particles: Particle[] = []
+      let camera: Camera
 
       p.setup = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height, p.WEBGL)
         canvas.parent(ref)
         canvas.style('visibility', 'visible')
-
-        // particles.push(new Particle(p, config, sphereRadius))
-        for (let i = 0; i < 50; i++) {
-          particles.push(new Particle(p, config, sphereRadius))
-        }
+        resetParticles(50)
       }
 
       p.draw = () => {
         p.background(50)
         p.orbitControl()
         p.strokeWeight(1)
-        p.stroke(241, 250, 218)
-        p.fill(154, 208, 194)
+        p.stroke(45, 149, 150)
+        if (config().transparentSphere) {
+          p.noFill()
+        } else {
+          p.fill(154, 208, 194)
+        }
         p.sphere(sphereRadius)
+
         const radius = sphereRadius + 50
         const quadtree = new Octree<Particle>(new Box(0, 0, 0, radius, radius, radius), 5)
         for (let particle of particles) {
@@ -211,6 +215,13 @@ const CoriolisEffectCanvas = () => {
         }
       }
 
+      const resetParticles = (numParticles: number) => {
+        particles.length = 0
+        for (let i = 0; i < numParticles; i++) {
+          particles.push(new Particle(p, config, sphereRadius))
+        }
+      }
+
       createEffect(() => {
         p.resizeCanvas(dimensions().width, dimensions().height)
       })
@@ -224,12 +235,20 @@ const CoriolisEffectCanvas = () => {
 
   return (
     <div class='flex flex-col items-start gap-8' ref={parentRef}>
-      <button
-        class='cursor-pointer rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'
-        onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
-      >
-        Toggle Trail
-      </button>
+      <div class='flex flex-wrap gap-4'>
+        <button
+          class='cursor-pointer rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'
+          onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
+        >
+          Toggle Trail
+        </button>
+        <button
+          class='cursor-pointer rounded-lg bg-background px-4 py-3 text-foreground hover:bg-accent hover:text-accent-foreground'
+          onClick={() => setConfig({ ...config(), transparentSphere: !config().transparentSphere })}
+        >
+          Toggle Transparency
+        </button>
+      </div>
       <div class='flex flex-wrap gap-4'>
         <div class='flex flex-col items-start'>
           <label for='separation-factor' class='mb-2'>
