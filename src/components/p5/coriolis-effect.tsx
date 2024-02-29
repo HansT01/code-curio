@@ -1,5 +1,5 @@
 import { Minus, Plus } from 'lucide-solid'
-import p5, { Camera } from 'p5'
+import p5 from 'p5'
 import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
@@ -177,7 +177,6 @@ const CoriolisEffectCanvas = () => {
     const sketch = (p: p5) => {
       const sphereRadius = 200
       const particles: Particle[] = []
-      let camera: Camera
 
       p.setup = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height, p.WEBGL)
@@ -188,7 +187,9 @@ const CoriolisEffectCanvas = () => {
 
       p.draw = () => {
         p.background(50)
-        p.orbitControl()
+        if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
+          p.orbitControl()
+        }
         p.strokeWeight(1)
         p.stroke(45, 149, 150)
         if (config().transparentSphere) {
@@ -248,16 +249,16 @@ const CoriolisEffectCanvas = () => {
         </label>
         <div class='flex' id='particle-count'>
           <button
-            class='hover:text-secondary-fg text-primary-fg h-full divide-secondary rounded-l-lg  bg-primary px-2 py-3 hover:bg-secondary'
+            class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
             onClick={() => {
               setCountIndex((index) => (index > 0 ? index - 1 : index))
             }}
           >
             <Minus />
           </button>
-          <div class='text-secondary-fg h-full w-16 bg-secondary py-3 text-center'>{count[countIndex()]}</div>
+          <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{count[countIndex()]}</div>
           <button
-            class='hover:text-secondary-fg text-primary-fg h-full divide-secondary rounded-r-lg  bg-primary px-2 py-3 hover:bg-secondary'
+            class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
             onClick={() => {
               setCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
             }}
@@ -268,13 +269,13 @@ const CoriolisEffectCanvas = () => {
       </div>
       <div class='flex flex-wrap gap-4'>
         <button
-          class='text-primary-fg hover:text-secondary-fg cursor-pointer rounded-lg bg-primary px-4 py-3 hover:bg-secondary'
+          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
           onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
         >
           Toggle Trail
         </button>
         <button
-          class='text-primary-fg hover:text-secondary-fg cursor-pointer rounded-lg bg-primary px-4 py-3 hover:bg-secondary'
+          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
           onClick={() => setConfig({ ...config(), transparentSphere: !config().transparentSphere })}
         >
           Toggle Transparency
@@ -292,7 +293,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.separationFactor * 5}
             value={defaultConfig.separationFactor}
             step={defaultConfig.separationFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
             onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -307,7 +308,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.centrifugalFactor * 5}
             value={defaultConfig.centrifugalFactor}
             step={defaultConfig.centrifugalFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
             onChange={(e) => setConfig({ ...config(), centrifugalFactor: parseFloat(e.target.value) })}
           />
         </div>
@@ -322,7 +323,7 @@ const CoriolisEffectCanvas = () => {
             max={defaultConfig.coriolisFactor * 5}
             value={defaultConfig.coriolisFactor}
             step={defaultConfig.coriolisFactor / 20}
-            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary'
+            class='h-2 w-full cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
             onChange={(e) => setConfig({ ...config(), coriolisFactor: parseFloat(e.target.value) })}
           />
         </div>
