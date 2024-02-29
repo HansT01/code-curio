@@ -10,13 +10,13 @@ const Footer: Component = (props) => {
       </div>
       <div class='flex flex-col items-start justify-center px-8'>
         <h2 class='text-2xl font-extralight'>Contact</h2>
-        <A href='/'>
+        <A target='_blank' href='https://www.linkedin.com/in/hans-teh-628b4a227'>
           <small class='font-extralight'>LinkedIn</small>
         </A>
-        <A href='/'>
+        <A target='_blank' href='https://github.com/HansT01'>
           <small class='font-extralight'>GitHub</small>
         </A>
-        <A href='/'>
+        <A target='_blank' href='https://discord.com/users/197132595727826944'>
           <small class='font-extralight'>Discord</small>
         </A>
       </div>
