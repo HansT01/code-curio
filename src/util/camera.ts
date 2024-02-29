@@ -64,9 +64,10 @@ export class Camera2D {
       return
     }
     e.preventDefault()
+
     const direction = e.deltaY > 0 ? -1 : 1
     const factor = 0.1
-    const zoom = 1 * direction * factor
+    const zoom = this.p.constrain(this.zoom + direction * factor, 0.1, 10.0) - this.zoom
 
     const wx = (this.p.mouseX - this.x) / this.zoom
     const wy = (this.p.mouseY - this.y) / this.zoom
