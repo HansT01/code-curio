@@ -21,13 +21,13 @@ export default function FlockingSimulation() {
           target='_blank'
           href='https://github.com/HansT01/code-curio/blob/main/src/components/p5/flocking-simulation.tsx'
         >
-          <div class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
+          <button class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
             <GithubIcon />
             View Source Code
-          </div>
+          </button>
         </A>
       </div>
-      <p class='whitespace-pre-wrap'>
+      <p>
         A flocking simulation, often referred to as "boids," is a computer-generated model that simulates the flocking
         behavior of birds or other animals. It involves creating a group of simulated entities (boids) that follow
         simple rules, such as separation, alignment, and cohesion, to mimic the natural movement patterns observed in

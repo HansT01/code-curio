@@ -18,13 +18,13 @@ export default function CoriolisEffect() {
       <h1 class='text-6xl font-thin'>Coriolis Effect</h1>
       <div class='flex flex-wrap'>
         <A target='_blank' href='https://github.com/HansT01/code-curio/blob/main/src/components/p5/coriolis-effect.tsx'>
-          <div class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
+          <button class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
             <GithubIcon />
             View Source Code
-          </div>
+          </button>
         </A>
       </div>
-      <p class=''>
+      <p>
         The Coriolis effect is a phenomenon that occurs due to the rotation of the Earth. It causes moving objects, such
         as air masses or ocean currents, to be deflected to the right in the Northern Hemisphere and to the left in the
         Southern Hemisphere. This deflection is a result of the Earth's rotation and the conservation of angular
