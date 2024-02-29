@@ -100,12 +100,26 @@ class LanguageBubble {
   }
 
   show() {
+    this.p.push()
     this.p.fill(255)
     this.p.ellipse(this.position.x, this.position.y, this.radius * 2, this.radius * 2)
+    this.p.pop()
+
+    this.p.push()
+    this.p.stroke(255)
+    this.p.strokeWeight(1)
     this.p.textSize(8)
     this.p.textAlign(this.p.CENTER, this.p.CENTER)
     this.p.fill(0)
     this.p.text(this.name, this.position.x, this.position.y)
+    this.p.pop()
+  }
+
+  showEdges(neighbors: LanguageBubble[]) {
+    this.p.stroke(0)
+    for (let neighbor of neighbors) {
+      this.p.line(this.position.x, this.position.y, neighbor.position.x, neighbor.position.y)
+    }
   }
 }
 
@@ -154,10 +168,10 @@ const ProgrammingLanguageOverlap = () => {
         camera.mousePressed()
         const [x, y] = camera.mouseInWorld()
         let closest = null
-        let closestDistance = null
+        let closestDistance = Number.MAX_VALUE
         for (let bubble of bubbles) {
           let distance = p.dist(x, y, bubble.position.x, bubble.position.y)
-          if (closestDistance === null || distance < bubble.radius) {
+          if (distance < bubble.radius && distance < closestDistance) {
             closest = bubble
             closestDistance = distance
           }
@@ -180,12 +194,18 @@ const ProgrammingLanguageOverlap = () => {
         p.background(50)
         p.translate(camera.x, camera.y)
         p.scale(camera.zoom)
+        let dragging: LanguageBubble[] = []
         for (let bubble of bubbles) {
           if (bubble.isDragging) {
             bubble.drag(...camera.mouseInWorld())
+            dragging.push(bubble)
           } else {
             bubble.update(bubbles)
+            bubble.show()
           }
+        }
+        for (let bubble of dragging) {
+          bubble.showEdges(bubbles)
           bubble.show()
         }
       }
