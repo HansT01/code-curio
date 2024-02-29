@@ -184,6 +184,9 @@ const ProgrammingLanguageOverlap = () => {
       p.mousePressed = () => {
         camera.mousePressed()
         const [x, y] = camera.mouseInWorld()
+        if (p.mouseButton !== p.LEFT) {
+          return
+        }
         let closest = null
         let closestDistance = Number.MAX_VALUE
         for (let bubble of bubbles) {
@@ -258,38 +261,6 @@ const ProgrammingLanguageOverlap = () => {
 
   return (
     <div class='flex flex-col items-start gap-8' ref={parentRef}>
-      <div class='flex flex-wrap gap-4'>
-        <div class='flex flex-col items-start'>
-          <label for='repulsion-factor' class='mb-2'>
-            Repulsion Factor
-          </label>
-          <input
-            id='repulsion-factor'
-            type='range'
-            min={0}
-            max={defaultConfig.repulsionFactor * 5}
-            value={defaultConfig.repulsionFactor}
-            step={defaultConfig.repulsionFactor / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), repulsionFactor: parseFloat(e.target.value) })}
-          />
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='weight-exponent' class='mb-2'>
-            Weight Exponent
-          </label>
-          <input
-            id='weight-exponent'
-            type='range'
-            min={0}
-            max={defaultConfig.weightExponent * 5}
-            value={defaultConfig.weightExponent}
-            step={defaultConfig.weightExponent / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), weightExponent: parseFloat(e.target.value) })}
-          />
-        </div>
-      </div>
       <div class='[&>canvas]:rounded-2xl' ref={createSketch} />
     </div>
   )
