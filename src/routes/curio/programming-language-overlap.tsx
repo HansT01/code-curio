@@ -24,6 +24,13 @@ export default function ProgrammingLanguageOverlap() {
           </button>
         </A>
       </div>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris maximus venenatis magna eget ornare. Integer
+        efficitur odio nunc, vitae mattis diam vehicula vel. Nullam eu elementum tellus, eget mattis quam. Duis euismod
+        leo id elit venenatis placerat sit amet et ligula. Curabitur id dolor sit amet enim placerat semper. Sed risus
+        dui, venenatis a justo in, tristique elementum sem. Interdum et malesuada fames ac ante ipsum primis in
+        faucibus.
+      </p>
       <ProgrammingLanguageOverlapCanvas />
     </main>
   )

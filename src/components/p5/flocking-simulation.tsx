@@ -217,7 +217,7 @@ const FlockingSimulationCanvas = () => {
             value={defaultConfig.separationFactor}
             step={defaultConfig.separationFactor / 20}
             class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onchange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
+            onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
           />
         </div>
         <div class='flex flex-col items-start'>
@@ -232,7 +232,7 @@ const FlockingSimulationCanvas = () => {
             value={defaultConfig.alignmentFactor}
             step={defaultConfig.alignmentFactor / 20}
             class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onchange={(e) => setConfig({ ...config(), alignmentFactor: parseFloat(e.target.value) })}
+            onChange={(e) => setConfig({ ...config(), alignmentFactor: parseFloat(e.target.value) })}
           />
         </div>
         <div class='flex flex-col items-start'>
@@ -247,7 +247,7 @@ const FlockingSimulationCanvas = () => {
             value={defaultConfig.cohesionFactor}
             step={defaultConfig.cohesionFactor / 20}
             class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onchange={(e) => setConfig({ ...config(), cohesionFactor: parseFloat(e.target.value) })}
+            onChange={(e) => setConfig({ ...config(), cohesionFactor: parseFloat(e.target.value) })}
           />
         </div>
       </div>

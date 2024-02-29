@@ -63,6 +63,7 @@ export class Camera2D {
     if (this.p.mouseX < 0 || this.p.mouseX > this.p.width || this.p.mouseY < 0 || this.p.mouseY > this.p.height) {
       return
     }
+    e.preventDefault()
     const direction = e.deltaY > 0 ? -1 : 1
     const factor = 0.1
     const zoom = 1 * direction * factor
