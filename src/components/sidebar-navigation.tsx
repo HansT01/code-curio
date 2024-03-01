@@ -23,7 +23,7 @@ const TagButton: Component<TagButtonProps> = (props) => {
           'text-background-fg': props.highlight,
         },
       )}
-      onclick={props.onClick}
+      onClick={props.onClick}
     >
       <small>{props.children}</small>
       <Show when={props.removable}>
@@ -33,7 +33,11 @@ const TagButton: Component<TagButtonProps> = (props) => {
   )
 }
 
-const CurioList: Component = () => {
+interface CurioListProps {
+  onCurioClick: (e: MouseEvent) => void
+}
+
+const CurioList: Component<CurioListProps> = (props) => {
   const [showFitlers, setShowFilters] = createSignal(false)
   const [filteredTags, setFilteredTags] = createSignal<Tag[]>([])
   const [curios] = createResource(getCurios)
@@ -62,7 +66,7 @@ const CurioList: Component = () => {
         <div>
           <button
             class='flex cursor-pointer items-center gap-2 rounded-lg bg-background px-4 py-3 text-background-fg hover:bg-accent hover:text-accent-fg'
-            onclick={() => setShowFilters((showFilters) => !showFilters)}
+            onClick={() => setShowFilters((showFilters) => !showFilters)}
           >
             <Pencil size={20} />
             Filters
@@ -95,7 +99,7 @@ const CurioList: Component = () => {
         <For each={curios()}>
           {(curio) => (
             <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
-              <A href={`/curio/${curio.id}`}>
+              <A href={`/curio/${curio.id}`} onClick={props.onCurioClick}>
                 <div class='flex flex-col gap-0 overflow-x-hidden rounded-xl bg-background px-4 py-2 text-background-fg'>
                   <h2>{curio.title}</h2>
                   <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
@@ -209,11 +213,11 @@ const Navigation: Component<NavigationProps> = (props) => {
       <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
-          'fixed -top-[80vh] bottom-0 left-0 overflow-y-auto overflow-x-hidden border-secondary bg-primary px-6 py-4 text-primary-fg transition-[top] duration-100',
+          'fixed -top-[80vh] bottom-0 left-0 overflow-y-auto overflow-x-hidden border-secondary bg-primary px-6 py-4 text-primary-fg transition-[top] duration-200',
           { 'top-[64px]': isSidebar() || isOpen(), 'h-[80vh] border-b-[9px]': !isSidebar() },
         )}
       >
-        <CurioList />
+        <CurioList onCurioClick={() => setIsOpen(false)} />
       </div>
       <Show when={isSidebar()}>
         <div
