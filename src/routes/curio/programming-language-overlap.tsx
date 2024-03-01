@@ -17,7 +17,10 @@ export default function ProgrammingLanguageOverlap() {
     <main class='flex flex-col gap-6 p-8'>
       <h1 class='text-6xl font-thin'>Programming Language Overlap</h1>
       <div class='flex flex-wrap'>
-        <A target='_blank' href='/'>
+        <A
+          target='_blank'
+          href='https://github.com/HansT01/code-curio/blob/main/src/components/p5/programming-language-overlap.tsx'
+        >
           <button class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
             <GithubIcon />
             View Source Code
