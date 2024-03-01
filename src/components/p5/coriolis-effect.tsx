@@ -1,6 +1,6 @@
 import { Minus, Plus } from 'lucide-solid'
 import p5 from 'p5'
-import { Accessor, createEffect, createSignal } from 'solid-js'
+import { Accessor, createSignal } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
 import Canvas from '../canvas'
@@ -149,6 +149,18 @@ const CoriolisEffectCanvas = () => {
   const [countIndex, setCountIndex] = createSignal(3)
   const count = [1, 5, 20, 50, 100, 200]
 
+  let resetParticles: (numParticles: number) => void
+
+  const reduceParticles = () => {
+    setCountIndex((index) => (index > 0 ? index - 1 : index))
+    resetParticles(count[countIndex()])
+  }
+
+  const increaseParticles = () => {
+    setCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
+    resetParticles(count[countIndex()])
+  }
+
   const sketch = (p: p5) => {
     const particles: Particle[] = []
 
@@ -192,16 +204,12 @@ const CoriolisEffectCanvas = () => {
       }
     }
 
-    const resetParticles = (numParticles: number) => {
+    resetParticles = (numParticles: number) => {
       particles.length = 0
       for (let i = 0; i < numParticles; i++) {
         particles.push(new Particle(p, config))
       }
     }
-
-    createEffect(() => {
-      resetParticles(count[countIndex()])
-    })
   }
 
   return (
@@ -213,18 +221,14 @@ const CoriolisEffectCanvas = () => {
         <div class='flex' id='particle-count'>
           <button
             class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-            onClick={() => {
-              setCountIndex((index) => (index > 0 ? index - 1 : index))
-            }}
+            onClick={reduceParticles}
           >
             <Minus />
           </button>
           <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{count[countIndex()]}</div>
           <button
             class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-            onClick={() => {
-              setCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
-            }}
+            onClick={increaseParticles}
           >
             <Plus />
           </button>
