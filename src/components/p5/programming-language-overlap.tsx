@@ -160,7 +160,9 @@ class BubbleManager {
   }
 
   dragStart() {
-    this.isDragging = true
+    if (this.p.mouseButton === this.p.LEFT) {
+      this.isDragging = true
+    }
   }
 
   dragEnd() {
@@ -288,7 +290,11 @@ const ProgrammingLanguageOverlap = () => {
   }
 
   return (
-    <div class='flex flex-col items-start gap-8' ref={parentRef}>
+    <div class='flex flex-col items-start gap-4' ref={parentRef}>
+      <small>
+        Use the cursor to reveal the relationship between the language bubbles. Use left click to drag them around, and
+        use right click and scroll wheel for camera controls.
+      </small>
       <div class='[&>canvas]:rounded-2xl' ref={createSketch} />
     </div>
   )

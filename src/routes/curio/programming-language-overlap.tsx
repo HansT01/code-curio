@@ -25,11 +25,17 @@ export default function ProgrammingLanguageOverlap() {
         </A>
       </div>
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris maximus venenatis magna eget ornare. Integer
-        efficitur odio nunc, vitae mattis diam vehicula vel. Nullam eu elementum tellus, eget mattis quam. Duis euismod
-        leo id elit venenatis placerat sit amet et ligula. Curabitur id dolor sit amet enim placerat semper. Sed risus
-        dui, venenatis a justo in, tristique elementum sem. Interdum et malesuada fames ac ante ipsum primis in
-        faucibus.
+        Programming languages are tools that developers use to communicate instructions to computers. They encompass a
+        set of rules and symbols that define the syntax and semantics for writing code.
+        <br />
+        <br />
+        As developers gain experience and work on different projects, they often specialize in a set of programming
+        languages. This specialization can be influenced by various factors such as personal interest, job requirements,
+        industry trends, and project needs.
+        <br />
+        <br />
+        By graphing the interconnectedness of programming languages, this visualization can offer valuable insights into
+        the factors that shape developers' language choices and specialization paths.
       </p>
       <ProgrammingLanguageOverlapCanvas />
     </main>

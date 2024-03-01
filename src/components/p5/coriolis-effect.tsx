@@ -242,7 +242,7 @@ const CoriolisEffectCanvas = () => {
   }
 
   return (
-    <div class='flex flex-col items-start gap-8' ref={parentRef}>
+    <div class='flex flex-col items-start gap-4' ref={parentRef}>
       <div class='flex flex-col items-start'>
         <label for='particle-count' class='mb-2'>
           Particle Count
@@ -328,6 +328,7 @@ const CoriolisEffectCanvas = () => {
           />
         </div>
       </div>
+      <small>Use the mouse for camera controls.</small>
       <div class='[&>canvas]:rounded-2xl' ref={createSketch} />
     </div>
   )

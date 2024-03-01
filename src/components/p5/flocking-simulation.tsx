@@ -203,7 +203,7 @@ const FlockingSimulationCanvas = () => {
   }
 
   return (
-    <div class='flex flex-col gap-8' ref={parentRef}>
+    <div class='flex flex-col gap-4' ref={parentRef}>
       <div class='flex flex-wrap gap-4'>
         <div class='flex flex-col items-start'>
           <label for='separation-factor' class='mb-2'>
@@ -251,6 +251,7 @@ const FlockingSimulationCanvas = () => {
           />
         </div>
       </div>
+      <small>Use the cursor to repel the boids.</small>
       <div class='[&>canvas]:rounded-2xl' ref={createSketch} />
     </div>
   )
