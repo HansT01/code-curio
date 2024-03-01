@@ -228,6 +228,10 @@ const ProgrammingLanguageOverlap = () => {
     p.mouseDragged = () => manager.camera.mouseDragged()
     p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
 
+    p.touchStarted = () => manager.camera.touchStarted()
+    p.touchEnded = () => manager.camera.touchEnded()
+    p.touchMoved = (e: TouchEvent) => manager.camera.touchMoved(e)
+
     onMount(() => {
       getCoOccurenceMatrix().then((matrix) => {
         for (let i = 0; i < matrix.data.length; i++) {
