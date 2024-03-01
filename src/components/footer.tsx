@@ -3,7 +3,7 @@ import { Component, createSignal, onCleanup, onMount } from 'solid-js'
 import { cn } from '~/util/cn'
 
 const Footer: Component = () => {
-  const [width, setWidth] = createSignal(0)
+  const [width, setWidth] = createSignal(1080)
   let footerRef: HTMLElement | undefined
 
   onMount(() => {
