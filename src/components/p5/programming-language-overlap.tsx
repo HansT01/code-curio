@@ -146,6 +146,9 @@ class BubbleManager {
   }
 
   hover() {
+    if (this.isDragging) {
+      return
+    }
     const [x, y] = this.camera.mouseInWorld()
     let closest = null
     let closestDistance = Number.MAX_VALUE
