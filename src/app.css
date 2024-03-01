@@ -14,5 +14,30 @@
     --primary-fg: #ffffff;
     --secondary: #6d2932;
     --secondary-fg: #ffffff;
+    --scrollbar: #3f141a;
+    --scrollbar-fg: #7d3232;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-fg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-fg);
+}
+
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-fg) var(--scrollbar);
   }
 }
