@@ -252,7 +252,7 @@ const FlockingSimulationCanvas = () => {
         </div>
       </div>
       <small>Use the cursor to repel the boids.</small>
-      <div class='[&>canvas]:rounded-2xl' ref={createSketch} />
+      <div class='select-none [&>canvas]:rounded-2xl' ref={createSketch} />
     </div>
   )
 }

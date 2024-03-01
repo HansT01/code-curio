@@ -329,7 +329,7 @@ const CoriolisEffectCanvas = () => {
         </div>
       </div>
       <small>Use the mouse for camera controls.</small>
-      <div class='[&>canvas]:rounded-2xl' ref={createSketch} />
+      <div class='select-none [&>canvas]:rounded-2xl' ref={createSketch} />
     </div>
   )
 }

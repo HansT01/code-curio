@@ -317,7 +317,7 @@ const ProgrammingLanguageOverlap = () => {
         Use the cursor to reveal the relationship between the language bubbles. Use left click to drag them around, and
         use right click and scroll wheel for camera controls.
       </small>
-      <div class='[&>canvas]:rounded-2xl' ref={createSketch} />
+      <div class='select-none [&>canvas]:rounded-2xl' ref={createSketch} />
     </div>
   )
 }
