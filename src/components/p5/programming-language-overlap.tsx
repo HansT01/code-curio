@@ -3,7 +3,7 @@ import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-
 import { Camera2D } from '~/util/camera'
 import { getCoOccurenceMatrix } from '~/util/data'
 
-class LanguageBubble {
+class Bubble {
   p: p5
   config: Accessor<typeof defaultConfig>
   name: string
@@ -12,7 +12,6 @@ class LanguageBubble {
   radius: number
   position: p5.Vector
   velocity: p5.Vector
-  isDragging: boolean
 
   constructor(p: p5, config: Accessor<typeof defaultConfig>, name: string, index: number, weights: number[]) {
     this.p = p
@@ -24,7 +23,6 @@ class LanguageBubble {
     this.position = p.createVector(p.random(p.width), p.random(p.height))
     this.velocity = p5.Vector.random2D()
     this.velocity.setMag(0)
-    this.isDragging = false
   }
 
   contains(x: number, y: number) {
@@ -32,7 +30,7 @@ class LanguageBubble {
     return distance < this.radius
   }
 
-  attraction(neighbors: LanguageBubble[]) {
+  attraction(neighbors: Bubble[]) {
     const totalOffset = this.p.createVector(0, 0)
     for (let neighbor of neighbors) {
       if (neighbor === this) {
@@ -51,7 +49,7 @@ class LanguageBubble {
     this.velocity.add(totalOffset)
   }
 
-  repulsion(neighbors: LanguageBubble[]) {
+  repulsion(neighbors: Bubble[]) {
     const totalOffset = this.p.createVector(0, 0)
     for (let neighbor of neighbors) {
       if (neighbor === this) {
@@ -80,18 +78,11 @@ class LanguageBubble {
   }
 
   drag(x: number, y: number) {
-    if (!this.isDragging) {
-      return
-    }
-    if (this.p.mouseIsPressed && this.p.mouseButton === this.p.LEFT) {
-      this.velocity.setMag(0)
-      this.position.set(x, y)
-    } else {
-      this.isDragging = false
-    }
+    this.velocity.setMag(0)
+    this.position.set(x, y)
   }
 
-  update(neighbors: LanguageBubble[]) {
+  update(neighbors: Bubble[]) {
     this.attraction(neighbors)
     this.repulsion(neighbors)
     this.center()
@@ -117,7 +108,7 @@ class LanguageBubble {
     this.p.pop()
   }
 
-  showEdges(neighbors: LanguageBubble[]) {
+  showEdges(neighbors: Bubble[]) {
     for (let neighbor of neighbors) {
       if (neighbor === this) {
         continue
@@ -136,6 +127,68 @@ class LanguageBubble {
       this.p.line(this.position.x, this.position.y, neighbor.position.x, neighbor.position.y)
       this.p.push()
     }
+  }
+}
+
+class BubbleManager {
+  p: p5
+  camera: Camera2D
+  bubbles: Bubble[]
+  hovering: Bubble | null
+  isDragging: boolean
+
+  constructor(p: p5, bubbles: Bubble[]) {
+    this.p = p
+    this.camera = new Camera2D(p, true)
+    this.bubbles = bubbles
+    this.hovering = null
+    this.isDragging = false
+  }
+
+  hover() {
+    const [x, y] = this.camera.mouseInWorld()
+    let closest = null
+    let closestDistance = Number.MAX_VALUE
+    for (let bubble of this.bubbles) {
+      let distance = this.p.dist(x, y, bubble.position.x, bubble.position.y)
+      if (distance < bubble.radius && distance < closestDistance) {
+        closest = bubble
+        closestDistance = distance
+      }
+    }
+    this.hovering = closest
+  }
+
+  dragStart() {
+    this.isDragging = true
+  }
+
+  dragEnd() {
+    this.isDragging = false
+  }
+
+  splitSelected() {
+    const bubbles = this.bubbles.filter((bubble) => bubble !== this.hovering)
+    return [this.hovering, bubbles] as const
+  }
+
+  draw() {
+    const [x, y] = this.camera.mouseInWorld()
+    const [selected, bubbles] = this.splitSelected()
+    for (let bubble of bubbles) {
+      bubble.update(this.bubbles)
+      bubble.show()
+    }
+    if (selected === null) {
+      return
+    }
+    if (this.isDragging) {
+      selected.drag(x, y)
+    } else {
+      selected.update(bubbles)
+    }
+    selected.showEdges(bubbles)
+    selected.show()
   }
 }
 
@@ -178,31 +231,19 @@ const ProgrammingLanguageOverlap = () => {
 
   const createSketch = (ref: HTMLDivElement) => {
     const sketch = (p: p5) => {
-      const bubbles: LanguageBubble[] = []
-      const camera = new Camera2D(p, true)
+      const manager = new BubbleManager(p, [])
 
       p.mousePressed = () => {
-        camera.mousePressed()
-        const [x, y] = camera.mouseInWorld()
-        if (p.mouseButton !== p.LEFT) {
-          return
-        }
-        let closest = null
-        let closestDistance = Number.MAX_VALUE
-        for (let bubble of bubbles) {
-          let distance = p.dist(x, y, bubble.position.x, bubble.position.y)
-          if (distance < bubble.radius && distance < closestDistance) {
-            closest = bubble
-            closestDistance = distance
-          }
-        }
-        if (closest !== null) {
-          closest.isDragging = true
-        }
+        manager.camera.mousePressed()
+        manager.dragStart()
       }
-      p.mouseDragged = () => camera.mouseDragged()
-      p.mouseReleased = () => camera.mouseReleased()
-      p.mouseWheel = (e: WheelEvent) => camera.mouseWheel(e)
+      p.mouseReleased = () => {
+        manager.camera.mouseReleased()
+        manager.dragEnd()
+      }
+      p.mouseMoved = () => manager.hover()
+      p.mouseDragged = () => manager.camera.mouseDragged()
+      p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
 
       p.setup = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height)
@@ -212,28 +253,15 @@ const ProgrammingLanguageOverlap = () => {
 
       p.draw = () => {
         p.background(50)
-        p.translate(camera.x, camera.y)
-        p.scale(camera.zoom)
-        let dragging: LanguageBubble[] = []
-        for (let bubble of bubbles) {
-          if (bubble.isDragging) {
-            bubble.drag(...camera.mouseInWorld())
-            dragging.push(bubble)
-          } else {
-            bubble.update(bubbles)
-            bubble.show()
-          }
-        }
-        for (let bubble of dragging) {
-          bubble.showEdges(bubbles)
-          bubble.show()
-        }
+        p.translate(manager.camera.x, manager.camera.y)
+        p.scale(manager.camera.zoom)
+        manager.draw()
       }
 
       onMount(() => {
         getCoOccurenceMatrix().then((matrix) => {
           for (let i = 0; i < matrix.data.length; i++) {
-            bubbles.push(new LanguageBubble(p, config, matrix.columns[i], i, matrix.data[i]))
+            manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
           }
         })
       })
