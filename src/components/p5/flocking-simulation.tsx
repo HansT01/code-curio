@@ -148,25 +148,36 @@ const FlockingSimulationCanvas = () => {
   const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
   const [config, setConfig] = createSignal(defaultConfig)
 
-  let parentRef: HTMLDivElement | undefined = undefined
-
-  onMount(() => {
+  const createResize = (ref: HTMLDivElement) => {
     const resize = () => {
-      if (parentRef !== undefined) {
-        setDimensions({ ...dimensions(), width: Math.min(parentRef.clientWidth, 854) })
-      }
+      setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
     }
-    resize()
-    window.addEventListener('resize', resize)
+    onMount(() => {
+      resize()
+      window.addEventListener('resize', resize)
+    })
     onCleanup(() => {
       window.removeEventListener('resize', resize)
     })
-  })
+  }
+
+  const createPreventContextMenu = (ref: HTMLDivElement) => {
+    const preventContextMenu = (e: MouseEvent) => {
+      e.preventDefault()
+      return false
+    }
+    onMount(() => {
+      ref.addEventListener('contextmenu', preventContextMenu)
+    })
+    onCleanup(() => {
+      ref.removeEventListener('contextmenu', preventContextMenu)
+    })
+  }
 
   const createSketch = (ref: HTMLDivElement) => {
+    const flock: Boid[] = []
     const sketch = (p: p5) => {
-      let flock: Boid[] = []
-
+      p.preload = () => {}
       p.setup = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height)
         canvas.parent(ref)
@@ -176,10 +187,9 @@ const FlockingSimulationCanvas = () => {
           flock.push(new Boid(p, config))
         }
       }
-
       p.draw = () => {
         p.background(50)
-        const quadtree = new Quadtree<Boid>(new Rectangle(0, 0, p.width, p.height), 5)
+        const quadtree = new Quadtree<Boid>(new Rectangle(-p.width, -p.height, 3 * p.width, 3 * p.height), 5)
         for (let boid of flock) {
           quadtree.insert(boid)
         }
@@ -190,20 +200,18 @@ const FlockingSimulationCanvas = () => {
           boid.show()
         }
       }
-
-      createEffect(() => {
-        p.resizeCanvas(dimensions().width, dimensions().height)
-      })
-
-      onCleanup(() => {
-        p.remove()
-      })
     }
-    new p5(sketch, ref)
+    const p = new p5(sketch, ref)
+    onCleanup(() => {
+      p.remove()
+    })
+    createEffect(() => {
+      p.resizeCanvas(dimensions().width, dimensions().height)
+    })
   }
 
   return (
-    <div class='flex flex-col gap-4' ref={parentRef}>
+    <div class='flex w-full flex-col gap-4'>
       <div class='flex flex-wrap gap-4'>
         <div class='flex flex-col items-start'>
           <label for='separation-factor' class='mb-2'>
@@ -252,7 +260,14 @@ const FlockingSimulationCanvas = () => {
         </div>
       </div>
       <small>Use the cursor to repel the boids.</small>
-      <div class='select-none [&>canvas]:rounded-2xl' ref={createSketch} />
+      <div
+        class='w-full select-none [&>canvas]:rounded-2xl'
+        ref={(ref) => {
+          createResize(ref)
+          createPreventContextMenu(ref)
+          createSketch(ref)
+        }}
+      />
     </div>
   )
 }
