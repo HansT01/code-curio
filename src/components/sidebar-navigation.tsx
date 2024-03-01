@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router'
 import dayjs from 'dayjs'
-import { Pencil, X } from 'lucide-solid'
-import { Component, For, JSX, Show, Suspense, createResource, createSignal } from 'solid-js'
+import { Menu, Pencil, X } from 'lucide-solid'
+import { Component, For, JSX, Show, Suspense, createResource, createSignal, onCleanup, onMount } from 'solid-js'
 import { cn } from '~/util/cn'
 import { Tag, getCurios, validTags } from '~/util/curio'
 
@@ -124,12 +124,14 @@ const CurioList: Component = () => {
   )
 }
 
-interface SidebarNavigationProps {
+interface NavigationProps {
   children: JSX.Element
 }
 
-const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
+const Navigation: Component<NavigationProps> = (props) => {
   const [sidebarWidth, setSidebarWidth] = createSignal(500)
+  const [isSidebar, setIsSidebar] = createSignal(true)
+  const [isOpen, setIsOpen] = createSignal(false)
 
   const handleMouseResize = (e: MouseEvent) => {
     let newWidth: number
@@ -153,38 +155,69 @@ const SidebarNavigation: Component<SidebarNavigationProps> = (props) => {
     document.removeEventListener('touchmove', handleTouchResize)
   }
 
+  const handleClick = () => {
+    setIsOpen(!isOpen())
+  }
+
+  onMount(() => {
+    const handleResize = () => {
+      setIsSidebar(window.innerWidth >= 768)
+    }
+    handleResize()
+    window.dispatchEvent(new Event('resize'))
+    window.addEventListener('resize', handleResize)
+    onCleanup(() => {
+      window.removeEventListener('resize', handleResize)
+    })
+  })
+
   return (
-    <div class='flex'>
+    <div>
       <div
-        style={{ width: `${sidebarWidth() - 4}px` }}
-        class='fixed left-0 flex h-dvh overflow-y-auto overflow-x-hidden bg-primary text-primary-fg'
-      >
-        <div class='flex shrink flex-grow flex-col gap-4 px-8 py-6'>
-          <A href='/'>
-            <h1 class='text-4xl font-thin'>Code Curio</h1>
-          </A>
-          <CurioList />
-        </div>
-      </div>
-      <div
-        style={{
-          'margin-left': `${sidebarWidth() - 4}px`,
-          'width': '9px',
-        }}
-        class='fixed h-dvh cursor-col-resize select-none bg-secondary text-secondary-fg'
-        onMouseDown={handleResizeStart}
-        onTouchStart={handleResizeStart}
-        onMouseUp={handleResizeEnd}
-        onTouchEnd={handleResizeEnd}
-      />
-      <div
-        style={{ 'margin-left': `${sidebarWidth() + 5}px` }}
-        class='h-dvh flex-grow overflow-y-auto bg-background text-background-fg'
+        style={{ 'left': isSidebar() ? `${sidebarWidth() + 5}px` : '0px' }}
+        class={cn('fixed bottom-0 right-0 top-[64px] overflow-y-auto bg-background text-background-fg', {
+          'top-0': isSidebar(),
+        })}
       >
         {props.children}
       </div>
+      <div
+        style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
+        class='fixed left-0 top-0 flex h-[64px] items-center justify-between border-secondary bg-primary px-6 text-primary-fg'
+      >
+        <A href='/'>
+          <h1 class='my-auto text-4xl font-thin'>Code Curio</h1>
+        </A>
+        <button class='md:hidden' onClick={handleClick}>
+          <Menu stroke-width={1} size={32} absoluteStrokeWidth />
+        </button>
+      </div>
+      <div
+        style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
+        class={cn(
+          'fixed -top-[80vh] bottom-0 left-0 overflow-y-auto overflow-x-hidden bg-primary px-6 py-4 text-primary-fg',
+          { 'top-[64px]': isSidebar() || isOpen(), 'h-[80vh]': !isSidebar() },
+        )}
+      >
+        <CurioList />
+      </div>
+      <Show when={!isSidebar() && isOpen()}>
+        <div class='fixed left-0 right-0 top-[calc(80vh+64px)] h-[9px] select-none bg-secondary text-secondary-fg' />
+      </Show>
+      <Show when={isSidebar()}>
+        <div
+          style={{
+            'left': `${sidebarWidth() - 4}px`,
+          }}
+          class='fixed bottom-0 top-0 w-[9px] cursor-col-resize select-none bg-secondary text-secondary-fg'
+          onMouseDown={handleResizeStart}
+          onTouchStart={handleResizeStart}
+          onMouseUp={handleResizeEnd}
+          onTouchEnd={handleResizeEnd}
+        />
+      </Show>
     </div>
   )
 }
 
-export default SidebarNavigation
+export default Navigation
