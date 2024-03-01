@@ -136,7 +136,7 @@ const isMobile = () => {
   }
   const regex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
   const isMobile = regex.test(userAgent)
-  console.log('Request is', isMobile ? 'from mobile device' : 'not from mobile')
+  console.log('Request is', isMobile ? 'from mobile device' : 'not from mobile device')
   return isMobile
 }
 
