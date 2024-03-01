@@ -162,16 +162,16 @@ const CoriolisEffectCanvas = () => {
     })
   })
 
-  createEffect(() => {
-    const canvases = document.querySelectorAll<HTMLCanvasElement>('canvas.p5Canvas')
-    canvases.forEach((canvas) => {
-      if (canvas.style.visibility === 'hidden') {
-        canvas.style.display = 'none'
-      } else {
-        canvas.style.display = 'block'
-      }
-    })
-  })
+  // createEffect(() => {
+  //   const canvases = document.querySelectorAll<HTMLCanvasElement>('canvas.p5Canvas')
+  //   canvases.forEach((canvas) => {
+  //     if (canvas.style.visibility === 'hidden') {
+  //       canvas.style.display = 'none'
+  //     } else {
+  //       canvas.style.display = 'block'
+  //     }
+  //   })
+  // })
 
   const createSketch = (ref: HTMLDivElement) => {
     const sketch = (p: p5) => {
@@ -238,6 +238,17 @@ const CoriolisEffectCanvas = () => {
         p.remove()
       })
     }
+    onMount(() => {
+      const children = ref.childNodes
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i] as HTMLElement
+        if (child.style.visibility === 'hidden') {
+          child.style.display = 'none'
+        } else {
+          child.style.display = 'block'
+        }
+      }
+    })
     new p5(sketch, ref)
   }
 

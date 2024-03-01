@@ -1,6 +1,7 @@
 import p5 from 'p5'
-import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Accessor, createSignal } from 'solid-js'
 import { Quadtree, Rectangle } from '~/util/quadtree'
+import Canvas from '../canvas'
 
 class Boid {
   p: p5
@@ -145,66 +146,31 @@ const defaultConfig = {
 }
 
 const FlockingSimulationCanvas = () => {
-  const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
+  const dimensions = { width: 854, height: 480 }
   const [config, setConfig] = createSignal(defaultConfig)
 
-  const createResize = (ref: HTMLDivElement) => {
-    const resize = () => {
-      setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
-    }
-    onMount(() => {
-      resize()
-      window.addEventListener('resize', resize)
-    })
-    onCleanup(() => {
-      window.removeEventListener('resize', resize)
-    })
-  }
-
-  const createPreventContextMenu = (ref: HTMLDivElement) => {
-    const preventContextMenu = (e: MouseEvent) => {
-      e.preventDefault()
-      return false
-    }
-    onMount(() => {
-      ref.addEventListener('contextmenu', preventContextMenu)
-    })
-    onCleanup(() => {
-      ref.removeEventListener('contextmenu', preventContextMenu)
-    })
-  }
-
-  const createSketch = (ref: HTMLDivElement) => {
+  const sketch = (p: p5) => {
     const flock: Boid[] = []
-    const sketch = (p: p5) => {
-      p.setup = () => {
-        const canvas = p.createCanvas(dimensions().width, dimensions().height)
-        canvas.style('visibility', 'visible')
-        for (let i = 0; i < 300; i++) {
-          flock.push(new Boid(p, config))
-        }
-      }
-      p.draw = () => {
-        p.background(50)
-        const quadtree = new Quadtree<Boid>(new Rectangle(-p.width, -p.height, 3 * p.width, 3 * p.height), 5)
-        for (let boid of flock) {
-          quadtree.insert(boid)
-        }
-        for (let boid of flock) {
-          const range = new Rectangle(boid.position.x, boid.position.y, config().visualRange, config().visualRange)
-          const neighbors = quadtree.query(range)
-          boid.update(neighbors)
-          boid.show()
-        }
+    p.setup = () => {
+      const canvas = p.createCanvas(dimensions.width, dimensions.height)
+      canvas.style('visibility', 'visible')
+      for (let i = 0; i < 300; i++) {
+        flock.push(new Boid(p, config))
       }
     }
-    const p = new p5(sketch, ref)
-    onCleanup(() => {
-      p.remove()
-    })
-    createEffect(() => {
-      p.resizeCanvas(dimensions().width, dimensions().height)
-    })
+    p.draw = () => {
+      p.background(50)
+      const quadtree = new Quadtree<Boid>(new Rectangle(-p.width, -p.height, 3 * p.width, 3 * p.height), 5)
+      for (let boid of flock) {
+        quadtree.insert(boid)
+      }
+      for (let boid of flock) {
+        const range = new Rectangle(boid.position.x, boid.position.y, config().visualRange, config().visualRange)
+        const neighbors = quadtree.query(range)
+        boid.update(neighbors)
+        boid.show()
+      }
+    }
   }
 
   return (
@@ -257,14 +223,7 @@ const FlockingSimulationCanvas = () => {
         </div>
       </div>
       <small>Use the cursor to repel the boids.</small>
-      <div
-        class='w-full [&>canvas]:rounded-2xl'
-        ref={(ref) => {
-          createResize(ref)
-          createPreventContextMenu(ref)
-          createSketch(ref)
-        }}
-      />
+      <Canvas sketch={sketch} {...dimensions} />
     </div>
   )
 }
