@@ -95,7 +95,7 @@ const CurioList: Component = () => {
           {(curio) => (
             <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
               <A href={`/curio/${curio.id}`}>
-                <div class='flex flex-col gap-0 rounded-xl bg-background px-4 py-2 text-background-fg'>
+                <div class='flex flex-col gap-0 overflow-x-hidden rounded-xl bg-background px-4 py-2 text-background-fg'>
                   <h3>{curio.title}</h3>
                   <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
                   <Show when={curio.tags.length > 0}>
@@ -161,7 +161,7 @@ const Navigation: Component<NavigationProps> = (props) => {
 
   onMount(() => {
     const handleResize = () => {
-      setIsSidebar(window.innerWidth >= 768)
+      setIsSidebar(window.innerWidth >= 1024)
     }
     handleResize()
     window.dispatchEvent(new Event('resize'))
@@ -183,27 +183,13 @@ const Navigation: Component<NavigationProps> = (props) => {
       </div>
       <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
-        class='fixed left-0 top-0 flex h-[64px] items-center justify-between border-secondary bg-primary px-6 text-primary-fg'
-      >
-        <A href='/'>
-          <h1 class='my-auto text-4xl font-thin'>Code Curio</h1>
-        </A>
-        <button class='md:hidden' onClick={handleClick}>
-          <Menu stroke-width={1} size={32} absoluteStrokeWidth />
-        </button>
-      </div>
-      <div
-        style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
-          'fixed -top-[80vh] bottom-0 left-0 overflow-y-auto overflow-x-hidden bg-primary px-6 py-4 text-primary-fg',
-          { 'top-[64px]': isSidebar() || isOpen(), 'h-[80vh]': !isSidebar() },
+          'fixed -top-[80vh] bottom-0 left-0 overflow-y-auto overflow-x-hidden border-secondary bg-primary px-6 py-4 text-primary-fg transition-[top] duration-100',
+          { 'top-[64px]': isSidebar() || isOpen(), 'h-[80vh]': !isSidebar(), 'border-b-[9px]': !isSidebar() },
         )}
       >
         <CurioList />
       </div>
-      <Show when={!isSidebar() && isOpen()}>
-        <div class='fixed left-0 right-0 top-[calc(80vh+64px)] h-[9px] select-none bg-secondary text-secondary-fg' />
-      </Show>
       <Show when={isSidebar()}>
         <div
           style={{
@@ -216,6 +202,29 @@ const Navigation: Component<NavigationProps> = (props) => {
           onTouchEnd={handleResizeEnd}
         />
       </Show>
+      <div
+        style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
+        class={cn(
+          'fixed left-0 top-0 flex h-[64px] items-center justify-between overflow-hidden border-primary bg-primary px-6 text-primary-fg',
+          {
+            'border-b-2': !isSidebar(),
+            'bg-accent': !isSidebar(),
+            'text-accent-fg': !isSidebar(),
+          },
+        )}
+      >
+        <A href='/'>
+          <h1 class='my-auto whitespace-nowrap text-4xl font-extralight'>Code Curio</h1>
+        </A>
+        <button
+          class={cn({
+            'hidden': isSidebar(),
+          })}
+          onClick={handleClick}
+        >
+          <Menu stroke-width={1} size={32} absoluteStrokeWidth />
+        </button>
+      </div>
     </div>
   )
 }

@@ -205,13 +205,16 @@ const defaultConfig = {
 }
 
 const ProgrammingLanguageOverlap = () => {
-  const dimensions = { width: 854, height: 480 }
   const [config, setConfig] = createSignal(defaultConfig)
 
+  let manager: BubbleManager
   let shuffle: () => void
 
-  const sketch = (p: p5) => {
-    const manager = new BubbleManager(p, [])
+  const setup = (p: p5) => {
+    manager = new BubbleManager(p, [])
+
+    manager.camera.x = 0
+    manager.camera.y = 0
 
     p.mousePressed = () => {
       manager.camera.mousePressed()
@@ -224,20 +227,6 @@ const ProgrammingLanguageOverlap = () => {
     p.mouseMoved = () => manager.hover()
     p.mouseDragged = () => manager.camera.mouseDragged()
     p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
-
-    p.setup = () => {
-      const canvas = p.createCanvas(dimensions.width, dimensions.height)
-      canvas.style('visibility', 'visible')
-      manager.camera.x = 0
-      manager.camera.y = 0
-    }
-
-    p.draw = () => {
-      p.background(50)
-      p.translate(manager.camera.x, manager.camera.y)
-      p.scale(manager.camera.zoom)
-      manager.draw()
-    }
 
     onMount(() => {
       getCoOccurenceMatrix().then((matrix) => {
@@ -259,6 +248,13 @@ const ProgrammingLanguageOverlap = () => {
     }
   }
 
+  const draw = (p: p5) => {
+    p.background(50)
+    p.translate(manager.camera.x, manager.camera.y)
+    p.scale(manager.camera.zoom)
+    manager.draw()
+  }
+
   return (
     <div class='flex flex-col items-start gap-4'>
       <div class='flex flex-wrap'>
@@ -273,7 +269,7 @@ const ProgrammingLanguageOverlap = () => {
         Use the cursor to reveal the relationship between the language bubbles. Use left click to drag them around, and
         use right click and scroll wheel for camera controls.
       </small>
-      <Canvas sketch={sketch} {...dimensions} />
+      <Canvas setup={setup} draw={draw} width={854} height={480} />
     </div>
   )
 }

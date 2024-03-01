@@ -2,9 +2,11 @@ import p5 from 'p5'
 import { Component, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 
 interface CanvasProps {
-  sketch: (p: p5) => void
+  setup: (p: p5) => void
+  draw: (p: p5) => void
   width: number
   height: number
+  webgl?: boolean
 }
 
 const Canvas: Component<CanvasProps> = (props) => {
@@ -36,8 +38,19 @@ const Canvas: Component<CanvasProps> = (props) => {
     })
   }
 
+  const sketch = (p: p5) => {
+    p.setup = () => {
+      const canvas = p.createCanvas(dimensions().width, dimensions().height, props.webgl ? p.WEBGL : undefined)
+      canvas.style('visibility', 'visible')
+      props.setup(p)
+    }
+    p.draw = () => {
+      props.draw(p)
+    }
+  }
+
   const createSketch = (ref: HTMLDivElement) => {
-    const p = new p5(props.sketch, ref)
+    const p = new p5(sketch, ref)
     onMount(() => {
       const children = ref.childNodes
       for (let i = 0; i < children.length; i++) {

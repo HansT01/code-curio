@@ -144,10 +144,10 @@ const defaultConfig = {
 }
 
 const CoriolisEffectCanvas = () => {
-  const dimensions = { width: 854, height: 480 }
   const [config, setConfig] = createSignal(defaultConfig)
   const [countIndex, setCountIndex] = createSignal(3)
   const count = [1, 5, 20, 50, 100, 200]
+  const particles: Particle[] = []
 
   let resetParticles: (numParticles: number) => void
 
@@ -161,54 +161,47 @@ const CoriolisEffectCanvas = () => {
     resetParticles(count[countIndex()])
   }
 
-  const sketch = (p: p5) => {
-    const particles: Particle[] = []
-
-    p.setup = () => {
-      const canvas = p.createCanvas(dimensions.width, dimensions.height, p.WEBGL)
-      canvas.style('visibility', 'visible')
-      resetParticles(50)
-    }
-
-    p.draw = () => {
-      p.background(50)
-      if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
-        p.orbitControl()
-      }
-      p.strokeWeight(1)
-      p.stroke(45, 149, 150)
-      if (config().transparentSphere) {
-        p.noFill()
-      } else {
-        p.fill(154, 208, 194)
-      }
-      p.sphere(config().radius)
-
-      const radius = config().radius + 50
-      const quadtree = new Octree<Particle>(new Box(0, 0, 0, radius, radius, radius), 5)
-      for (let particle of particles) {
-        quadtree.insert(particle)
-      }
-      for (let particle of particles) {
-        const range = new Box(
-          particle.position.x,
-          particle.position.y,
-          particle.position.z,
-          config().radius / 2,
-          config().radius / 2,
-          config().radius / 2,
-        )
-        const neighbors = quadtree.query(range)
-        particle.update(neighbors)
-        particle.show()
-      }
-    }
-
+  const setup = (p: p5) => {
     resetParticles = (numParticles: number) => {
       particles.length = 0
       for (let i = 0; i < numParticles; i++) {
         particles.push(new Particle(p, config))
       }
+    }
+    resetParticles(50)
+  }
+
+  const draw = (p: p5) => {
+    p.background(50)
+    if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
+      p.orbitControl()
+    }
+    p.strokeWeight(1)
+    p.stroke(45, 149, 150)
+    if (config().transparentSphere) {
+      p.noFill()
+    } else {
+      p.fill(154, 208, 194)
+    }
+    p.sphere(config().radius)
+
+    const radius = config().radius + 50
+    const quadtree = new Octree<Particle>(new Box(0, 0, 0, radius, radius, radius), 5)
+    for (let particle of particles) {
+      quadtree.insert(particle)
+    }
+    for (let particle of particles) {
+      const range = new Box(
+        particle.position.x,
+        particle.position.y,
+        particle.position.z,
+        config().radius / 2,
+        config().radius / 2,
+        config().radius / 2,
+      )
+      const neighbors = quadtree.query(range)
+      particle.update(neighbors)
+      particle.show()
     }
   }
 
@@ -296,7 +289,7 @@ const CoriolisEffectCanvas = () => {
         </div>
       </div>
       <small>Use the mouse for camera controls.</small>
-      <Canvas sketch={sketch} {...dimensions} />
+      <Canvas setup={setup} draw={draw} width={854} height={480} webgl />
     </div>
   )
 }

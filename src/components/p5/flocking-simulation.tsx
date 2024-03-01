@@ -146,32 +146,26 @@ const defaultConfig = {
 }
 
 const FlockingSimulationCanvas = () => {
-  const dimensions = { width: 854, height: 480 }
   const [config, setConfig] = createSignal(defaultConfig)
+  const flock: Boid[] = []
 
-  const sketch = (p: p5) => {
-    const flock: Boid[] = []
-
-    p.setup = () => {
-      const canvas = p.createCanvas(dimensions.width, dimensions.height)
-      canvas.style('visibility', 'visible')
-      for (let i = 0; i < 300; i++) {
-        flock.push(new Boid(p, config))
-      }
+  const setup = (p: p5) => {
+    for (let i = 0; i < 300; i++) {
+      flock.push(new Boid(p, config))
     }
+  }
 
-    p.draw = () => {
-      p.background(50)
-      const quadtree = new Quadtree<Boid>(new Rectangle(-p.width, -p.height, 3 * p.width, 3 * p.height), 5)
-      for (let boid of flock) {
-        quadtree.insert(boid)
-      }
-      for (let boid of flock) {
-        const range = new Rectangle(boid.position.x, boid.position.y, config().visualRange, config().visualRange)
-        const neighbors = quadtree.query(range)
-        boid.update(neighbors)
-        boid.show()
-      }
+  const draw = (p: p5) => {
+    p.background(50)
+    const quadtree = new Quadtree<Boid>(new Rectangle(-p.width, -p.height, 3 * p.width, 3 * p.height), 5)
+    for (let boid of flock) {
+      quadtree.insert(boid)
+    }
+    for (let boid of flock) {
+      const range = new Rectangle(boid.position.x, boid.position.y, config().visualRange, config().visualRange)
+      const neighbors = quadtree.query(range)
+      boid.update(neighbors)
+      boid.show()
     }
   }
 
@@ -225,7 +219,7 @@ const FlockingSimulationCanvas = () => {
         </div>
       </div>
       <small>Use the cursor to repel the boids.</small>
-      <Canvas sketch={sketch} {...dimensions} />
+      <Canvas setup={setup} draw={draw} width={854} height={480} />
     </div>
   )
 }
