@@ -68,13 +68,12 @@ class Bubble {
   center() {
     const offset = this.p.createVector(this.p.width / 2, this.p.height / 2)
     offset.sub(this.position)
-    offset.normalize()
     offset.mult(this.config().radialAccelerationFactor)
     this.velocity.add(offset)
   }
 
   decelerate() {
-    this.velocity.mult(0.99)
+    this.velocity.mult(0.98)
   }
 
   drag(x: number, y: number) {
@@ -196,15 +195,16 @@ class BubbleManager {
 
 const defaultConfig = {
   weightExponent: 2,
-  attractionFactor: 0.01,
-  repulsionFactor: 1,
-  radialAccelerationFactor: 0.01,
+  attractionFactor: 0.1,
+  repulsionFactor: 20,
+  radialAccelerationFactor: 0.0001,
 }
 
 const ProgrammingLanguageOverlap = () => {
   const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
   const [config, setConfig] = createSignal(defaultConfig)
 
+  let shuffle: () => void
   let parentRef: HTMLDivElement | undefined = undefined
 
   onMount(() => {
@@ -251,6 +251,8 @@ const ProgrammingLanguageOverlap = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height)
         canvas.parent(ref)
         canvas.style('visibility', 'visible')
+        manager.camera.x = 0
+        manager.camera.y = 0
       }
 
       p.draw = () => {
@@ -278,6 +280,17 @@ const ProgrammingLanguageOverlap = () => {
         })
       })
 
+      shuffle = () => {
+        for (let bubble of manager.bubbles) {
+          const angle = p.random(-p.PI / 2, p.PI / 2)
+          const offset = p.createVector(p.width / 2, p.height / 2)
+          offset.sub(bubble.position)
+          offset.rotate(angle)
+          offset.setMag(10)
+          bubble.velocity.add(offset)
+        }
+      }
+
       createEffect(() => {
         p.resizeCanvas(dimensions().width, dimensions().height)
       })
@@ -291,6 +304,11 @@ const ProgrammingLanguageOverlap = () => {
 
   return (
     <div class='flex flex-col items-start gap-4' ref={parentRef}>
+      <div class='flex flex-wrap'>
+        <button class='bg-primary px-4 py-3 text-primary-fg' onClick={() => shuffle()}>
+          Shuffle
+        </button>
+      </div>
       <small>
         Use the cursor to reveal the relationship between the language bubbles. Use left click to drag them around, and
         use right click and scroll wheel for camera controls.

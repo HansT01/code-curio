@@ -34,8 +34,9 @@ export default function ProgrammingLanguageOverlap() {
         industry trends, and project needs.
         <br />
         <br />
-        By graphing the interconnectedness of programming languages, this visualization can offer valuable insights into
-        the factors that shape developers' language choices and specialization paths.
+        The data used for this visualization is from the 2023 Stack Overflow Survey. By graphing the interconnectedness
+        of programming languages, this visualization can offer valuable insights into the factors that shape developers'
+        language choices and specialization paths.
       </p>
       <ProgrammingLanguageOverlapCanvas />
     </main>
