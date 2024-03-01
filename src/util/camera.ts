@@ -31,7 +31,13 @@ export class Camera2D {
     this.preventLeftPan = preventLeftPan
   }
 
-  mouseInWorld() {
+  cursorInWorld() {
+    const touches = this.p.touches as Touch[]
+    if (touches.length === 1) {
+      const x = (touches[0].x - this.x) / this.zoom
+      const y = (touches[0].y - this.y) / this.zoom
+      return [x, y]
+    }
     const x = (this.p.mouseX - this.x) / this.zoom
     const y = (this.p.mouseY - this.y) / this.zoom
     return [x, y] as const

@@ -149,7 +149,7 @@ class BubbleManager {
     if (this.isDragging) {
       return
     }
-    const [x, y] = this.camera.mouseInWorld()
+    const [x, y] = this.camera.cursorInWorld()
     let closest = null
     let closestDistance = Number.MAX_VALUE
     for (let bubble of this.bubbles) {
@@ -163,13 +163,20 @@ class BubbleManager {
   }
 
   dragStart() {
-    if (this.p.mouseButton === this.p.LEFT) {
+    const touches = this.p.touches as Touch[]
+    this.hover()
+    if (this.p.mouseButton === this.p.LEFT || touches.length === 1) {
       this.isDragging = true
     }
   }
 
   dragEnd() {
+    const touches = this.p.touches as Touch[]
+    if (touches.length > 0) {
+      return
+    }
     this.isDragging = false
+    this.hover()
   }
 
   splitSelected() {
@@ -178,7 +185,7 @@ class BubbleManager {
   }
 
   draw() {
-    const [x, y] = this.camera.mouseInWorld()
+    const [x, y] = this.camera.cursorInWorld()
     const [selected, bubbles] = this.splitSelected()
     for (let bubble of bubbles) {
       bubble.update(this.bubbles)
@@ -228,8 +235,14 @@ const ProgrammingLanguageOverlap = () => {
     p.mouseDragged = () => manager.camera.mouseDragged()
     p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
 
-    p.touchStarted = () => manager.camera.touchStarted()
-    p.touchEnded = () => manager.camera.touchEnded()
+    p.touchStarted = () => {
+      manager.camera.touchStarted()
+      manager.dragStart()
+    }
+    p.touchEnded = () => {
+      manager.camera.touchEnded()
+      manager.dragEnd()
+    }
     p.touchMoved = (e: TouchEvent) => manager.camera.touchMoved(e)
 
     onMount(() => {
