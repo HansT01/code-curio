@@ -2,7 +2,7 @@ import { A } from '@solidjs/router'
 import { Component, createSignal, onCleanup, onMount } from 'solid-js'
 import { cn } from '~/util/cn'
 
-const Footer: Component = (props) => {
+const Footer: Component = () => {
   const [width, setWidth] = createSignal(0)
   let footerRef: HTMLElement | undefined
 
@@ -13,6 +13,7 @@ const Footer: Component = (props) => {
       }
       setWidth(footerRef.offsetWidth)
     }
+    updateWidth()
     window.addEventListener('resize', updateWidth)
     onCleanup(() => {
       window.removeEventListener('resize', updateWidth)
