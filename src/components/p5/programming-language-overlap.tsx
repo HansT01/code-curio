@@ -273,6 +273,7 @@ const ProgrammingLanguageOverlap = () => {
       onMount(() => {
         const preventContextMenu = (e: MouseEvent) => {
           e.preventDefault()
+          return false
         }
         ref.addEventListener('contextmenu', preventContextMenu)
         onCleanup(() => {
@@ -305,7 +306,10 @@ const ProgrammingLanguageOverlap = () => {
   return (
     <div class='flex flex-col items-start gap-4' ref={parentRef}>
       <div class='flex flex-wrap'>
-        <button class='bg-primary px-4 py-3 text-primary-fg' onClick={() => shuffle()}>
+        <button
+          class='rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+          onClick={() => shuffle()}
+        >
           Shuffle
         </button>
       </div>
