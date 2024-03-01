@@ -96,8 +96,8 @@ export class Camera2D {
       return
     }
     this.isDragging = true
-    this.prevX = this.p.mouseX
-    this.prevY = this.p.mouseY
+    this.prevX = (touches[0].x + touches[1].x) / 2
+    this.prevY = (touches[0].y + touches[1].y) / 2
     this.prevTouches = touches
   }
 
@@ -141,7 +141,7 @@ export class Camera2D {
     )
     const distance = this.p.dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y)
     const factor = distance / prevDistance
-    const zoom = this.p.constrain(this.zoom + factor, 0.1, 10.0) - this.zoom
+    const zoom = this.p.constrain(this.zoom * factor, 0.1, 10.0) - this.zoom
 
     const wx = (x - this.x) / this.zoom
     const wy = (y - this.y) / this.zoom
