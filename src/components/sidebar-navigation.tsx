@@ -2,6 +2,7 @@ import { A } from '@solidjs/router'
 import dayjs from 'dayjs'
 import { Menu, Pencil, X } from 'lucide-solid'
 import { Component, For, JSX, Show, Suspense, createResource, createSignal, onCleanup, onMount } from 'solid-js'
+import { getRequestEvent } from 'solid-js/web'
 import { cn } from '~/util/cn'
 import { Tag, getCurios, validTags } from '~/util/curio'
 
@@ -124,13 +125,28 @@ const CurioList: Component = () => {
   )
 }
 
+const isMobile = () => {
+  const req = getRequestEvent()
+  if (req === undefined) {
+    return false
+  }
+  const userAgent = req.request.headers.get('user-agent')
+  if (userAgent === null) {
+    return false
+  }
+  const regex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+  const isMobile = regex.test(userAgent)
+  console.log('Request is', isMobile ? 'from mobile device' : 'not from mobile')
+  return isMobile
+}
+
 interface NavigationProps {
   children: JSX.Element
 }
 
 const Navigation: Component<NavigationProps> = (props) => {
   const [sidebarWidth, setSidebarWidth] = createSignal(500)
-  const [isSidebar, setIsSidebar] = createSignal(true)
+  const [isSidebar, setIsSidebar] = createSignal(!isMobile())
   const [isOpen, setIsOpen] = createSignal(false)
 
   const handleMouseResize = (e: MouseEvent) => {
@@ -182,10 +198,19 @@ const Navigation: Component<NavigationProps> = (props) => {
         {props.children}
       </div>
       <div
+        class={cn(
+          'pointer-events-none fixed inset-0 cursor-pointer bg-black opacity-0 transition-opacity duration-200',
+          {
+            'pointer-events-auto opacity-40': isOpen() && !isSidebar(),
+          },
+        )}
+        onClick={() => setIsOpen(false)}
+      />
+      <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
           'fixed -top-[80vh] bottom-0 left-0 overflow-y-auto overflow-x-hidden border-secondary bg-primary px-6 py-4 text-primary-fg transition-[top] duration-100',
-          { 'top-[64px]': isSidebar() || isOpen(), 'h-[80vh]': !isSidebar(), 'border-b-[9px]': !isSidebar() },
+          { 'top-[64px]': isSidebar() || isOpen(), 'h-[80vh] border-b-[9px]': !isSidebar() },
         )}
       >
         <CurioList />
@@ -207,9 +232,7 @@ const Navigation: Component<NavigationProps> = (props) => {
         class={cn(
           'fixed left-0 top-0 flex h-[64px] items-center justify-between overflow-hidden border-primary bg-primary px-6 text-primary-fg',
           {
-            'border-b-2': !isSidebar(),
-            'bg-accent': !isSidebar(),
-            'text-accent-fg': !isSidebar(),
+            'border-b-2 bg-accent text-accent-fg': !isSidebar(),
           },
         )}
       >
