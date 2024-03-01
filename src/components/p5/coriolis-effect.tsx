@@ -1,23 +1,24 @@
 import { Minus, Plus } from 'lucide-solid'
 import p5 from 'p5'
-import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Accessor, createEffect, createSignal } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
+import Canvas from '../canvas'
 
 class Particle {
   p: p5
   config: Accessor<typeof defaultConfig>
-  radius: number
   position: p5.Vector
   velocity: p5.Vector
   history: CircularQueue<p5.Vector>
   count: number
 
-  constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number) {
+  constructor(p: p5, config: Accessor<typeof defaultConfig>) {
     this.p = p
     this.config = config
-    this.radius = radius
-    this.position = p.createVector(...this.fromSpherical(radius, p.randomGaussian(0, p.PI / 4), p.random(2 * p.PI)))
+    this.position = p.createVector(
+      ...this.fromSpherical(config().radius, p.randomGaussian(0, p.PI / 4), p.random(2 * p.PI)),
+    )
     this.velocity = p5.Vector.random3D()
     this.velocity.setMag(0)
     this.history = new CircularQueue(10)
@@ -106,7 +107,7 @@ class Particle {
       this.velocity.setMag(this.config().maxVelocity)
     }
     this.position.add(this.velocity)
-    this.position.setMag(this.radius)
+    this.position.setMag(this.config().radius)
   }
 
   show() {
@@ -134,6 +135,7 @@ class Particle {
 const defaultConfig = {
   trailMode: true,
   transparentSphere: false,
+  radius: 200,
   maxVelocity: 3,
   separationRange: 40,
   separationFactor: 20,
@@ -142,118 +144,68 @@ const defaultConfig = {
 }
 
 const CoriolisEffectCanvas = () => {
-  const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
+  const dimensions = { width: 854, height: 480 }
   const [config, setConfig] = createSignal(defaultConfig)
   const [countIndex, setCountIndex] = createSignal(3)
   const count = [1, 5, 20, 50, 100, 200]
 
-  let parentRef: HTMLDivElement | undefined = undefined
+  const sketch = (p: p5) => {
+    const particles: Particle[] = []
 
-  onMount(() => {
-    const resize = () => {
-      if (parentRef !== undefined) {
-        setDimensions({ ...dimensions(), width: Math.min(parentRef.clientWidth, 854) })
+    p.setup = () => {
+      const canvas = p.createCanvas(dimensions.width, dimensions.height, p.WEBGL)
+      canvas.style('visibility', 'visible')
+      resetParticles(50)
+    }
+
+    p.draw = () => {
+      p.background(50)
+      if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
+        p.orbitControl()
+      }
+      p.strokeWeight(1)
+      p.stroke(45, 149, 150)
+      if (config().transparentSphere) {
+        p.noFill()
+      } else {
+        p.fill(154, 208, 194)
+      }
+      p.sphere(config().radius)
+
+      const radius = config().radius + 50
+      const quadtree = new Octree<Particle>(new Box(0, 0, 0, radius, radius, radius), 5)
+      for (let particle of particles) {
+        quadtree.insert(particle)
+      }
+      for (let particle of particles) {
+        const range = new Box(
+          particle.position.x,
+          particle.position.y,
+          particle.position.z,
+          config().radius / 2,
+          config().radius / 2,
+          config().radius / 2,
+        )
+        const neighbors = quadtree.query(range)
+        particle.update(neighbors)
+        particle.show()
       }
     }
-    resize()
-    window.addEventListener('resize', resize)
-    onCleanup(() => {
-      window.removeEventListener('resize', resize)
-    })
-  })
 
-  // createEffect(() => {
-  //   const canvases = document.querySelectorAll<HTMLCanvasElement>('canvas.p5Canvas')
-  //   canvases.forEach((canvas) => {
-  //     if (canvas.style.visibility === 'hidden') {
-  //       canvas.style.display = 'none'
-  //     } else {
-  //       canvas.style.display = 'block'
-  //     }
-  //   })
-  // })
-
-  const createSketch = (ref: HTMLDivElement) => {
-    const sketch = (p: p5) => {
-      const sphereRadius = 200
-      const particles: Particle[] = []
-
-      p.setup = () => {
-        const canvas = p.createCanvas(dimensions().width, dimensions().height, p.WEBGL)
-        canvas.parent(ref)
-        canvas.style('visibility', 'visible')
-        resetParticles(50)
+    const resetParticles = (numParticles: number) => {
+      particles.length = 0
+      for (let i = 0; i < numParticles; i++) {
+        particles.push(new Particle(p, config))
       }
-
-      p.draw = () => {
-        p.background(50)
-        if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
-          p.orbitControl()
-        }
-        p.strokeWeight(1)
-        p.stroke(45, 149, 150)
-        if (config().transparentSphere) {
-          p.noFill()
-        } else {
-          p.fill(154, 208, 194)
-        }
-        p.sphere(sphereRadius)
-
-        const radius = sphereRadius + 50
-        const quadtree = new Octree<Particle>(new Box(0, 0, 0, radius, radius, radius), 5)
-        for (let particle of particles) {
-          quadtree.insert(particle)
-        }
-        for (let particle of particles) {
-          const range = new Box(
-            particle.position.x,
-            particle.position.y,
-            particle.position.z,
-            particle.radius,
-            particle.radius,
-            particle.radius,
-          )
-          const neighbors = quadtree.query(range)
-          particle.update(neighbors)
-          particle.show()
-        }
-      }
-
-      const resetParticles = (numParticles: number) => {
-        particles.length = 0
-        for (let i = 0; i < numParticles; i++) {
-          particles.push(new Particle(p, config, sphereRadius))
-        }
-      }
-
-      createEffect(() => {
-        resetParticles(count[countIndex()])
-      })
-
-      createEffect(() => {
-        p.resizeCanvas(dimensions().width, dimensions().height)
-      })
-
-      onCleanup(() => {
-        p.remove()
-      })
     }
-    onMount(() => {
-      const children = ref.childNodes
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i] as HTMLElement
-        if (child.style.visibility === 'hidden') {
-          child.style.display = 'none'
-        } else {
-          child.style.display = 'block'
-        }
-      }
+
+    createEffect(() => {
+      resetParticles(count[countIndex()])
     })
-    new p5(sketch, ref)
   }
 
   return (
-    <div class='flex flex-col items-start gap-4' ref={parentRef}>
+    <div class='flex flex-col items-start gap-4'>
       <div class='flex flex-col items-start'>
         <label for='particle-count' class='mb-2'>
           Particle Count
@@ -340,7 +292,7 @@ const CoriolisEffectCanvas = () => {
         </div>
       </div>
       <small>Use the mouse for camera controls.</small>
-      <div class='select-none [&>canvas]:rounded-2xl' ref={createSketch} />
+      <Canvas sketch={sketch} {...dimensions} />
     </div>
   )
 }

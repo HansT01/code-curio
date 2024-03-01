@@ -1,7 +1,8 @@
 import p5 from 'p5'
-import { Accessor, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Accessor, createSignal, onMount } from 'solid-js'
 import { Camera2D } from '~/util/camera'
 import { getCoOccurenceMatrix } from '~/util/data'
+import Canvas from '../canvas'
 
 class Bubble {
   p: p5
@@ -201,110 +202,62 @@ const defaultConfig = {
 }
 
 const ProgrammingLanguageOverlap = () => {
-  const [dimensions, setDimensions] = createSignal({ width: 854, height: 480 })
+  const dimensions = { width: 854, height: 480 }
   const [config, setConfig] = createSignal(defaultConfig)
 
   let shuffle: () => void
-  let parentRef: HTMLDivElement | undefined = undefined
 
-  onMount(() => {
-    const resize = () => {
-      if (parentRef !== undefined) {
-        setDimensions({ ...dimensions(), width: Math.min(parentRef.clientWidth, 854) })
+  const sketch = (p: p5) => {
+    const manager = new BubbleManager(p, [])
+
+    p.mousePressed = () => {
+      manager.camera.mousePressed()
+      manager.dragStart()
+    }
+    p.mouseReleased = () => {
+      manager.camera.mouseReleased()
+      manager.dragEnd()
+    }
+    p.mouseMoved = () => manager.hover()
+    p.mouseDragged = () => manager.camera.mouseDragged()
+    p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
+
+    p.setup = () => {
+      const canvas = p.createCanvas(dimensions.width, dimensions.height)
+      canvas.style('visibility', 'visible')
+      manager.camera.x = 0
+      manager.camera.y = 0
+    }
+
+    p.draw = () => {
+      p.background(50)
+      p.translate(manager.camera.x, manager.camera.y)
+      p.scale(manager.camera.zoom)
+      manager.draw()
+    }
+
+    onMount(() => {
+      getCoOccurenceMatrix().then((matrix) => {
+        for (let i = 0; i < matrix.data.length; i++) {
+          manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
+        }
+      })
+    })
+
+    shuffle = () => {
+      for (let bubble of manager.bubbles) {
+        const angle = p.random(-p.PI / 2, p.PI / 2)
+        const offset = p.createVector(p.width / 2, p.height / 2)
+        offset.sub(bubble.position)
+        offset.rotate(angle)
+        offset.setMag(10)
+        bubble.velocity.add(offset)
       }
     }
-    resize()
-    window.addEventListener('resize', resize)
-    onCleanup(() => {
-      window.removeEventListener('resize', resize)
-    })
-  })
-
-  createEffect(() => {
-    const canvases = document.querySelectorAll<HTMLCanvasElement>('canvas.p5Canvas')
-    canvases.forEach((canvas) => {
-      if (canvas.style.visibility === 'hidden') {
-        canvas.style.display = 'none'
-      } else {
-        canvas.style.display = 'block'
-      }
-    })
-  })
-
-  const createSketch = (ref: HTMLDivElement) => {
-    const sketch = (p: p5) => {
-      const manager = new BubbleManager(p, [])
-
-      p.mousePressed = () => {
-        manager.camera.mousePressed()
-        manager.dragStart()
-      }
-      p.mouseReleased = () => {
-        manager.camera.mouseReleased()
-        manager.dragEnd()
-      }
-      p.mouseMoved = () => manager.hover()
-      p.mouseDragged = () => manager.camera.mouseDragged()
-      p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
-
-      p.setup = () => {
-        const canvas = p.createCanvas(dimensions().width, dimensions().height)
-        canvas.parent(ref)
-        canvas.style('visibility', 'visible')
-        manager.camera.x = 0
-        manager.camera.y = 0
-      }
-
-      p.draw = () => {
-        p.background(50)
-        p.translate(manager.camera.x, manager.camera.y)
-        p.scale(manager.camera.zoom)
-        manager.draw()
-      }
-
-      onMount(() => {
-        getCoOccurenceMatrix().then((matrix) => {
-          for (let i = 0; i < matrix.data.length; i++) {
-            manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
-          }
-        })
-      })
-
-      onMount(() => {
-        const preventContextMenu = (e: MouseEvent) => {
-          e.preventDefault()
-          return false
-        }
-        ref.addEventListener('contextmenu', preventContextMenu)
-        onCleanup(() => {
-          ref.removeEventListener('contextmenu', preventContextMenu)
-        })
-      })
-
-      shuffle = () => {
-        for (let bubble of manager.bubbles) {
-          const angle = p.random(-p.PI / 2, p.PI / 2)
-          const offset = p.createVector(p.width / 2, p.height / 2)
-          offset.sub(bubble.position)
-          offset.rotate(angle)
-          offset.setMag(10)
-          bubble.velocity.add(offset)
-        }
-      }
-
-      createEffect(() => {
-        p.resizeCanvas(dimensions().width, dimensions().height)
-      })
-
-      onCleanup(() => {
-        p.remove()
-      })
-    }
-    new p5(sketch, ref)
   }
 
   return (
-    <div class='flex flex-col items-start gap-4' ref={parentRef}>
+    <div class='flex flex-col items-start gap-4'>
       <div class='flex flex-wrap'>
         <button
           class='rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
@@ -317,7 +270,7 @@ const ProgrammingLanguageOverlap = () => {
         Use the cursor to reveal the relationship between the language bubbles. Use left click to drag them around, and
         use right click and scroll wheel for camera controls.
       </small>
-      <div class='select-none [&>canvas]:rounded-2xl' ref={createSketch} />
+      <Canvas sketch={sketch} {...dimensions} />
     </div>
   )
 }

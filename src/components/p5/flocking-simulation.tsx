@@ -151,6 +151,7 @@ const FlockingSimulationCanvas = () => {
 
   const sketch = (p: p5) => {
     const flock: Boid[] = []
+
     p.setup = () => {
       const canvas = p.createCanvas(dimensions.width, dimensions.height)
       canvas.style('visibility', 'visible')
@@ -158,6 +159,7 @@ const FlockingSimulationCanvas = () => {
         flock.push(new Boid(p, config))
       }
     }
+
     p.draw = () => {
       p.background(50)
       const quadtree = new Quadtree<Boid>(new Rectangle(-p.width, -p.height, 3 * p.width, 3 * p.height), 5)
