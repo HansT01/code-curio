@@ -97,7 +97,7 @@ const CurioList: Component = () => {
             <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
               <A href={`/curio/${curio.id}`}>
                 <div class='flex flex-col gap-0 overflow-x-hidden rounded-xl bg-background px-4 py-2 text-background-fg'>
-                  <h3>{curio.title}</h3>
+                  <h2>{curio.title}</h2>
                   <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
                   <Show when={curio.tags.length > 0}>
                     <div class='my-1 flex flex-wrap gap-2'>
