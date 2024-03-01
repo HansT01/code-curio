@@ -177,12 +177,9 @@ const FlockingSimulationCanvas = () => {
   const createSketch = (ref: HTMLDivElement) => {
     const flock: Boid[] = []
     const sketch = (p: p5) => {
-      p.preload = () => {}
       p.setup = () => {
         const canvas = p.createCanvas(dimensions().width, dimensions().height)
-        canvas.parent(ref)
         canvas.style('visibility', 'visible')
-
         for (let i = 0; i < 300; i++) {
           flock.push(new Boid(p, config))
         }
@@ -261,7 +258,7 @@ const FlockingSimulationCanvas = () => {
       </div>
       <small>Use the cursor to repel the boids.</small>
       <div
-        class='w-full select-none [&>canvas]:rounded-2xl'
+        class='w-full [&>canvas]:rounded-2xl'
         ref={(ref) => {
           createResize(ref)
           createPreventContextMenu(ref)
