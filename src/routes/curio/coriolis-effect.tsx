@@ -7,7 +7,7 @@ export const info: CurioInfo = {
   id: 'coriolis-effect',
   title: 'Coriolis Effect',
   created: new Date(2024, 2, 28),
-  tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics', 'simulation'],
+  tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics', 'simulation', '3d'],
 }
 
 const CoriolisEffectCanvas = clientOnly(() => import('~/components/p5/coriolis-effect'))
