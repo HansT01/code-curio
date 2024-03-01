@@ -7,7 +7,7 @@ export const info: CurioInfo = {
   id: 'programming-language-overlap',
   title: 'Programming Language Overlap',
   created: new Date(2024, 2, 30),
-  tags: [],
+  tags: ['animation', 'data-vis', 'interactive', 'p5.js'],
 }
 
 const ProgrammingLanguageOverlapCanvas = clientOnly(() => import('~/components/p5/programming-language-overlap'))
