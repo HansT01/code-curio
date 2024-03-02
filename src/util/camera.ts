@@ -1,6 +1,6 @@
 import p5 from 'p5'
 
-interface Touch {
+export interface Touch {
   x: number
   y: number
   winX: number
@@ -44,7 +44,7 @@ export class Camera2D {
   }
 
   mousePressed() {
-    if (this.p.mouseX < 0 || this.p.mouseX > this.p.width || this.p.mouseY < 0 || this.p.mouseY > this.p.height) {
+    if (!isMouseInCanvas(this.p)) {
       return
     }
     this.isDragging = true
@@ -76,7 +76,7 @@ export class Camera2D {
   }
 
   mouseWheel(e: WheelEvent) {
-    if (this.p.mouseX < 0 || this.p.mouseX > this.p.width || this.p.mouseY < 0 || this.p.mouseY > this.p.height) {
+    if (!isMouseInCanvas(this.p)) {
       return
     }
     e.preventDefault()
@@ -94,10 +94,10 @@ export class Camera2D {
   }
 
   touchStarted() {
-    const touches = this.p.touches as Touch[]
-    if (touches[0].x < 0 || touches[0].x > this.p.width || touches[0].y < 0 || touches[0].y > this.p.height) {
+    if (!isTouchInCanvas(this.p)) {
       return
     }
+    const touches = this.p.touches as Touch[]
     if (touches.length < 2) {
       return
     }
@@ -119,11 +119,11 @@ export class Camera2D {
   }
 
   touchMoved(e: TouchEvent) {
-    const touches = this.p.touches as Touch[]
-    if (touches[0].x < 0 || touches[0].x > this.p.width || touches[0].y < 0 || touches[0].y > this.p.height) {
+    if (!isTouchInCanvas(this.p)) {
       return
     }
     e.preventDefault()
+    const touches = this.p.touches as Touch[]
     if (touches.length < 2 || this.prevTouches === null || this.prevTouches.length < 2) {
       this.prevTouches = touches
       return
@@ -157,4 +157,16 @@ export class Camera2D {
 
     this.prevTouches = touches
   }
+}
+
+export const isMouseInCanvas = (p: p5) => {
+  return p.mouseX >= 0 && p.mouseX < p.width && p.mouseY >= 0 && p.mouseY < p.height
+}
+
+export const isTouchInCanvas = (p: p5) => {
+  if (p.touches.length === 0) {
+    return false
+  }
+  const touch = p.touches[0] as Touch
+  return touch.x >= 0 && touch.x < p.width && touch.y >= 0 && touch.y < p.height
 }

@@ -21,7 +21,7 @@ class Bubble {
     this.index = index
     this.weights = weights
     this.radius = weights[index] ** 0.333
-    this.position = p.createVector(p.random(p.width), p.random(p.height))
+    this.position = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2))
     this.velocity = p5.Vector.random2D()
     this.velocity.setMag(0)
   }
@@ -67,7 +67,7 @@ class Bubble {
   }
 
   center() {
-    const offset = this.p.createVector(this.p.width / 2, this.p.height / 2)
+    const offset = this.p.createVector(0, 0)
     offset.sub(this.position)
     offset.mult(this.config().radialAccelerationFactor)
     this.velocity.add(offset)
@@ -219,9 +219,8 @@ const ProgrammingLanguageOverlap = () => {
 
   const setup = (p: p5) => {
     manager = new BubbleManager(p, [])
-
-    manager.camera.x = 0
-    manager.camera.y = 0
+    manager.camera.x = p.width / 2
+    manager.camera.y = p.height / 2
 
     p.mousePressed = () => {
       manager.camera.mousePressed()
