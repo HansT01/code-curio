@@ -1,7 +1,7 @@
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import { Quadtree, Rectangle } from '~/util/quadtree'
-import Canvas from '../canvas'
+import Canvas, { isMouseInCanvas } from '../canvas'
 
 class Boid {
   p: p5
@@ -12,26 +12,28 @@ class Boid {
   constructor(p: p5, config: Accessor<typeof defaultConfig>) {
     this.p = p
     this.config = config
-    this.position = p.createVector(p.random(p.width), p.random(p.height))
+    this.position = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2))
     this.velocity = p5.Vector.random2D()
     this.velocity.setMag(p.random(1, 2))
   }
 
   edge() {
-    if (this.position.x < this.config().edgeMargin) {
+    const halfWidth = this.p.width / 2
+    const halfHeight = this.p.height / 2
+    if (this.position.x < this.config().edgeMargin - halfWidth) {
       this.velocity.add(this.config().edgeFactor, 0)
-    } else if (this.position.x > this.p.width - this.config().edgeMargin) {
+    } else if (this.position.x > halfWidth - this.config().edgeMargin) {
       this.velocity.sub(this.config().edgeFactor, 0)
     }
-    if (this.position.y < this.config().edgeMargin) {
+    if (this.position.y < this.config().edgeMargin - halfHeight) {
       this.velocity.add(0, this.config().edgeFactor)
-    } else if (this.position.y > this.p.height - this.config().edgeMargin) {
+    } else if (this.position.y > halfHeight - this.config().edgeMargin) {
       this.velocity.sub(0, this.config().edgeFactor)
     }
   }
 
   mouse() {
-    if (this.p.mouseX < 0 || this.p.mouseX > this.p.width || this.p.mouseY < 0 || this.p.mouseY > this.p.height) {
+    if (!isMouseInCanvas(this.p)) {
       return
     }
     const distance = this.p.dist(this.position.x, this.position.y, this.p.mouseX, this.p.mouseY)
@@ -157,7 +159,8 @@ const FlockingSimulationCanvas = () => {
 
   const draw = (p: p5) => {
     p.background(50)
-    const quadtree = new Quadtree<Boid>(new Rectangle(-p.width, -p.height, 3 * p.width, 3 * p.height), 5)
+    p.translate(p.width / 2, p.height / 2)
+    const quadtree = new Quadtree<Boid>(new Rectangle(0, 0, p.width, p.height), 5)
     for (let boid of flock) {
       quadtree.insert(boid)
     }

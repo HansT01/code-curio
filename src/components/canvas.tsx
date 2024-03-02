@@ -1,6 +1,10 @@
 import p5 from 'p5'
 import { Component, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 
+export const isMouseInCanvas = (p: p5) => {
+  return p.mouseX >= 0 && p.mouseX < p.width && p.mouseY >= 0 && p.mouseY < p.height
+}
+
 interface CanvasProps {
   setup: (p: p5) => void
   draw: (p: p5) => void
