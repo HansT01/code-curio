@@ -1,5 +1,5 @@
 import p5 from 'p5'
-import { Accessor, createSignal, onMount } from 'solid-js'
+import { Accessor, createSignal, onCleanup, onMount } from 'solid-js'
 import { Camera2D } from '~/util/camera'
 import { getCoOccurenceMatrix } from '~/util/data'
 import Canvas from '../canvas'
@@ -31,17 +31,17 @@ class Bubble {
     return distance < this.radius
   }
 
-  attraction(neighbors: Bubble[]) {
+  attraction(bubbles: Bubble[]) {
     const totalOffset = this.p.createVector(0, 0)
-    for (let neighbor of neighbors) {
-      if (neighbor === this) {
+    for (let bubble of bubbles) {
+      if (bubble === this) {
         continue
       }
-      const offset = p5.Vector.sub(neighbor.position, this.position)
+      const offset = p5.Vector.sub(bubble.position, this.position)
       offset.setMag(
         this.p.max(
-          this.weights[neighbor.index] / this.weights[this.index],
-          neighbor.weights[this.index] / neighbor.weights[neighbor.index],
+          this.weights[bubble.index] / this.weights[this.index],
+          bubble.weights[this.index] / bubble.weights[bubble.index],
         ) ** this.config().weightExponent,
       )
       totalOffset.add(offset)
@@ -50,15 +50,15 @@ class Bubble {
     this.velocity.add(totalOffset)
   }
 
-  repulsion(neighbors: Bubble[]) {
+  repulsion(bubbles: Bubble[]) {
     const totalOffset = this.p.createVector(0, 0)
-    for (let neighbor of neighbors) {
-      if (neighbor === this) {
+    for (let bubble of bubbles) {
+      if (bubble === this) {
         continue
       }
-      const offset = p5.Vector.sub(this.position, neighbor.position)
+      const offset = p5.Vector.sub(this.position, bubble.position)
       offset.div(offset.magSq())
-      offset.mult(this.weights[neighbor.index])
+      offset.mult(this.weights[bubble.index])
       totalOffset.add(offset)
     }
     totalOffset.div(this.weights[this.index])
@@ -82,9 +82,9 @@ class Bubble {
     this.position.set(x, y)
   }
 
-  update(neighbors: Bubble[]) {
-    this.attraction(neighbors)
-    this.repulsion(neighbors)
+  update(bubbles: Bubble[]) {
+    this.attraction(bubbles)
+    this.repulsion(bubbles)
     this.center()
     this.decelerate()
     this.position.add(this.velocity)
@@ -108,15 +108,15 @@ class Bubble {
     this.p.pop()
   }
 
-  showEdges(neighbors: Bubble[]) {
-    for (let neighbor of neighbors) {
-      if (neighbor === this) {
+  showEdges(bubbles: Bubble[]) {
+    for (let bubble of bubbles) {
+      if (bubble === this) {
         continue
       }
       const weight =
         this.p.max(
-          this.weights[neighbor.index] / this.weights[this.index],
-          neighbor.weights[this.index] / neighbor.weights[neighbor.index],
+          this.weights[bubble.index] / this.weights[this.index],
+          bubble.weights[this.index] / bubble.weights[bubble.index],
         ) ** this.config().weightExponent
       const threshold = 0.2
       const normalizedWeight = (weight - threshold) / (1 - threshold)
@@ -124,7 +124,7 @@ class Bubble {
       this.p.push()
       this.p.stroke(255, normalizedWeight * 255)
       this.p.strokeWeight(5)
-      this.p.line(this.position.x, this.position.y, neighbor.position.x, neighbor.position.y)
+      this.p.line(this.position.x, this.position.y, bubble.position.x, bubble.position.y)
       this.p.push()
     }
   }
@@ -249,6 +249,18 @@ const ProgrammingLanguageOverlap = () => {
         for (let i = 0; i < matrix.data.length; i++) {
           manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
         }
+      })
+    })
+
+    onMount(() => {
+      const resize = () => {
+        if (manager !== undefined) {
+          manager.camera.canvasResized()
+        }
+      }
+      window.addEventListener('resize', resize)
+      onCleanup(() => {
+        window.removeEventListener('resize', resize)
       })
     })
 

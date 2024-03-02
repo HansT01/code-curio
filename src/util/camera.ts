@@ -10,9 +10,11 @@ export interface Touch {
 
 export class Camera2D {
   p: p5
+  width: number
+  height: number
+  zoom: number
   x: number
   y: number
-  zoom: number
   prevX: number | null
   prevY: number | null
   prevTouches: Touch[] | null
@@ -21,9 +23,11 @@ export class Camera2D {
 
   constructor(p: p5, preventLeftPan: boolean = false) {
     this.p = p
+    this.width = p.width
+    this.height = p.height
+    this.zoom = 1
     this.x = 0
     this.y = 0
-    this.zoom = 1
     this.prevX = null
     this.prevY = null
     this.prevTouches = null
@@ -41,6 +45,13 @@ export class Camera2D {
     const x = (this.p.mouseX - this.x) / this.zoom
     const y = (this.p.mouseY - this.y) / this.zoom
     return [x, y] as const
+  }
+
+  canvasResized() {
+    this.x += ((this.p.width - this.width) * this.zoom) / 2
+    this.y += ((this.p.height - this.height) * this.zoom) / 2
+    this.width = this.p.width
+    this.height = this.p.height
   }
 
   mousePressed() {
