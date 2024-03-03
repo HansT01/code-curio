@@ -113,7 +113,6 @@ const NeonConstellationCanvas = () => {
   }
 
   const setup = (p: p5) => {
-    // p.setAttributes('alpha', true)
     p.shader(shader)
     p.noStroke()
   }
@@ -122,7 +121,9 @@ const NeonConstellationCanvas = () => {
     p.background(0)
     p.rect(0, 0, p.width, p.height)
     shader.setUniform('u_resolution', [p.width, p.height])
-    shader.setUniform('u_lights', [-200, 0, 10, 200, 0, 100])
+    shader.setUniform('u_lightPositions', [-200, 0, 200, 0])
+    shader.setUniform('u_lightRadii', [10, 10])
+    shader.setUniform('u_lightColors', [1, 1, 1, 1, 1, 1])
   }
 
   return (
