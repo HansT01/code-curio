@@ -65,5 +65,16 @@ void main() {
         color += lightColor * intensity * lightRadius;
     }
 
+    for (int i = 0; i < NUM_OBSTACLES; i++) {
+        vec2 obstaclePosition = (2.0 / u_resolution) * u_obstaclePositions[i] * aspectRatio;
+        float obstacleRadius = (2.0 / u_resolution.y) * u_obstacleRadii[i];
+
+        float dist = distance(obstaclePosition, coord) - 0.01;
+
+        if (dist < obstacleRadius) {
+            color += vec3(0.1);
+        }
+    }
+
     gl_FragColor = vec4(color, 1.0);
 }
