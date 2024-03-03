@@ -17,7 +17,7 @@ class NeonBubble {
     this.color = color
     this.position = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2))
     this.velocity = p5.Vector.random2D()
-    this.velocity.setMag(3)
+    this.velocity.setMag(2)
   }
 
   mass() {
@@ -107,6 +107,7 @@ const defaultConfig = {}
 const NeonConstellationCanvas = () => {
   const [config, setConfig] = createSignal(defaultConfig)
   const bubbles: NeonBubble[] = []
+  const linePairs: [NeonBubble, NeonBubble][] = []
 
   let shader: p5.Shader
 
@@ -117,11 +118,16 @@ const NeonConstellationCanvas = () => {
   const setup = (p: p5) => {
     p.shader(shader)
     p.noStroke()
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 10; i++) {
       bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
     }
-    for (let i = 0; i < 20; i++) {
-      bubbles.push(new NeonBubble(p, config, p.random(10, 40)))
+    for (let i = 0; i < bubbles.length; i++) {
+      for (let j = i + 1; j < bubbles.length; j++) {
+        linePairs.push([bubbles[i], bubbles[j]])
+      }
+    }
+    for (let i = 0; i < 10; i++) {
+      bubbles.push(new NeonBubble(p, config, p.random(10, 60)))
     }
     const logFPS = async () => {
       while (p.isLooping()) {
@@ -139,21 +145,6 @@ const NeonConstellationCanvas = () => {
 
     for (let bubble of bubbles) {
       bubble.update(bubbles)
-    }
-
-    const pairs: [NeonBubble, NeonBubble][] = []
-    for (let bubble of bubbles) {
-      if (bubble.color === undefined) {
-        continue
-      }
-      for (let neighbor of bubbles) {
-        if (bubble === neighbor || neighbor.color === undefined) {
-          continue
-        }
-        if (p.dist(bubble.position.x, bubble.position.y, neighbor.position.x, neighbor.position.y) < 200) {
-          pairs.push([bubble, neighbor])
-        }
-      }
     }
 
     const lightPositions: number[] = []
@@ -176,10 +167,17 @@ const NeonConstellationCanvas = () => {
       }
     }
 
-    for (let [bubble, neighbor] of pairs) {
-      lineStartPositions.push(bubble.position.x, bubble.position.y)
-      lineEndPositions.push(neighbor.position.x, neighbor.position.y)
-      lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
+    for (let [bubble, neighbor] of linePairs) {
+      if (p.dist(bubble.position.x, bubble.position.y, neighbor.position.x, neighbor.position.y) < 200) {
+        lineStartPositions.push(bubble.position.x, bubble.position.y)
+        lineEndPositions.push(neighbor.position.x, neighbor.position.y)
+        lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
+      }
+    }
+    for (let i = lineStartPositions.length; i < linePairs.length; i++) {
+      lineStartPositions.push(0, 0)
+      lineEndPositions.push(0, 0)
+      lineColors.push(0, 0, 0)
     }
 
     shader.setUniform('u_lightPositions', lightPositions)
@@ -191,7 +189,6 @@ const NeonConstellationCanvas = () => {
 
     shader.setUniform('u_lineStart', lineStartPositions)
     shader.setUniform('u_lineEnd', lineEndPositions)
-    shader.setUniform('u_lineColors', [0, 0, 0])
     shader.setUniform('u_lineColors', lineColors)
   }
 
