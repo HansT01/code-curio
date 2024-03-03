@@ -6,11 +6,11 @@ class NeonBubble {
   p: p5
   config: Accessor<typeof defaultConfig>
   radius: number
-  color: [number, number, number]
+  color?: [number, number, number]
   position: p5.Vector
   velocity: p5.Vector
 
-  constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number, color: [number, number, number]) {
+  constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number, color?: [number, number, number]) {
     this.p = p
     this.config = config
     this.radius = radius
@@ -115,8 +115,11 @@ const NeonConstellationCanvas = () => {
   }
 
   const setup = (p: p5) => {
-    for (let i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 20; i++) {
       bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
+    }
+    for (let i = 1; i <= 5; i++) {
+      bubbles.push(new NeonBubble(p, config, p.random(20, 50)))
     }
     p.shader(shader)
     p.noStroke()
@@ -134,16 +137,25 @@ const NeonConstellationCanvas = () => {
     const lightPositions: number[] = []
     const lightRadii: number[] = []
     const lightColors: number[] = []
+    const obstaclePositions: number[] = []
+    const obstacleRadii: number[] = []
 
     for (let bubble of bubbles) {
-      lightPositions.push(bubble.position.x, bubble.position.y)
-      lightRadii.push(bubble.radius)
-      lightColors.push(...bubble.color)
+      if (bubble.color !== undefined) {
+        lightPositions.push(bubble.position.x, bubble.position.y)
+        lightRadii.push(bubble.radius)
+        lightColors.push(...bubble.color)
+      } else {
+        obstaclePositions.push(bubble.position.x, bubble.position.y)
+        obstacleRadii.push(bubble.radius)
+      }
     }
 
     shader.setUniform('u_lightPositions', lightPositions)
     shader.setUniform('u_lightRadii', lightRadii)
     shader.setUniform('u_lightColors', lightColors)
+    shader.setUniform('u_obstaclePositions', obstaclePositions)
+    shader.setUniform('u_obstacleRadii', obstacleRadii)
   }
 
   return (
