@@ -122,7 +122,7 @@ const NeonConstellationCanvas = () => {
     p.rect(0, 0, p.width, p.height)
     shader.setUniform('u_resolution', [p.width, p.height])
     shader.setUniform('u_lightPositions', [-200, 0, 200, 0])
-    shader.setUniform('u_lightRadii', [10, 10])
+    shader.setUniform('u_lightRadii', [50, 10])
     shader.setUniform('u_lightColors', [1, 1, 1, 1, 1, 1])
   }
 
