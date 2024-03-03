@@ -16,12 +16,12 @@ void main() {
 
     for (int i = 0; i < NUM_LIGHTS; i++) {
         vec2 lightPos = (2.0 / u_resolution) * u_lightPositions[i] * aspectRatio;
-        float lightRadius = (2.0 / u_resolution.x) * u_lightRadii[i];
+        float lightRadius = (2.0 / u_resolution.y) * u_lightRadii[i];
         vec3 lightColor = u_lightColors[i];
 
         float dist = distance(lightPos, coord) - lightRadius;
         dist = clamp(dist, 0.0, 1.0);
-        float intensity = 1.0 / (dist);
+        float intensity = 1.0 / (dist) * 0.2;
         color += lightColor * intensity * lightRadius;
     }
 

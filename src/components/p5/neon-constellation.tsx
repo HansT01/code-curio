@@ -115,7 +115,7 @@ const NeonConstellationCanvas = () => {
   }
 
   const setup = (p: p5) => {
-    for (let i = 1; i <= 50; i++) {
+    for (let i = 1; i <= 100; i++) {
       bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
     }
     p.shader(shader)
