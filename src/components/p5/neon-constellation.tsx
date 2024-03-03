@@ -106,24 +106,23 @@ const NeonConstellationCanvas = () => {
   const [config, setConfig] = createSignal(defaultConfig)
   const bubbles: NeonBubble[] = []
 
-  let testShader: p5.Shader
+  let shader: p5.Shader
 
   const preload = (p: p5) => {
-    testShader = p.loadShader('/shaders/neon-constellation.vert', '/shaders/neon-constellation.frag')
+    shader = p.loadShader('/shaders/neon-constellation.vert', '/shaders/neon-constellation.frag')
   }
 
   const setup = (p: p5) => {
     p.setAttributes('alpha', true)
-    p.shader(testShader)
+    p.shader(shader)
     p.noStroke()
   }
 
   const draw = (p: p5) => {
-    p.clear()
+    p.background(0)
     p.rect(0, 0, 0, 0)
-    const color1 = [1, 0, 1]
-    const color2 = [0, 1, 1]
-    testShader.setUniform('color', color1.concat(color2))
+    shader.setUniform('u_resolution', [p.width, p.height])
+    shader.setUniform('u_lights', [200, 200, -200, -200])
   }
 
   return (
