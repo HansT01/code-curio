@@ -1,6 +1,7 @@
 import { Minus, Plus } from 'lucide-solid'
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
+import { Quadtree, Rectangle } from '~/util/quadtree'
 import Canvas from '../canvas'
 
 class NeonBubble {
@@ -18,7 +19,7 @@ class NeonBubble {
     this.color = color
     this.position = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2))
     this.velocity = p5.Vector.random2D()
-    this.velocity.setMag(2)
+    this.velocity.setMag(20 / radius)
   }
 
   mass() {
@@ -27,6 +28,21 @@ class NeonBubble {
 
   energy() {
     return 0.5 * this.mass() * (this.velocity.x ** 2 + this.velocity.y ** 2)
+  }
+
+  isOnLine(start: p5.Vector, end: p5.Vector) {
+    const line = p5.Vector.sub(end, start)
+    const length = line.mag()
+    const direction = line.normalize()
+    let t = p5.Vector.sub(this.position, start).dot(direction.x, direction.y)
+    t = this.p.max(t, 0.0)
+    t = this.p.min(t, length)
+    const closestPoint = p5.Vector.add(start, direction.mult(t))
+    const distance = this.p.dist(closestPoint.x, closestPoint.y, this.position.x, this.position.y)
+    if (distance < this.radius) {
+      return true
+    }
+    return false
   }
 
   edge() {
@@ -153,16 +169,49 @@ const NeonConstellationCanvas = () => {
     p.rect(0, 0, p.width, p.height)
     shader.setUniform('u_resolution', [p.width, p.height])
 
+    const quadtree = new Quadtree<NeonBubble>(new Rectangle(0, 0, p.width, p.height), 5)
     for (let bubble of bubbles) {
-      bubble.update(bubbles)
+      quadtree.insert(bubble)
+    }
+    for (let bubble of bubbles) {
+      const range = new Rectangle(bubble.position.x, bubble.position.y, 200, 200)
+      const neighbors = quadtree.query(range)
+      bubble.update(neighbors)
+    }
+
+    const lineStartPositions: number[] = []
+    const lineEndPositions: number[] = []
+    const lineColors: number[] = []
+    for (let [bubble, neighbor] of linePairs) {
+      const distance = p.dist(bubble.position.x, bubble.position.y, neighbor.position.x, neighbor.position.y)
+      if (distance > 200) {
+        continue
+      }
+      const range = new Rectangle(
+        (bubble.position.x + neighbor.position.x) / 2,
+        (bubble.position.y + neighbor.position.y) / 2,
+        distance / 2,
+        distance / 2,
+      )
+      const obstacles = quadtree.query(range)
+      let anyOnLine = false
+      for (let obstacle of obstacles) {
+        if (obstacle === bubble || obstacle === neighbor) {
+          continue
+        }
+        anyOnLine ||= obstacle.isOnLine(bubble.position, neighbor.position)
+      }
+      if (anyOnLine) {
+        continue
+      }
+      lineStartPositions.push(bubble.position.x, bubble.position.y)
+      lineEndPositions.push(neighbor.position.x, neighbor.position.y)
+      lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
     }
 
     const lightPositions: number[] = []
     const lightRadii: number[] = []
     const lightColors: number[] = []
-    const lineStartPositions: number[] = []
-    const lineEndPositions: number[] = []
-    const lineColors: number[] = []
     const obstaclePositions: number[] = []
     const obstacleRadii: number[] = []
 
@@ -174,14 +223,6 @@ const NeonConstellationCanvas = () => {
       } else {
         obstaclePositions.push(bubble.position.x, bubble.position.y)
         obstacleRadii.push(bubble.radius)
-      }
-    }
-
-    for (let [bubble, neighbor] of linePairs) {
-      if (p.dist(bubble.position.x, bubble.position.y, neighbor.position.x, neighbor.position.y) < 200) {
-        lineStartPositions.push(bubble.position.x, bubble.position.y)
-        lineEndPositions.push(neighbor.position.x, neighbor.position.y)
-        lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
       }
     }
     for (let i = lineStartPositions.length; i < 100; i++) {
