@@ -2,6 +2,7 @@ import p5 from 'p5'
 import { Component, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 
 interface CanvasProps {
+  preload?: (p: p5) => void
   setup: (p: p5) => void
   draw: (p: p5) => void
   width: number
@@ -39,6 +40,13 @@ const Canvas: Component<CanvasProps> = (props) => {
   }
 
   const sketch = (p: p5) => {
+    if (props.preload !== undefined) {
+      p.preload = () => {
+        if (props.preload !== undefined) {
+          props.preload(p)
+        }
+      }
+    }
     p.setup = () => {
       const canvas = p.createCanvas(dimensions().width, dimensions().height, props.webgl ? p.WEBGL : undefined)
       canvas.style('visibility', 'visible')

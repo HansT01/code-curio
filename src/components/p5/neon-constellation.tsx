@@ -59,8 +59,9 @@ class NeonBubble {
           .copy()
           .normalize()
           .mult(overlap / 2)
-        this.position.sub(correction)
-        bubble.position.add(correction)
+        const massOffset = this.mass() / bubble.mass()
+        this.position.sub(correction.div(massOffset))
+        bubble.position.add(correction.mult(massOffset))
 
         const m1 = this.mass()
         const m2 = bubble.mass()
@@ -105,23 +106,25 @@ const NeonConstellationCanvas = () => {
   const [config, setConfig] = createSignal(defaultConfig)
   const bubbles: NeonBubble[] = []
 
+  let testShader: p5.Shader
+
+  const preload = (p: p5) => {
+    testShader = p.loadShader('/shaders/neon-constellation.vert', '/shaders/neon-constellation.frag')
+  }
+
   const setup = (p: p5) => {
-    for (let i = 0; i < 5; i++) {
-      bubbles.push(new NeonBubble(p, config, 25))
-    }
+    p.shader(testShader)
+    p.noStroke()
   }
 
   const draw = (p: p5) => {
-    p.background(50)
-    for (let bubble of bubbles) {
-      bubble.update(bubbles)
-      bubble.show()
-    }
+    p.clear()
+    p.rect(0, 0, 1, 1)
   }
 
   return (
     <div class='flex w-full flex-col gap-4'>
-      <Canvas setup={setup} draw={draw} width={854} height={480} webgl />
+      <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} webgl />
     </div>
   )
 }
