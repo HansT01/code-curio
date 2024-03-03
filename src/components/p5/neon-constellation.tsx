@@ -6,13 +6,15 @@ class NeonBubble {
   p: p5
   config: Accessor<typeof defaultConfig>
   radius: number
+  color: [number, number, number]
   position: p5.Vector
   velocity: p5.Vector
 
-  constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number) {
+  constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number, color: [number, number, number]) {
     this.p = p
     this.config = config
     this.radius = radius
+    this.color = color
     this.position = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2))
     this.velocity = p5.Vector.random2D()
     this.velocity.setMag(3)
@@ -113,6 +115,9 @@ const NeonConstellationCanvas = () => {
   }
 
   const setup = (p: p5) => {
+    for (let i = 1; i <= 50; i++) {
+      bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
+    }
     p.shader(shader)
     p.noStroke()
   }
@@ -121,9 +126,24 @@ const NeonConstellationCanvas = () => {
     p.background(50)
     p.rect(0, 0, p.width, p.height)
     shader.setUniform('u_resolution', [p.width, p.height])
-    shader.setUniform('u_lightPositions', [-20, 0, 20, 0])
-    shader.setUniform('u_lightRadii', [50, 10])
-    shader.setUniform('u_lightColors', [0.5, 0.2, 0.8, 0.5, 1, 0.9])
+
+    for (let bubble of bubbles) {
+      bubble.update(bubbles)
+    }
+
+    const lightPositions: number[] = []
+    const lightRadii: number[] = []
+    const lightColors: number[] = []
+
+    for (let bubble of bubbles) {
+      lightPositions.push(bubble.position.x, bubble.position.y)
+      lightRadii.push(bubble.radius)
+      lightColors.push(...bubble.color)
+    }
+
+    shader.setUniform('u_lightPositions', lightPositions)
+    shader.setUniform('u_lightRadii', lightRadii)
+    shader.setUniform('u_lightColors', lightColors)
   }
 
   return (

@@ -1,9 +1,12 @@
 precision mediump float;
+
+#define NUM_LIGHTS 100
+
 varying vec2 pos;
 uniform vec2 u_resolution;
-uniform vec2 u_lightPositions[2];
-uniform float u_lightRadii[2];
-uniform vec3 u_lightColors[2];
+uniform vec2 u_lightPositions[NUM_LIGHTS];
+uniform float u_lightRadii[NUM_LIGHTS];
+uniform vec3 u_lightColors[NUM_LIGHTS];
 
 void main() {
     vec2 aspectRatio = vec2(u_resolution.x / u_resolution.y, 1.0);
@@ -11,16 +14,16 @@ void main() {
 
     vec3 color = vec3(0.0);
 
-    for (int i = 0; i < 2; i++) {
-        vec2 lightPos = 2.0 * u_lightPositions[i] / u_resolution * aspectRatio;
-        float lightRadius = (u_lightRadii[i] / u_resolution.x);
+    for (int i = 0; i < NUM_LIGHTS; i++) {
+        vec2 lightPos = (2.0 / u_resolution) * u_lightPositions[i] * aspectRatio;
+        float lightRadius = (2.0 / u_resolution.x) * u_lightRadii[i];
         vec3 lightColor = u_lightColors[i];
 
         float dist = distance(lightPos, coord) - lightRadius;
-        dist = clamp(dist, 0., 1.);
+        dist = clamp(dist, 0.0, 1.0);
         float intensity = 1.0 / (dist);
         color += lightColor * intensity * lightRadius;
     }
 
-    gl_FragColor = vec4(color, 1.);
+    gl_FragColor = vec4(color, 1.0);
 }
