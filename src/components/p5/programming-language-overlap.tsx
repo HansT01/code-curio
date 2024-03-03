@@ -1,7 +1,6 @@
 import p5 from 'p5'
 import { Accessor, createSignal, onCleanup, onMount } from 'solid-js'
 import { Camera2D } from '~/util/camera'
-import { getCoOccurenceMatrix } from '~/util/data'
 import Canvas from '../canvas'
 
 class Bubble {
@@ -244,12 +243,12 @@ const ProgrammingLanguageOverlap = () => {
     }
     p.touchMoved = (e: TouchEvent) => manager.camera.touchMoved(e)
 
-    onMount(() => {
-      getCoOccurenceMatrix().then((matrix) => {
-        for (let i = 0; i < matrix.data.length; i++) {
-          manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
-        }
-      })
+    onMount(async () => {
+      const res = await fetch('/data/languages-co-occurence.json')
+      const matrix: { columns: string[]; data: number[][] } = await res.json()
+      for (let i = 0; i < matrix.data.length; i++) {
+        manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
+      }
     })
 
     onMount(() => {
