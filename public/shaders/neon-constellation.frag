@@ -1,7 +1,7 @@
 precision mediump float;
 
 #define NUM_LIGHTS 20
-#define NUM_OBSTACLES 5
+#define NUM_OBSTACLES 80
 #define PI 3.14159265359
 
 varying vec2 pos;
@@ -17,27 +17,18 @@ uniform float u_obstacleRadii[NUM_OBSTACLES];
 float isLit(vec2 lightPosition, vec2 obstaclePosition, float obstacleRadius, vec2 location) {
     float distanceToLight = distance(lightPosition, location);
     float distanceToObstacle = distance(obstaclePosition, location);
-
-    if (distanceToObstacle < obstacleRadius) {
-        return 0.0;
-    }
-    if (distanceToLight < distanceToObstacle) {
-        return 1.0;
-    }
-
     vec2 lightDirection = normalize(lightPosition - location);
     vec2 obstacleDirection = normalize(obstaclePosition - location);
     float dotProduct = dot(obstacleDirection, lightDirection);
-
-    if (dotProduct < 0.0) {
-        return 1.0;
-    }
-
-    float angle = acos(dotProduct);
-    if (distanceToObstacle * sin(angle) < obstacleRadius) {
+    if (distanceToObstacle < obstacleRadius) {
         return 0.0;
     }
-
+    if (distanceToLight < distanceToObstacle || dotProduct < 0.0) {
+        return 1.0;
+    }
+    if (distanceToObstacle * sqrt(1.0 - dotProduct * dotProduct) < obstacleRadius) {
+        return 0.0;
+    }
     return 1.0;
 }
 

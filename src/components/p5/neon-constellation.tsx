@@ -115,14 +115,21 @@ const NeonConstellationCanvas = () => {
   }
 
   const setup = (p: p5) => {
+    p.shader(shader)
+    p.noStroke()
     for (let i = 1; i <= 20; i++) {
       bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
     }
-    for (let i = 1; i <= 5; i++) {
-      bubbles.push(new NeonBubble(p, config, p.random(20, 50)))
+    for (let i = 1; i <= 80; i++) {
+      bubbles.push(new NeonBubble(p, config, p.random(10, 20)))
     }
-    p.shader(shader)
-    p.noStroke()
+    const logFPS = async () => {
+      while (p.isLooping()) {
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        console.log((p.frameCount / p.millis()) * 1000)
+      }
+    }
+    logFPS()
   }
 
   const draw = (p: p5) => {
@@ -154,6 +161,7 @@ const NeonConstellationCanvas = () => {
     shader.setUniform('u_lightPositions', lightPositions)
     shader.setUniform('u_lightRadii', lightRadii)
     shader.setUniform('u_lightColors', lightColors)
+
     shader.setUniform('u_obstaclePositions', obstaclePositions)
     shader.setUniform('u_obstacleRadii', obstacleRadii)
   }
