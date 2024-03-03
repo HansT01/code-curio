@@ -15,8 +15,8 @@ uniform vec2 u_obstaclePositions[NUM_OBSTACLES];
 uniform float u_obstacleRadii[NUM_OBSTACLES];
 
 float isLit(vec2 lightPosition, vec2 obstaclePosition, float obstacleRadius, vec2 location) {
-    float distanceToLight = distance(lightPosition, location);
     float distanceToObstacle = distance(obstaclePosition, location);
+    float distanceToLight = distance(lightPosition, location);
     vec2 lightDirection = normalize(lightPosition - location);
     vec2 obstacleDirection = normalize(obstaclePosition - location);
     float dotProduct = dot(obstacleDirection, lightDirection);
@@ -35,12 +35,14 @@ float isLit(vec2 lightPosition, vec2 obstaclePosition, float obstacleRadius, vec
 void main() {
     vec2 aspectRatio = vec2(u_resolution.x / u_resolution.y, 1.0);
     vec2 coord = (pos * 2.0 - 1.0) * aspectRatio;
+    vec2 positionFactor = (2.0 / u_resolution) * aspectRatio;
+    float radiusFactor = (2.0 / u_resolution.y);
 
     vec3 color = vec3(0.0);
 
     for (int i = 0; i < NUM_LIGHTS; i++) {
-        vec2 lightPosition = (2.0 / u_resolution) * u_lightPositions[i] * aspectRatio;
-        float lightRadius = (2.0 / u_resolution.y) * u_lightRadii[i];
+        vec2 lightPosition = u_lightPositions[i] * positionFactor;
+        float lightRadius = u_lightRadii[i] * radiusFactor;
         vec3 lightColor = u_lightColors[i];
 
         float dist = distance(lightPosition, coord) - lightRadius;
@@ -48,8 +50,8 @@ void main() {
         float intensity = 1.0 / (dist) * 0.4;
 
         for (int j = 0; j < NUM_OBSTACLES; j++) {
-            vec2 obstaclePosition = (2.0 / u_resolution) * u_obstaclePositions[j] * aspectRatio;
-            float obstacleRadius = (2.0 / u_resolution.y) * u_obstacleRadii[j];
+            vec2 obstaclePosition = u_obstaclePositions[j] * positionFactor;
+            float obstacleRadius = u_obstacleRadii[j] * radiusFactor;
             intensity *= isLit(lightPosition, obstaclePosition, obstacleRadius, coord);
         }
 
@@ -57,11 +59,12 @@ void main() {
     }
 
     for (int i = 0; i < NUM_OBSTACLES; i++) {
-        vec2 obstaclePosition = (2.0 / u_resolution) * u_obstaclePositions[i] * aspectRatio;
-        float obstacleRadius = (2.0 / u_resolution.y) * u_obstacleRadii[i];
+        vec2 obstaclePosition = u_obstaclePositions[i] * positionFactor;
+        float obstacleRadius = u_obstacleRadii[i] * radiusFactor;
 
-        float dist = distance(obstaclePosition, coord) - 0.01;
-        color += vec3(0.1) * step(0.0, obstacleRadius - dist);
+        float dist = distance(obstaclePosition, coord);
+        color += vec3(0.15) * step(0.0, obstacleRadius - dist);
+        color -= vec3(0.05) * step(0.0, obstacleRadius - dist - 0.01);
     }
 
     gl_FragColor = vec4(color, 1.0);
