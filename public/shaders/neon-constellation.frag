@@ -1,8 +1,7 @@
 precision mediump float;
 
 #define NUM_LIGHTS 20
-#define NUM_OBSTACLES 80
-#define PI 3.14159265359
+#define NUM_OBSTACLES 20
 
 varying vec2 pos;
 uniform vec2 u_resolution;
@@ -11,14 +10,18 @@ uniform vec2 u_lightPositions[NUM_LIGHTS];
 uniform float u_lightRadii[NUM_LIGHTS];
 uniform vec3 u_lightColors[NUM_LIGHTS];
 
+uniform vec2 u_lineStart[2];
+uniform vec2 u_lineEnd[2];
+uniform vec3 u_lineColors[2];
+
 uniform vec2 u_obstaclePositions[NUM_OBSTACLES];
 uniform float u_obstacleRadii[NUM_OBSTACLES];
 
-float isLit(vec2 lightPosition, vec2 obstaclePosition, float obstacleRadius, vec2 location) {
-    float distanceToObstacle = distance(obstaclePosition, location);
-    float distanceToLight = distance(lightPosition, location);
-    vec2 lightDirection = normalize(lightPosition - location);
-    vec2 obstacleDirection = normalize(obstaclePosition - location);
+float isLit(vec2 coord, vec2 lightPosition, vec2 obstaclePosition, float obstacleRadius) {
+    float distanceToObstacle = distance(obstaclePosition, coord);
+    float distanceToLight = distance(lightPosition, coord);
+    vec2 lightDirection = normalize(lightPosition - coord);
+    vec2 obstacleDirection = normalize(obstaclePosition - coord);
     float dotProduct = dot(obstacleDirection, lightDirection);
     if (distanceToObstacle < obstacleRadius) {
         return 0.0;
@@ -32,6 +35,19 @@ float isLit(vec2 lightPosition, vec2 obstaclePosition, float obstacleRadius, vec
     return 1.0;
 }
 
+vec2 closestPointOnLine(vec2 coord, vec2 lineStart, vec2 lineEnd) {
+    vec2 line = lineEnd - lineStart;
+    vec2 direction = normalize(line);
+    float t = dot(coord - lineStart, direction);
+    t = clamp(t, 0.0, length(line));
+    return lineStart + direction * t;
+}
+
+float distancePointToLine(vec2 coord, vec2 lineStart, vec2 lineEnd) {
+    vec2 closest = closestPointOnLine(coord, lineStart, lineEnd);
+    return distance(coord, closest);
+}
+
 void main() {
     vec2 aspectRatio = vec2(u_resolution.x / u_resolution.y, 1.0);
     vec2 coord = (pos * 2.0 - 1.0) * aspectRatio;
@@ -39,6 +55,24 @@ void main() {
     float radiusFactor = (2.0 / u_resolution.y);
 
     vec3 color = vec3(0.0);
+
+    vec2 lineStart = u_lineStart[0] * positionFactor;
+    vec2 lineEnd = u_lineEnd[0] * positionFactor;
+
+    float distanceToLine = distancePointToLine(coord, lineStart, lineEnd);
+    float intensity = 1.0 / distanceToLine * 0.01;
+
+    for (int j = 0; j < NUM_OBSTACLES; j++) {
+        vec2 obstaclePosition = u_obstaclePositions[j] * positionFactor;
+        float obstacleRadius = u_obstacleRadii[j] * radiusFactor;
+        float lit = 0.0;
+        lit += isLit(coord, lineStart, obstaclePosition, obstacleRadius);
+        lit += isLit(coord, lineEnd, obstaclePosition, obstacleRadius);
+        lit = clamp(lit, 0.0, 1.0);
+        intensity *= lit;
+    }
+
+    color += vec3(1.) * intensity * u_lineColors[0];
 
     for (int i = 0; i < NUM_LIGHTS; i++) {
         vec2 lightPosition = u_lightPositions[i] * positionFactor;
@@ -52,7 +86,7 @@ void main() {
         for (int j = 0; j < NUM_OBSTACLES; j++) {
             vec2 obstaclePosition = u_obstaclePositions[j] * positionFactor;
             float obstacleRadius = u_obstacleRadii[j] * radiusFactor;
-            intensity *= isLit(lightPosition, obstaclePosition, obstacleRadius, coord);
+            intensity *= isLit(coord, lightPosition, obstaclePosition, obstacleRadius);
         }
 
         color += lightColor * intensity * lightRadius;

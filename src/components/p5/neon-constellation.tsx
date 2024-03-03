@@ -117,11 +117,11 @@ const NeonConstellationCanvas = () => {
   const setup = (p: p5) => {
     p.shader(shader)
     p.noStroke()
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 0; i < 2; i++) {
       bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
     }
-    for (let i = 1; i <= 80; i++) {
-      bubbles.push(new NeonBubble(p, config, p.random(10, 20)))
+    for (let i = 0; i < 20; i++) {
+      bubbles.push(new NeonBubble(p, config, p.random(10, 40)))
     }
     const logFPS = async () => {
       while (p.isLooping()) {
@@ -144,6 +144,9 @@ const NeonConstellationCanvas = () => {
     const lightPositions: number[] = []
     const lightRadii: number[] = []
     const lightColors: number[] = []
+    const lineStartPositions: number[] = []
+    const lineEndPositions: number[] = []
+    const lineColors: number[] = []
     const obstaclePositions: number[] = []
     const obstacleRadii: number[] = []
 
@@ -158,12 +161,25 @@ const NeonConstellationCanvas = () => {
       }
     }
 
+    const bubble0 = bubbles[0]
+    const bubble1 = bubbles[1]
+    // lineStartPositions.push(bubble0.position.x, bubble0.position.y)
+    // lineEndPositions.push(bubble1.position.x, bubble1.position.y)
+    // lineColors.push(...bubble0.color!.map((num, index) => (num + bubble1.color![index]) / 2))
+
     shader.setUniform('u_lightPositions', lightPositions)
     shader.setUniform('u_lightRadii', lightRadii)
     shader.setUniform('u_lightColors', lightColors)
 
     shader.setUniform('u_obstaclePositions', obstaclePositions)
     shader.setUniform('u_obstacleRadii', obstacleRadii)
+
+    shader.setUniform('u_lineStart', [bubble0.position.x, bubble0.position.y])
+    shader.setUniform('u_lineEnd', [bubble1.position.x, bubble1.position.y])
+    shader.setUniform(
+      'u_lineColors',
+      bubble0.color!.map((num, index) => (num + bubble1.color![index]) / 2),
+    )
   }
 
   return (
