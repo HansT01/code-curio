@@ -13,6 +13,34 @@ interface CanvasProps {
 const Canvas: Component<CanvasProps> = (props) => {
   const [dimensions, setDimensions] = createSignal({ width: props.width, height: props.height })
 
+  const sketch = (p: p5) => {
+    if (props.preload !== undefined) {
+      p.preload = () => {
+        if (props.preload !== undefined) {
+          props.preload(p)
+        }
+      }
+    }
+    p.setup = () => {
+      const canvas = p.createCanvas(dimensions().width, dimensions().height, props.webgl ? p.WEBGL : undefined)
+      canvas.style('visibility', 'visible')
+      props.setup(p)
+    }
+    p.draw = () => {
+      props.draw(p)
+    }
+  }
+
+  const createSketch = (ref: HTMLDivElement) => {
+    const p = new p5(sketch, ref)
+    createEffect(() => {
+      p.resizeCanvas(dimensions().width, dimensions().height)
+    })
+    onCleanup(() => {
+      p.remove()
+    })
+  }
+
   const createResize = (ref: HTMLDivElement) => {
     const resize = () => {
       setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
@@ -39,26 +67,7 @@ const Canvas: Component<CanvasProps> = (props) => {
     })
   }
 
-  const sketch = (p: p5) => {
-    if (props.preload !== undefined) {
-      p.preload = () => {
-        if (props.preload !== undefined) {
-          props.preload(p)
-        }
-      }
-    }
-    p.setup = () => {
-      const canvas = p.createCanvas(dimensions().width, dimensions().height, props.webgl ? p.WEBGL : undefined)
-      canvas.style('visibility', 'visible')
-      props.setup(p)
-    }
-    p.draw = () => {
-      props.draw(p)
-    }
-  }
-
-  const createSketch = (ref: HTMLDivElement) => {
-    const p = new p5(sketch, ref)
+  const createInvisibleCanvasFix = (ref: HTMLDivElement) => {
     onMount(() => {
       const children = ref.childNodes
       for (let i = 0; i < children.length; i++) {
@@ -70,21 +79,16 @@ const Canvas: Component<CanvasProps> = (props) => {
         }
       }
     })
-    createEffect(() => {
-      p.resizeCanvas(dimensions().width, dimensions().height)
-    })
-    onCleanup(() => {
-      p.remove()
-    })
   }
 
   return (
     <div
       class='w-full [&>canvas]:rounded-2xl'
       ref={(ref) => {
+        createSketch(ref)
         createResize(ref)
         createPreventContextMenu(ref)
-        createSketch(ref)
+        createInvisibleCanvasFix(ref)
       }}
     />
   )
