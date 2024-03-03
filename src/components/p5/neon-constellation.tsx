@@ -123,9 +123,9 @@ const defaultConfig = {}
 
 const NeonConstellationCanvas = () => {
   const [config, setConfig] = createSignal(defaultConfig)
-  const [lightCountIndex, setLightCountIndex] = createSignal(2)
-  const [obstacleCountIndex, setObstacleCountIndex] = createSignal(2)
-  const count = [1, 3, 5, 10, 15, 20]
+  const [lightCountIndex, setLightCountIndex] = createSignal(5)
+  const [obstacleCountIndex, setObstacleCountIndex] = createSignal(4)
+  const count = [0, 1, 2, 4, 7, 10, 14, 20]
   const bubbles: NeonBubble[] = []
   const linePairs: [NeonBubble, NeonBubble][] = []
 
