@@ -141,6 +141,21 @@ const NeonConstellationCanvas = () => {
       bubble.update(bubbles)
     }
 
+    const pairs: [NeonBubble, NeonBubble][] = []
+    for (let bubble of bubbles) {
+      if (bubble.color === undefined) {
+        continue
+      }
+      for (let neighbor of bubbles) {
+        if (bubble === neighbor || neighbor.color === undefined) {
+          continue
+        }
+        if (p.dist(bubble.position.x, bubble.position.y, neighbor.position.x, neighbor.position.y) < 200) {
+          pairs.push([bubble, neighbor])
+        }
+      }
+    }
+
     const lightPositions: number[] = []
     const lightRadii: number[] = []
     const lightColors: number[] = []
@@ -161,11 +176,11 @@ const NeonConstellationCanvas = () => {
       }
     }
 
-    const bubble0 = bubbles[0]
-    const bubble1 = bubbles[1]
-    // lineStartPositions.push(bubble0.position.x, bubble0.position.y)
-    // lineEndPositions.push(bubble1.position.x, bubble1.position.y)
-    // lineColors.push(...bubble0.color!.map((num, index) => (num + bubble1.color![index]) / 2))
+    for (let [bubble, neighbor] of pairs) {
+      lineStartPositions.push(bubble.position.x, bubble.position.y)
+      lineEndPositions.push(neighbor.position.x, neighbor.position.y)
+      lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
+    }
 
     shader.setUniform('u_lightPositions', lightPositions)
     shader.setUniform('u_lightRadii', lightRadii)
@@ -174,12 +189,10 @@ const NeonConstellationCanvas = () => {
     shader.setUniform('u_obstaclePositions', obstaclePositions)
     shader.setUniform('u_obstacleRadii', obstacleRadii)
 
-    shader.setUniform('u_lineStart', [bubble0.position.x, bubble0.position.y])
-    shader.setUniform('u_lineEnd', [bubble1.position.x, bubble1.position.y])
-    shader.setUniform(
-      'u_lineColors',
-      bubble0.color!.map((num, index) => (num + bubble1.color![index]) / 2),
-    )
+    shader.setUniform('u_lineStart', lineStartPositions)
+    shader.setUniform('u_lineEnd', lineEndPositions)
+    shader.setUniform('u_lineColors', [0, 0, 0])
+    shader.setUniform('u_lineColors', lineColors)
   }
 
   return (
