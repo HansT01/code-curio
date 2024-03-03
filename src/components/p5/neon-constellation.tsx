@@ -6,11 +6,11 @@ class NeonBubble {
   p: p5
   config: Accessor<typeof defaultConfig>
   radius: number
-  color: readonly [number, number, number]
+  color: [number, number, number]
   position: p5.Vector
   velocity: p5.Vector
 
-  constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number, color: readonly [number, number, number]) {
+  constructor(p: p5, config: Accessor<typeof defaultConfig>, radius: number, color: [number, number, number]) {
     this.p = p
     this.config = config
     this.radius = radius
@@ -102,18 +102,6 @@ class NeonBubble {
   }
 }
 
-const neonPalette: [number, number, number][] = [
-  [255, 85, 187],
-  [255, 211, 163],
-  [252, 255, 178],
-  [182, 234, 250],
-]
-for (let color of neonPalette) {
-  for (let i = 0; i < color.length; i++) {
-    color[i] = color[i] / 255
-  }
-}
-
 const defaultConfig = {}
 
 const NeonConstellationCanvas = () => {
@@ -127,8 +115,8 @@ const NeonConstellationCanvas = () => {
   }
 
   const setup = (p: p5) => {
-    for (let i = 1; i <= 20; i++) {
-      bubbles.push(new NeonBubble(p, config, p.random(5, 10), neonPalette[p.floor(p.random() * neonPalette.length)]))
+    for (let i = 1; i <= 100; i++) {
+      bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
     }
     p.shader(shader)
     p.noStroke()

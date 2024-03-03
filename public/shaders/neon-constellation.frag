@@ -21,7 +21,7 @@ void main() {
 
         float dist = distance(lightPos, coord) - lightRadius;
         dist = clamp(dist, 0.0, 1.0);
-        float intensity = 1.0 / (dist) * 0.5;
+        float intensity = 1.0 / (dist) * 0.2;
         color += lightColor * intensity * lightRadius;
     }
 
