@@ -179,9 +179,15 @@ const NeonConstellationCanvas = () => {
       bubble.update(neighbors)
     }
 
+    const lightPositions: number[] = []
+    const lightRadii: number[] = []
+    const lightColors: number[] = []
     const lineStartPositions: number[] = []
     const lineEndPositions: number[] = []
     const lineColors: number[] = []
+    const obstaclePositions: number[] = []
+    const obstacleRadii: number[] = []
+
     for (let [bubble, neighbor] of linePairs) {
       const distance = p.dist(bubble.position.x, bubble.position.y, neighbor.position.x, neighbor.position.y)
       if (distance > 200) {
@@ -209,12 +215,6 @@ const NeonConstellationCanvas = () => {
       lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
     }
 
-    const lightPositions: number[] = []
-    const lightRadii: number[] = []
-    const lightColors: number[] = []
-    const obstaclePositions: number[] = []
-    const obstacleRadii: number[] = []
-
     for (let bubble of bubbles) {
       if (bubble.color !== undefined) {
         lightPositions.push(bubble.position.x, bubble.position.y)
@@ -225,6 +225,7 @@ const NeonConstellationCanvas = () => {
         obstacleRadii.push(bubble.radius)
       }
     }
+
     for (let i = lineStartPositions.length; i < 100; i++) {
       lineStartPositions.push(0, 0)
       lineEndPositions.push(0, 0)
