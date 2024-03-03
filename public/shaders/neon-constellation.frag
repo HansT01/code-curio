@@ -70,10 +70,7 @@ void main() {
         float obstacleRadius = (2.0 / u_resolution.y) * u_obstacleRadii[i];
 
         float dist = distance(obstaclePosition, coord) - 0.01;
-
-        if (dist < obstacleRadius) {
-            color += vec3(0.1);
-        }
+        color += vec3(0.1) * step(0.0, obstacleRadius - dist);
     }
 
     gl_FragColor = vec4(color, 1.0);
