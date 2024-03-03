@@ -1,6 +1,13 @@
 import p5 from 'p5'
 import { Component, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 
+export const logFPS = async (p: p5) => {
+  while (p.isLooping()) {
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    console.log((p.frameCount / p.millis()) * 1000)
+  }
+}
+
 interface CanvasProps {
   preload?: (p: p5) => void
   setup: (p: p5) => void

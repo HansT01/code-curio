@@ -1,3 +1,4 @@
+import { Minus, Plus } from 'lucide-solid'
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import Canvas from '../canvas'
@@ -106,10 +107,14 @@ const defaultConfig = {}
 
 const NeonConstellationCanvas = () => {
   const [config, setConfig] = createSignal(defaultConfig)
+  const [lightCountIndex, setLightCountIndex] = createSignal(2)
+  const [obstacleCountIndex, setObstacleCountIndex] = createSignal(2)
+  const count = [1, 3, 5, 10, 15, 20]
   const bubbles: NeonBubble[] = []
   const linePairs: [NeonBubble, NeonBubble][] = []
 
   let shader: p5.Shader
+  let resetCanvas: () => void
 
   const preload = (p: p5) => {
     shader = p.loadShader('/shaders/neon-constellation.vert', '/shaders/neon-constellation.frag')
@@ -118,28 +123,33 @@ const NeonConstellationCanvas = () => {
   const setup = (p: p5) => {
     p.shader(shader)
     p.noStroke()
-    for (let i = 0; i < 10; i++) {
-      bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
-    }
-    for (let i = 0; i < bubbles.length; i++) {
-      for (let j = i + 1; j < bubbles.length; j++) {
-        linePairs.push([bubbles[i], bubbles[j]])
+    resetCanvas = () => {
+      bubbles.length = 0
+      linePairs.length = 0
+
+      for (let i = 0; i < count[lightCountIndex()]; i++) {
+        bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
       }
-    }
-    for (let i = 0; i < 10; i++) {
-      bubbles.push(new NeonBubble(p, config, p.random(10, 60)))
-    }
-    const logFPS = async () => {
-      while (p.isLooping()) {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        console.log((p.frameCount / p.millis()) * 1000)
+      for (let i = 0; i < bubbles.length; i++) {
+        for (let j = i + 1; j < bubbles.length; j++) {
+          linePairs.push([bubbles[i], bubbles[j]])
+        }
       }
+      for (let i = 0; i < count[obstacleCountIndex()]; i++) {
+        bubbles.push(new NeonBubble(p, config, p.random(10, 60)))
+      }
+
+      shader.setUniform('u_lightPositions', new Array(count[count.length - 1] * 2).fill(0))
+      shader.setUniform('u_lightRadii', new Array(count[count.length - 1]).fill(0))
+      shader.setUniform('u_lightColors', new Array(count[count.length - 1] * 3).fill(0))
+
+      shader.setUniform('u_obstaclePositions', new Array(count[count.length - 1] * 2).fill(0))
+      shader.setUniform('u_obstacleRadii', new Array(count[count.length - 1]).fill(0))
     }
-    logFPS()
+    resetCanvas()
   }
 
   const draw = (p: p5) => {
-    p.background(50)
     p.rect(0, 0, p.width, p.height)
     shader.setUniform('u_resolution', [p.width, p.height])
 
@@ -174,7 +184,7 @@ const NeonConstellationCanvas = () => {
         lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
       }
     }
-    for (let i = lineStartPositions.length; i < linePairs.length; i++) {
+    for (let i = lineStartPositions.length; i < 100; i++) {
       lineStartPositions.push(0, 0)
       lineEndPositions.push(0, 0)
       lineColors.push(0, 0, 0)
@@ -192,8 +202,70 @@ const NeonConstellationCanvas = () => {
     shader.setUniform('u_lineColors', lineColors)
   }
 
+  const increaseLightCount = () => {
+    setLightCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
+    resetCanvas()
+  }
+
+  const reduceLightCount = () => {
+    setLightCountIndex((index) => (index > 0 ? index - 1 : index))
+    resetCanvas()
+  }
+
+  const increaseObstacleCount = () => {
+    setObstacleCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
+    resetCanvas()
+  }
+
+  const reduceObstacleCount = () => {
+    setObstacleCountIndex((index) => (index > 0 ? index - 1 : index))
+    resetCanvas()
+  }
+
   return (
     <div class='flex w-full flex-col gap-4'>
+      <div class='flex flex-wrap gap-4'>
+        <div class='flex flex-col items-start'>
+          <label for='particle-count' class='mb-2'>
+            Light Count
+          </label>
+          <div class='flex' id='particle-count'>
+            <button
+              class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+              onClick={reduceLightCount}
+            >
+              <Minus />
+            </button>
+            <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{count[lightCountIndex()]}</div>
+            <button
+              class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+              onClick={increaseLightCount}
+            >
+              <Plus />
+            </button>
+          </div>
+        </div>
+        <div class='flex flex-col items-start'>
+          <label for='particle-count' class='mb-2'>
+            Obstacle Count
+          </label>
+          <div class='flex' id='particle-count'>
+            <button
+              class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+              onClick={reduceObstacleCount}
+            >
+              <Minus />
+            </button>
+            <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{count[obstacleCountIndex()]}</div>
+            <button
+              class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+              onClick={increaseObstacleCount}
+            >
+              <Plus />
+            </button>
+          </div>
+        </div>
+      </div>
       <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} webgl />
     </div>
   )

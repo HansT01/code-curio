@@ -1,7 +1,7 @@
 precision mediump float;
 
 #define NUM_LIGHTS 20
-#define NUM_LINES NUM_LIGHTS * 2
+#define NUM_LINES NUM_LIGHTS * 3
 #define NUM_OBSTACLES 20
 
 varying vec2 pos;
