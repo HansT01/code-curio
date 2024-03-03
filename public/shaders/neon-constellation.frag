@@ -16,8 +16,9 @@ void main() {
         float lightRadius = (u_lightRadii[i] / u_resolution.x);
         vec3 lightColor = u_lightColors[i];
 
-        float dist = distance(lightPos, coord);
-        float intensity = 1.0 / (dist * dist);
+        float dist = distance(lightPos, coord) - lightRadius;
+        dist = clamp(dist, 0., 1.);
+        float intensity = 1.0 / (dist);
         color += lightColor * intensity * lightRadius;
     }
 
