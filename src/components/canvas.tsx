@@ -19,16 +19,17 @@ interface CanvasProps {
 
 const Canvas: Component<CanvasProps> = (props) => {
   const [dimensions, setDimensions] = createSignal({ width: props.width, height: props.height })
+  const [show, setShow] = createSignal(true)
 
   const sketch = (p: p5) => {
-    if (props.preload !== undefined) {
-      p.preload = () => {
-        if (props.preload !== undefined) {
-          props.preload(p)
-        }
+    p.preload = () => {
+      setShow(false)
+      if (props.preload !== undefined) {
+        props.preload(p)
       }
     }
     p.setup = () => {
+      setShow(true)
       const canvas = p.createCanvas(dimensions().width, dimensions().height, props.webgl ? p.WEBGL : undefined)
       canvas.style('visibility', 'visible')
       props.setup(p)
@@ -74,28 +75,13 @@ const Canvas: Component<CanvasProps> = (props) => {
     })
   }
 
-  const createInvisibleCanvasFix = (ref: HTMLDivElement) => {
-    onMount(() => {
-      const children = ref.childNodes
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i] as HTMLElement
-        if (child.style.visibility === 'hidden') {
-          child.style.display = 'none'
-        } else {
-          child.style.display = 'block'
-        }
-      }
-    })
-  }
-
   return (
     <div
-      class='w-full [&>canvas]:rounded-2xl'
+      class='w-full [&>#p5\_loading]:hidden [&>[style*="visibility:_hidden;"]]:hidden [&>canvas]:rounded-2xl'
       ref={(ref) => {
         createSketch(ref)
         createResize(ref)
         createPreventContextMenu(ref)
-        createInvisibleCanvasFix(ref)
       }}
     />
   )
