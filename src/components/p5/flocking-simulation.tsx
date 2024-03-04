@@ -37,11 +37,13 @@ class Boid {
     if (!isMouseInCanvas(this.p)) {
       return
     }
-    const distance = this.p.dist(this.position.x, this.position.y, this.p.mouseX, this.p.mouseY)
+    const x = this.p.mouseX - this.p.width / 2
+    const y = this.p.mouseY - this.p.height / 2
+    const distance = this.p.dist(this.position.x, this.position.y, x, y)
     if (distance < this.config().visualRange) {
       this.velocity.add(
-        (this.position.x - this.p.mouseX) * this.config().mouseFactor,
-        (this.position.y - this.p.mouseY) * this.config().mouseFactor,
+        (this.position.x - x) * this.config().mouseFactor,
+        (this.position.y - y) * this.config().mouseFactor,
       )
     }
   }
