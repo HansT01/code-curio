@@ -216,6 +216,19 @@ const ProgrammingLanguageOverlap = () => {
   let manager: BubbleManager
   let shuffle: () => void
 
+  onMount(() => {
+    const resize = () => {
+      if (manager !== undefined) {
+        manager.camera.canvasResized()
+      }
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    onCleanup(() => {
+      window.removeEventListener('resize', resize)
+    })
+  })
+
   const setup = (p: p5) => {
     manager = new BubbleManager(p, [])
     manager.camera.x = p.width / 2
@@ -249,19 +262,6 @@ const ProgrammingLanguageOverlap = () => {
       for (let i = 0; i < matrix.data.length; i++) {
         manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
       }
-    })
-
-    onMount(() => {
-      const resize = () => {
-        if (manager !== undefined) {
-          manager.camera.canvasResized()
-        }
-      }
-      resize()
-      window.addEventListener('resize', resize)
-      onCleanup(() => {
-        window.removeEventListener('resize', resize)
-      })
     })
 
     shuffle = () => {
