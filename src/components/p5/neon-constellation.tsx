@@ -8,6 +8,7 @@ class Bubble {
   p: p5
   config: Accessor<typeof defaultConfig>
   radius: number
+  mass: number
   color?: [number, number, number]
   position: p5.Vector
   velocity: p5.Vector
@@ -16,18 +17,15 @@ class Bubble {
     this.p = p
     this.config = config
     this.radius = radius
+    this.mass = radius ** 2
     this.color = color
     this.position = p.createVector(p.random(-p.width / 2, p.width / 2), p.random(-p.height / 2, p.height / 2))
     this.velocity = p5.Vector.random2D()
     this.velocity.setMag(20 / radius)
   }
 
-  mass() {
-    return this.radius ** 2
-  }
-
   energy() {
-    return 0.5 * this.mass() * (this.velocity.x ** 2 + this.velocity.y ** 2)
+    return 0.5 * this.mass * (this.velocity.x ** 2 + this.velocity.y ** 2)
   }
 
   isOnLine(start: p5.Vector, end: p5.Vector) {
@@ -78,12 +76,12 @@ class Bubble {
           .copy()
           .normalize()
           .mult(overlap / 2)
-        const massOffset = this.mass() / bubble.mass()
+        const massOffset = this.mass / bubble.mass
         this.position.sub(correction.div(massOffset))
         bubble.position.add(correction.mult(massOffset))
 
-        const m1 = this.mass()
-        const m2 = bubble.mass()
+        const m1 = this.mass
+        const m2 = bubble.mass
 
         const angle = distance.heading()
         const sine = this.p.sin(angle)
