@@ -65,7 +65,7 @@ export default function CoriolisEffect() {
         </Show>
       </section>
       <section class='flex flex-col gap-4'>
-        <h2 class='text-4xl font-extralight'>Discussion</h2>
+        <h2 class='text-4xl font-extralight'>Understanding The Simulation</h2>
         <p>
           The simulation consisted of three acting forces: separation, centrifugal, and the Coriolis force. The
           centrifugal force directs the particles towards the equator, which then the Coriolis force deflects them in a

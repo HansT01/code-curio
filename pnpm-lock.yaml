@@ -24,7 +24,7 @@ dependencies:
     specifier: ^0.340.0
     version: 0.340.0(solid-js@1.8.15)
   p5:
-    specifier: ^1.9.0
+    specifier: ^1.9.1
     version: 1.9.1
   postcss:
     specifier: ^8.4.26
