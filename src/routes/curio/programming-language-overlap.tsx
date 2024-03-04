@@ -35,25 +35,28 @@ export default function ProgrammingLanguageOverlap() {
           </button>
         </A>
       </div>
-      <p>
-        Programming languages are tools that developers use to communicate instructions to computers. They encompass a
-        set of rules and symbols that define the syntax and semantics for writing code.
-        <br />
-        <br />
-        As developers gain experience and work on different projects, they often specialize in a set of programming
-        languages. This specialization can be influenced by various factors such as personal interest, job requirements,
-        industry trends, and project needs.
-        <br />
-        <br />
-        The data used for this visualization is from the 2023 Stack Overflow Survey. By graphing the interconnectedness
-        of programming languages, this visualization can offer valuable insights into the factors that shape developers'
-        language choices and specialization paths.
-      </p>
-      <div class='min-h-[480px]'>
+      <section class='flex flex-col gap-4'>
+        <h2 class='text-4xl font-extralight'>Introduction</h2>
+        <p>
+          Programming languages are tools that developers use to communicate instructions to computers. They encompass a
+          set of rules and symbols that define the syntax and semantics for writing code.
+        </p>
+        <p>
+          As developers gain experience and work on different projects, they often specialize in a set of programming
+          languages. This specialization can be influenced by various factors such as personal interest, job
+          requirements, industry trends, and project needs.
+        </p>
+        <p>
+          The data used for this visualization is from the 2023 Stack Overflow Survey. By graphing the
+          interconnectedness of programming languages, this visualization can offer valuable insights into the factors
+          that shape developers' language choices and specialization paths.
+        </p>
+      </section>
+      <section class='min-h-[480px]'>
         <Show when={!isLoading()} fallback={<CanvasLoader />}>
           <ProgrammingLanguageOverlapCanvas />
         </Show>
-      </div>
+      </section>
     </main>
   )
 }

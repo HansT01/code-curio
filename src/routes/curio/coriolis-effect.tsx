@@ -32,27 +32,31 @@ export default function CoriolisEffect() {
           </button>
         </A>
       </div>
-      <p>
-        The Coriolis effect is a phenomenon that occurs due to the rotation of the Earth. It causes moving objects, such
-        as air masses and ocean currents, to deflect to the right in the Northern Hemisphere and to the left in the
-        Southern Hemisphere. This deflection is a result of the Earth's rotation and the conservation of angular
-        momentum, which causes freely moving objects to appear to curve from an observer's perspective on the rotating
-        Earth.
-        <br />
-        <br />
-        One of the most well-known examples of the Coriolis effect is its impact on weather patterns. In the Northern
-        Hemisphere, winds tend to curve to the right, leading to the formation of counterclockwise cyclones. Contrarily,
-        in the Southern Hemisphere, winds curve to the left, leading to the formation of clockwise cyclones.
-        <br />
-        <br />
-        This simulation assumes the perspective of an observer rotating alongside a sphere representing Earth, and
-        attempts to simulate the impact of the Coriolis force on the direction of winds.
-      </p>
-      <div class='min-h-[480px]'>
+      <section class='flex flex-col gap-4'>
+        <h2 class='text-4xl font-extralight'>Introduction</h2>
+        <p>
+          The Coriolis effect is a phenomenon that occurs due to the rotation of the Earth. It causes moving objects,
+          such as air masses and ocean currents, to deflect to the right in the Northern Hemisphere and to the left in
+          the Southern Hemisphere. This deflection is a result of the Earth's rotation and the conservation of angular
+          momentum, which causes freely moving objects to appear to curve from an observer's perspective on the rotating
+          Earth.
+        </p>
+        <p>
+          One of the most well-known examples of the Coriolis effect is its impact on weather patterns. In the Northern
+          Hemisphere, winds tend to curve to the right, leading to the formation of counterclockwise cyclones.
+          Contrarily, in the Southern Hemisphere, winds curve to the left, leading to the formation of clockwise
+          cyclones.
+        </p>
+        <p>
+          This simulation assumes the perspective of an observer rotating alongside a sphere representing Earth, and
+          attempts to simulate the impact of the Coriolis force on the direction of winds.
+        </p>
+      </section>
+      <section class='min-h-[480px]'>
         <Show when={!isLoading()} fallback={<CanvasLoader />}>
           <CoriolisEffectCanvas />
         </Show>
-      </div>
+      </section>
     </main>
   )
 }

@@ -35,17 +35,20 @@ export default function FlockingSimulation() {
           </button>
         </A>
       </div>
-      <p>
-        A flocking simulation, often referred to as "boids," is a computer-generated model that simulates the flocking
-        behavior of birds or other animals. It involves creating a group of simulated entities (boids) that follow
-        simple rules, such as separation, alignment, and cohesion, to mimic the natural movement patterns observed in
-        flocks or herds.
-      </p>
-      <div class='min-h-[480px]'>
+      <section class='flex flex-col gap-4'>
+        <h2 class='text-4xl font-extralight'>Introduction</h2>
+        <p>
+          A flocking simulation, often referred to as boids, is a computer-generated model that simulates the flocking
+          behavior of birds or other animals. It involves creating a group of simulated entities (boids) that follow
+          simple rules, such as separation, alignment, and cohesion, to mimic the natural movement patterns observed in
+          flocks or herds.
+        </p>
+      </section>
+      <section class='min-h-[480px]'>
         <Show when={!isLoading()} fallback={<CanvasLoader />}>
           <FlockingSimulationCanvas />
         </Show>
-      </div>
+      </section>
     </main>
   )
 }
