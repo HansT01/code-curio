@@ -1,5 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
+import { Show, createSignal, onMount } from 'solid-js'
+import CanvasLoader from '~/components/canvas-loader'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -13,6 +15,12 @@ export const info: CurioInfo = {
 const CoriolisEffectCanvas = clientOnly(() => import('~/components/p5/coriolis-effect'))
 
 export default function CoriolisEffect() {
+  const [isLoading, setIsLoading] = createSignal(true)
+
+  onMount(() => {
+    setIsLoading(false)
+  })
+
   return (
     <main class='flex flex-col gap-6 p-8'>
       <h1 class='text-6xl font-thin'>Coriolis Effect</h1>
@@ -40,7 +48,11 @@ export default function CoriolisEffect() {
         This simulation assumes the perspective of an observer rotating alongside a sphere representing Earth, and
         attempts to simulate the impact of the Coriolis force on the direction of winds.
       </p>
-      <CoriolisEffectCanvas />
+      <div class='min-h-[480px]'>
+        <Show when={!isLoading()} fallback={<CanvasLoader />}>
+          <CoriolisEffectCanvas />
+        </Show>
+      </div>
     </main>
   )
 }

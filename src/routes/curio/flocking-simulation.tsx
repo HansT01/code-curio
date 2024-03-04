@@ -1,5 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
+import { Show, createSignal, onMount } from 'solid-js'
+import CanvasLoader from '~/components/canvas-loader'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -13,6 +15,12 @@ export const info: CurioInfo = {
 const FlockingSimulationCanvas = clientOnly(() => import('~/components/p5/flocking-simulation'))
 
 export default function FlockingSimulation() {
+  const [isLoading, setIsLoading] = createSignal(true)
+
+  onMount(() => {
+    setIsLoading(false)
+  })
+
   return (
     <main class='flex flex-col gap-6 p-8'>
       <h1 class='text-6xl font-thin'>Flocking Simulation</h1>
@@ -33,7 +41,11 @@ export default function FlockingSimulation() {
         simple rules, such as separation, alignment, and cohesion, to mimic the natural movement patterns observed in
         flocks or herds.
       </p>
-      <FlockingSimulationCanvas />
+      <div class='min-h-[480px]'>
+        <Show when={!isLoading()} fallback={<CanvasLoader />}>
+          <FlockingSimulationCanvas />
+        </Show>
+      </div>
     </main>
   )
 }

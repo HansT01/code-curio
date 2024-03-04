@@ -1,5 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
+import { Show, createSignal, onMount } from 'solid-js'
+import CanvasLoader from '~/components/canvas-loader'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -13,6 +15,12 @@ export const info: CurioInfo = {
 const NeonConstellationCanvas = clientOnly(() => import('~/components/p5/neon-constellation'))
 
 export default function NeonConstellation() {
+  const [isLoading, setIsLoading] = createSignal(true)
+
+  onMount(() => {
+    setIsLoading(false)
+  })
+
   return (
     <main class='flex flex-col gap-6 p-8'>
       <h1 class='text-6xl font-thin'>Neon Constellation (Shader Render)</h1>
@@ -32,7 +40,11 @@ export default function NeonConstellation() {
         physics of bodies of motion within an indealized enclosed system. The kinetic energy obersvable in the
         simulation remains constant throughout the its lifetime.
       </p>
-      <NeonConstellationCanvas />
+      <div class='min-h-[480px]'>
+        <Show when={!isLoading()} fallback={<CanvasLoader />}>
+          <NeonConstellationCanvas />
+        </Show>
+      </div>
       <p>
         This curio was my first time writing shader code. In the simulation for the Coriolis effect, I needed to use
         WebGL for 3D rendering. I noticed that rendering performance in 3D was quite slow, especially when trails were
