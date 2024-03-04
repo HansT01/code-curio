@@ -4,7 +4,7 @@ import { Accessor, createSignal } from 'solid-js'
 import { Quadtree, Rectangle } from '~/util/quadtree'
 import Canvas from '../canvas'
 
-class NeonBubble {
+class Bubble {
   p: p5
   config: Accessor<typeof defaultConfig>
   radius: number
@@ -66,7 +66,7 @@ class NeonBubble {
     }
   }
 
-  collisions(bubbles: NeonBubble[]) {
+  collisions(bubbles: Bubble[]) {
     for (let bubble of bubbles) {
       if (bubble === this) {
         return
@@ -103,7 +103,12 @@ class NeonBubble {
     }
   }
 
-  update(bubbles: NeonBubble[]) {
+  drag(x: number, y: number) {
+    this.velocity.set((x - this.position.x) / 2, (y - this.position.y) / 2)
+    this.position.set(x, y)
+  }
+
+  update(bubbles: Bubble[]) {
     this.edge()
     this.position.add(this.velocity)
     this.collisions(bubbles)
@@ -126,11 +131,16 @@ const NeonConstellationCanvas = () => {
   const [lightCountIndex, setLightCountIndex] = createSignal(5)
   const [obstacleCountIndex, setObstacleCountIndex] = createSignal(4)
   const count = [0, 1, 2, 4, 7, 10, 14, 20]
-  const bubbles: NeonBubble[] = []
-  const linePairs: [NeonBubble, NeonBubble][] = []
+  const bubbles: Bubble[] = []
+  const linePairs: [Bubble, Bubble][] = []
 
+  let dragging: Bubble | null = null
   let shader: p5.Shader
   let resetCanvas: () => void
+
+  const mouseInWorld = (p: p5) => {
+    return [p.mouseX - p.width / 2, p.height / 2 - p.mouseY]
+  }
 
   const preload = (p: p5) => {
     shader = p.loadShader('/shaders/neon-constellation.vert', '/shaders/neon-constellation.frag')
@@ -139,12 +149,29 @@ const NeonConstellationCanvas = () => {
   const setup = (p: p5) => {
     p.shader(shader)
     p.noStroke()
+
+    p.mousePressed = () => {
+      const [x, y] = mouseInWorld(p)
+      let closest = null
+      let closestDistance = Number.MAX_VALUE
+      for (let bubble of bubbles) {
+        let distance = p.dist(x, y, bubble.position.x, bubble.position.y)
+        if (distance < p.max(bubble.radius, 50) && distance < closestDistance) {
+          closest = bubble
+          closestDistance = distance
+        }
+      }
+      dragging = closest
+    }
+    p.mouseReleased = () => {
+      dragging = null
+    }
+
     resetCanvas = () => {
       bubbles.length = 0
       linePairs.length = 0
-
       for (let i = 0; i < count[lightCountIndex()]; i++) {
-        bubbles.push(new NeonBubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
+        bubbles.push(new Bubble(p, config, p.random(5, 10), [p.random(), p.random(), p.random()]))
       }
       for (let i = 0; i < bubbles.length; i++) {
         for (let j = i + 1; j < bubbles.length; j++) {
@@ -152,7 +179,7 @@ const NeonConstellationCanvas = () => {
         }
       }
       for (let i = 0; i < count[obstacleCountIndex()]; i++) {
-        bubbles.push(new NeonBubble(p, config, p.random(10, 60)))
+        bubbles.push(new Bubble(p, config, p.random(10, 60)))
       }
     }
     resetCanvas()
@@ -162,14 +189,20 @@ const NeonConstellationCanvas = () => {
     p.rect(0, 0, p.width, p.height)
     shader.setUniform('u_resolution', [p.width, p.height])
 
-    const quadtree = new Quadtree<NeonBubble>(new Rectangle(0, 0, p.width, p.height), 5)
+    const quadtree = new Quadtree<Bubble>(new Rectangle(0, 0, p.width, p.height), 5)
     for (let bubble of bubbles) {
       quadtree.insert(bubble)
     }
     for (let bubble of bubbles) {
       const range = new Rectangle(bubble.position.x, bubble.position.y, 200, 200)
       const neighbors = quadtree.query(range)
-      bubble.update(neighbors)
+      if (bubble === dragging) {
+        const [x, y] = mouseInWorld(p)
+        bubble.drag(x, y)
+        bubble.collisions(neighbors)
+      } else {
+        bubble.update(neighbors)
+      }
     }
 
     const lightPositions: number[] = []
