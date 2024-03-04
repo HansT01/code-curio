@@ -226,7 +226,7 @@ const NeonConstellationCanvas = () => {
       }
     }
 
-    for (let i = lineStartPositions.length; i < 100; i++) {
+    for (let i = lineStartPositions.length; i < 120; i++) {
       lineStartPositions.push(0, 0)
       lineEndPositions.push(0, 0)
       lineColors.push(0, 0, 0)
