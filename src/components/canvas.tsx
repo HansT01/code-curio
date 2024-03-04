@@ -1,5 +1,6 @@
 import p5 from 'p5'
-import { Component, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { Component, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import CanvasLoader from './canvas-loader'
 
 export const logFPS = async (p: p5) => {
   while (p.isLooping()) {
@@ -19,17 +20,17 @@ interface CanvasProps {
 
 const Canvas: Component<CanvasProps> = (props) => {
   const [dimensions, setDimensions] = createSignal({ width: props.width, height: props.height })
-  const [show, setShow] = createSignal(true)
+  const [isLoading, setIsLoading] = createSignal(true)
 
   const sketch = (p: p5) => {
     p.preload = () => {
-      setShow(false)
+      setIsLoading(true)
       if (props.preload !== undefined) {
         props.preload(p)
       }
     }
     p.setup = () => {
-      setShow(true)
+      setIsLoading(false)
       const canvas = p.createCanvas(dimensions().width, dimensions().height, props.webgl ? p.WEBGL : undefined)
       canvas.style('visibility', 'visible')
       props.setup(p)
@@ -77,14 +78,19 @@ const Canvas: Component<CanvasProps> = (props) => {
   }
 
   return (
-    <div
-      class='w-full [&>#p5\_loading]:hidden [&>[style*="visibility:_hidden;"]]:hidden [&>canvas]:rounded-2xl'
-      ref={(ref) => {
-        createSketch(ref)
-        createResize(ref)
-        createPreventContextMenu(ref)
-      }}
-    />
+    <div class=''>
+      <Show when={isLoading()}>
+        <CanvasLoader />
+      </Show>
+      <div
+        class='w-full [&>#p5\_loading]:hidden [&>[style*="visibility:_hidden;"]]:hidden [&>canvas]:rounded-2xl'
+        ref={(ref) => {
+          createSketch(ref)
+          createResize(ref)
+          createPreventContextMenu(ref)
+        }}
+      />
+    </div>
   )
 }
 
