@@ -251,22 +251,23 @@ const ProgrammingLanguageOverlap = () => {
       }
     })
 
-    onMount(() => {
-      const resize = () => {
-        if (manager !== undefined) {
-          manager.camera.canvasResized()
-        }
+    const resize = () => {
+      if (manager !== undefined) {
+        manager.camera.canvasResized()
       }
+    }
+    onMount(() => {
+      resize()
       window.addEventListener('resize', resize)
-      onCleanup(() => {
-        window.removeEventListener('resize', resize)
-      })
+    })
+    onCleanup(() => {
+      window.removeEventListener('resize', resize)
     })
 
     shuffle = () => {
       for (let bubble of manager.bubbles) {
         const angle = p.random(-p.PI / 2, p.PI / 2)
-        const offset = p.createVector(p.width / 2, p.height / 2)
+        const offset = p.createVector(0, 0)
         offset.sub(bubble.position)
         offset.rotate(angle)
         offset.setMag(10)
