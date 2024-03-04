@@ -214,6 +214,10 @@ const ProgrammingLanguageOverlap = () => {
   const [config, setConfig] = createSignal(defaultConfig)
 
   let manager: BubbleManager
+  let data: {
+    columns: string[]
+    matrix: number[][]
+  }
   let shuffle: () => void
 
   onMount(() => {
@@ -229,10 +233,18 @@ const ProgrammingLanguageOverlap = () => {
     })
   })
 
+  const preload = async (p: p5) => {
+    data = p.loadJSON('/data/languages-co-occurence.json') as any
+  }
+
   const setup = (p: p5) => {
     manager = new BubbleManager(p, [])
     manager.camera.x = p.width / 2
     manager.camera.y = p.height / 2
+
+    for (let i = 0; i < data.matrix.length; i++) {
+      manager.bubbles.push(new Bubble(p, config, data.columns[i], i, data.matrix[i]))
+    }
 
     p.mousePressed = () => {
       manager.camera.mousePressed()
@@ -255,14 +267,6 @@ const ProgrammingLanguageOverlap = () => {
       manager.dragEnd()
     }
     p.touchMoved = (e: TouchEvent) => manager.camera.touchMoved(e)
-
-    onMount(async () => {
-      const res = await fetch('/data/languages-co-occurence.json')
-      const matrix: { columns: string[]; data: number[][] } = await res.json()
-      for (let i = 0; i < matrix.data.length; i++) {
-        manager.bubbles.push(new Bubble(p, config, matrix.columns[i], i, matrix.data[i]))
-      }
-    })
 
     shuffle = () => {
       for (let bubble of manager.bubbles) {
@@ -297,7 +301,7 @@ const ProgrammingLanguageOverlap = () => {
         Use the cursor to reveal the relationship between the language bubbles. Use left click to drag them around, and
         use right click and scroll wheel for camera controls.
       </small>
-      <Canvas setup={setup} draw={draw} width={854} height={480} />
+      <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} />
     </div>
   )
 }
