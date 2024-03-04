@@ -78,18 +78,17 @@ const Canvas: Component<CanvasProps> = (props) => {
   }
 
   return (
-    <div class=''>
+    <div
+      class='w-full [&>#p5\_loading]:hidden [&>[style*="visibility:_hidden;"]]:hidden [&>canvas]:rounded-2xl'
+      ref={(ref) => {
+        createSketch(ref)
+        createResize(ref)
+        createPreventContextMenu(ref)
+      }}
+    >
       <Show when={isLoading()}>
         <CanvasLoader />
       </Show>
-      <div
-        class='w-full [&>#p5\_loading]:hidden [&>[style*="visibility:_hidden;"]]:hidden [&>canvas]:rounded-2xl'
-        ref={(ref) => {
-          createSketch(ref)
-          createResize(ref)
-          createPreventContextMenu(ref)
-        }}
-      />
     </div>
   )
 }
