@@ -1,5 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
+import { Loader2 } from 'lucide-solid'
+import { Suspense } from 'solid-js'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -41,7 +43,15 @@ export default function ProgrammingLanguageOverlap() {
         of programming languages, this visualization can offer valuable insights into the factors that shape developers'
         language choices and specialization paths.
       </p>
-      <ProgrammingLanguageOverlapCanvas />
+      <Suspense
+        fallback={
+          <div class='flex h-[480px] w-[calc(min(854px,100%))] items-center justify-center rounded-2xl bg-accent text-accent-fg '>
+            <Loader2 class='animate-spin' size={36} />
+          </div>
+        }
+      >
+        <ProgrammingLanguageOverlapCanvas />
+      </Suspense>
     </main>
   )
 }
