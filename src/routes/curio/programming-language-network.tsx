@@ -64,7 +64,15 @@ export default function ProgrammingLanguageOverlap() {
         <p>
           The data utilized in this visualization consisted of the programming languages they had worked with in the
           past year. Using this data, a co-occurrence matrix was generated and utilized for the visualization, which can
-          be accessed in the public/data directory of the source code.
+          be accessed in the{' '}
+          <A
+            target='_blank'
+            href='https://github.com/HansT01/code-curio/blob/main/public/data/languages-co-occurence.json'
+            class='underline'
+          >
+            public/data
+          </A>{' '}
+          directory of the source code.
         </p>
         <p>
           Each node in the visualization represents a programming language, with the radius of the node being
@@ -76,8 +84,8 @@ export default function ProgrammingLanguageOverlap() {
           The attraction forces between nodes are based on the edges in the network, which are undirected. The strength
           of the attraction force is determined by the square of the higher overlap between two languages. For instance,
           if 5% of C programmers have worked with Assembly, but 90% of Assembly programmers have worked with C, the edge
-          weight is a coefficient multiplied by the 0.81. On the other hand, the repulsion force is inversely
-          proportional to the squared distance between two nodes.
+          weight is a coefficient multiplied by 0.81. On the other hand, the repulsion force is inversely proportional
+          to the squared distance between two nodes.
         </p>
         <p>
           One notable observation from the simulation is the tendency for certain groups of languages to navigate
@@ -87,9 +95,9 @@ export default function ProgrammingLanguageOverlap() {
         </p>
         <p>
           By graphing the interconnectedness of programming languages, this visualization can offer insights into the
-          factors that shape developers' language choices and specialization paths. Alternatively, it could potentially
-          be used to confirm or challenge the biases and sterotypes about developers of certain languages, as it
-          provides a visual representation of the clustering tendencies based on its real-world usage.
+          factors that shape developers' language choices and specialization paths. Alternatively, it could be used to
+          confirm or challenge the biases and sterotypes about developers of certain languages, as it provides a visual
+          representation of the clustering tendencies based on their real-world usage.
         </p>
       </section>
     </main>
