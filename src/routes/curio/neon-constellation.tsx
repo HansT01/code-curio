@@ -8,7 +8,7 @@ import { CurioInfo } from '~/util/curio'
 export const info: CurioInfo = {
   id: 'neon-constellation',
   title: 'Neon Constellation',
-  created: new Date(2024, 3, 3),
+  created: new Date('2024-03-03'),
   tags: ['algorithms', 'animation', 'art', 'interactive', 'p5.js', 'physics', 'simulation', 'shader'],
 }
 

@@ -8,7 +8,7 @@ import { CurioInfo } from '~/util/curio'
 export const info: CurioInfo = {
   id: 'programming-language-overlap',
   title: 'Programming Language Overlap',
-  created: new Date(2024, 2, 30),
+  created: new Date('2024-03-01'),
   tags: ['animation', 'data-vis', 'interactive', 'p5.js'],
 }
 
