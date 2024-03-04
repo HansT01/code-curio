@@ -65,7 +65,7 @@ export default function NeonConstellation() {
         <p>
           Shaders are incredibly powerful, as they allow you to easily parallelize highly optimized renders on the GPU.
           If you're interested in learning more about what you can do with shaders, I implore you to head over to{' '}
-          <A href='https://www.shadertoy.com/browse' class='underline'>
+          <A target='_blank' href='https://www.shadertoy.com/browse' class='underline'>
             Shadertoy
           </A>{' '}
           to peruse through the works of others, all made using GLSL shaders!

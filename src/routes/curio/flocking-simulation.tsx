@@ -43,6 +43,19 @@ export default function FlockingSimulation() {
           simple rules, such as separation, alignment, and cohesion, to mimic the natural movement patterns observed in
           flocks or herds.
         </p>
+        <p>
+          I won't delve deeper into the boids algorithm, as it has been extensively covered as an introductory
+          simulation project. This curio served as my introduction to integrating p5.js into the SolidStart framework.
+          If you're interested in learning more about the boids algorithms I used, you can visit this{' '}
+          <A
+            target='_blank'
+            href='https://vanhunteradams.com/Pico/Animal_Movement/Boids-algorithm.html'
+            class='underline'
+          >
+            website
+          </A>
+          .
+        </p>
       </section>
       <section class='min-h-[480px]'>
         <Show when={!isLoading()} fallback={<CanvasLoader />}>

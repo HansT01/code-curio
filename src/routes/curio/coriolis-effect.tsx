@@ -49,7 +49,7 @@ export default function CoriolisEffect() {
         </p>
         <p>
           Read more about the Coriolis effect{' '}
-          <A href='https://en.wikipedia.org/wiki/Coriolis_force' class='underline'>
+          <A target='_blank' href='https://en.wikipedia.org/wiki/Coriolis_force' class='underline'>
             here
           </A>
           .

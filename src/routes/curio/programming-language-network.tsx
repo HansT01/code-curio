@@ -48,7 +48,7 @@ export default function ProgrammingLanguageOverlap() {
         </p>
         <p>
           The data used for this visualization is from the 2023 Stack Overflow Survey. Read more about it{' '}
-          <A href='https://insights.stackoverflow.com/survey' class='underline'>
+          <A target='_blank' href='https://insights.stackoverflow.com/survey' class='underline'>
             here
           </A>
           .
