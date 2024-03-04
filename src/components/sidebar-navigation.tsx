@@ -17,7 +17,7 @@ const TagButton: Component<TagButtonProps> = (props) => {
   return (
     <button
       class={cn(
-        'flex items-center gap-1 rounded-lg bg-secondary px-3 py-1 text-secondary-fg hover:bg-accent hover:text-accent-fg',
+        'flex items-center gap-1 rounded-lg bg-secondary px-3 py-1 text-secondary-fg hover:bg-background hover:text-background-fg',
         {
           'bg-background': props.highlight,
           'text-background-fg': props.highlight,
@@ -100,7 +100,7 @@ const CurioList: Component<CurioListProps> = (props) => {
           {(curio) => (
             <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
               <A href={`/curio/${curio.id}`} onClick={props.onCurioClick}>
-                <div class='flex flex-col gap-0 overflow-x-hidden rounded-xl bg-background px-4 py-2 text-background-fg'>
+                <div class='flex flex-col gap-0 overflow-x-hidden rounded-xl bg-background px-4 py-2 text-background-fg hover:bg-accent hover:text-accent-fg'>
                   <h2>{curio.title}</h2>
                   <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
                   <Show when={curio.tags.length > 0}>
