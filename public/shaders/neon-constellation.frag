@@ -1,22 +1,25 @@
 precision mediump float;
 
-#define NUM_LIGHTS 20
-#define NUM_LINES NUM_LIGHTS * 4
-#define NUM_OBSTACLES 20
+#define MAX_LIGHTS 20
+#define MAX_LINES MAX_LIGHTS * 4
+#define MAX_OBSTACLES 20
 
 varying vec2 pos;
 uniform vec2 u_resolution;
 
-uniform vec2 u_lightPositions[NUM_LIGHTS];
-uniform float u_lightRadii[NUM_LIGHTS];
-uniform vec3 u_lightColors[NUM_LIGHTS];
+uniform int u_lightCount;
+uniform vec2 u_lightPositions[MAX_LIGHTS];
+uniform float u_lightRadii[MAX_LIGHTS];
+uniform vec3 u_lightColors[MAX_LIGHTS];
 
-uniform vec2 u_lineStart[NUM_LINES];
-uniform vec2 u_lineEnd[NUM_LINES];
-uniform vec3 u_lineColors[NUM_LINES];
+uniform int u_lineCount;
+uniform vec2 u_lineStart[MAX_LINES];
+uniform vec2 u_lineEnd[MAX_LINES];
+uniform vec3 u_lineColors[MAX_LINES];
 
-uniform vec2 u_obstaclePositions[NUM_OBSTACLES];
-uniform float u_obstacleRadii[NUM_OBSTACLES];
+uniform int u_obstacleCount;
+uniform vec2 u_obstaclePositions[MAX_OBSTACLES];
+uniform float u_obstacleRadii[MAX_OBSTACLES];
 
 float isLit(vec2 coord, vec2 lightPosition, vec2 obstaclePosition, float obstacleRadius) {
     float distanceToObstacle = distance(obstaclePosition, coord);
@@ -57,7 +60,10 @@ void main() {
 
     vec3 color = vec3(0.0);
 
-    for (int i = 0; i < NUM_LINES; i++) {
+    for (int i = 0; i < MAX_LINES; i++) {
+        if (i >= u_lineCount) {
+            break;
+        }
         vec2 lineStart = u_lineStart[i] * positionFactor;
         vec2 lineEnd = u_lineEnd[i] * positionFactor;
         vec3 lineColor = u_lineColors[i];
@@ -66,7 +72,10 @@ void main() {
         distanceToLine = clamp(distanceToLine, 0.0, 1.0);
         float intensity = 1.0 / distanceToLine * 0.01;
 
-        for (int j = 0; j < NUM_OBSTACLES; j++) {
+        for (int j = 0; j < MAX_OBSTACLES; j++) {
+            if (j >= u_obstacleCount) {
+                break;
+            }
             vec2 obstaclePosition = u_obstaclePositions[j] * positionFactor;
             float obstacleRadius = u_obstacleRadii[j] * radiusFactor;
             float lit = 0.0;
@@ -79,7 +88,10 @@ void main() {
         color += lineColor * intensity;
     }
 
-    for (int i = 0; i < NUM_LIGHTS; i++) {
+    for (int i = 0; i < MAX_LIGHTS; i++) {
+        if (i >= u_lightCount) {
+            break;
+        }
         vec2 lightPosition = u_lightPositions[i] * positionFactor;
         float lightRadius = u_lightRadii[i] * radiusFactor;
         vec3 lightColor = u_lightColors[i];
@@ -88,7 +100,10 @@ void main() {
         dist = clamp(dist, 0.0, 1.0);
         float intensity = 1.0 / (dist) * 0.4;
 
-        for (int j = 0; j < NUM_OBSTACLES; j++) {
+        for (int j = 0; j < MAX_OBSTACLES; j++) {
+            if (j >= u_obstacleCount) {
+                break;
+            }
             vec2 obstaclePosition = u_obstaclePositions[j] * positionFactor;
             float obstacleRadius = u_obstacleRadii[j] * radiusFactor;
             intensity *= isLit(coord, lightPosition, obstaclePosition, obstacleRadius);
@@ -97,7 +112,10 @@ void main() {
         color += lightColor * intensity * lightRadius;
     }
 
-    for (int i = 0; i < NUM_OBSTACLES; i++) {
+    for (int i = 0; i < MAX_OBSTACLES; i++) {
+        if (i >= u_obstacleCount) {
+            break;
+        }
         vec2 obstaclePosition = u_obstaclePositions[i] * positionFactor;
         float obstacleRadius = u_obstacleRadii[i] * radiusFactor;
 
