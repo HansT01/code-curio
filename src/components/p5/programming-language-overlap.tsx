@@ -251,17 +251,17 @@ const ProgrammingLanguageOverlap = () => {
       }
     })
 
-    const resize = () => {
-      if (manager !== undefined) {
-        manager.camera.canvasResized()
-      }
-    }
     onMount(() => {
+      const resize = () => {
+        if (manager !== undefined) {
+          manager.camera.canvasResized()
+        }
+      }
       resize()
       window.addEventListener('resize', resize)
-    })
-    onCleanup(() => {
-      window.removeEventListener('resize', resize)
+      onCleanup(() => {
+        window.removeEventListener('resize', resize)
+      })
     })
 
     shuffle = () => {

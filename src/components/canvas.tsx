@@ -50,28 +50,28 @@ const Canvas: Component<CanvasProps> = (props) => {
   }
 
   const createResize = (ref: HTMLDivElement) => {
-    const resize = () => {
-      setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
-    }
     onMount(() => {
+      const resize = () => {
+        setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
+      }
       resize()
       window.addEventListener('resize', resize)
-    })
-    onCleanup(() => {
-      window.removeEventListener('resize', resize)
+      onCleanup(() => {
+        window.removeEventListener('resize', resize)
+      })
     })
   }
 
   const createPreventContextMenu = (ref: HTMLDivElement) => {
-    const preventContextMenu = (e: MouseEvent) => {
-      e.preventDefault()
-      return false
-    }
     onMount(() => {
+      const preventContextMenu = (e: MouseEvent) => {
+        e.preventDefault()
+        return false
+      }
       ref.addEventListener('contextmenu', preventContextMenu)
-    })
-    onCleanup(() => {
-      ref.removeEventListener('contextmenu', preventContextMenu)
+      onCleanup(() => {
+        ref.removeEventListener('contextmenu', preventContextMenu)
+      })
     })
   }
 
