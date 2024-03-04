@@ -55,6 +55,7 @@ const Canvas: Component<CanvasProps> = (props) => {
         setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
       }
       resize()
+      window.dispatchEvent(new Event('resize'))
       window.addEventListener('resize', resize)
       onCleanup(() => {
         window.removeEventListener('resize', resize)
