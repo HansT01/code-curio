@@ -49,19 +49,19 @@ class Bubble {
     const halfWidth = this.p.width / 2
     const halfHeight = this.p.height / 2
     if (this.position.x - this.radius < -halfWidth) {
-      this.velocity.x *= -this.config().edgeRestitutionCoefficient
+      this.velocity.x *= -this.config().edgeBounceFactor
       this.position.x = this.radius - halfWidth
     }
     if (this.position.x + this.radius > halfWidth) {
-      this.velocity.x *= -this.config().edgeRestitutionCoefficient
+      this.velocity.x *= -this.config().edgeBounceFactor
       this.position.x = halfWidth - this.radius
     }
     if (this.position.y - this.radius < -halfHeight) {
-      this.velocity.y *= -this.config().edgeRestitutionCoefficient
+      this.velocity.y *= -this.config().edgeBounceFactor
       this.position.y = this.radius - halfHeight
     }
     if (this.position.y + this.radius > halfHeight) {
-      this.velocity.y *= -this.config().edgeRestitutionCoefficient
+      this.velocity.y *= -this.config().edgeBounceFactor
       this.position.y = halfHeight - this.radius
     }
   }
@@ -125,7 +125,7 @@ class Bubble {
 }
 
 const defaultConfig = {
-  edgeRestitutionCoefficient: 1,
+  edgeBounceFactor: 1,
 }
 
 const NeonConstellationCanvas = () => {
@@ -337,22 +337,22 @@ const NeonConstellationCanvas = () => {
         </div>
       </div>
       <div class='flex flex-wrap gap-4'>
-        <div class='relative mb-6 flex flex-col items-start'>
-          <label for='edge-bounce-factor' class='mb-2'>
-            Edge Restitution Coefficient Factor
-          </label>
-          <input
-            id='edge-bounce-factor'
-            type='range'
-            min={0.5}
-            max={1}
-            value={defaultConfig.edgeRestitutionCoefficient}
-            step={0.01}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), edgeBounceFactor: parseFloat(e.target.value) })}
-          />
-          <span class='absolute -bottom-6 start-0 text-sm'>0.5</span>
-          <span class='absolute -bottom-6 end-0 text-sm'>1.0</span>
+        <div class='flex flex-col items-start'>
+          <label for='edge-bounce-factor'>Edge Bounce Factor</label>
+          <div class='relative mb-5'>
+            <input
+              id='edge-bounce-factor'
+              type='range'
+              min={0.5}
+              max={1}
+              value={defaultConfig.edgeBounceFactor}
+              step={0.01}
+              class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
+              onChange={(e) => setConfig({ ...config(), edgeBounceFactor: parseFloat(e.target.value) })}
+            />
+            <span class='absolute -bottom-5 start-0 text-sm'>0.5</span>
+            <span class='absolute -bottom-5 end-0 text-sm'>1.0</span>
+          </div>
         </div>
       </div>
       <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} webgl />
