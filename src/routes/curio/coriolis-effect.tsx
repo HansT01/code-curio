@@ -48,6 +48,13 @@ export default function CoriolisEffect() {
           cyclones.
         </p>
         <p>
+          Read more about the Coriolis effect{' '}
+          <A href='https://en.wikipedia.org/wiki/Coriolis_force' class='underline'>
+            here
+          </A>
+          .
+        </p>
+        <p>
           This simulation assumes the perspective of an observer rotating alongside a sphere representing Earth, and
           attempts to simulate the impact of the Coriolis force on the direction of winds.
         </p>
@@ -56,6 +63,30 @@ export default function CoriolisEffect() {
         <Show when={!isLoading()} fallback={<CanvasLoader />}>
           <CoriolisEffectCanvas />
         </Show>
+      </section>
+      <section class='flex flex-col gap-4'>
+        <h2 class='text-4xl font-extralight'>Discussion</h2>
+        <p>
+          The simulation consisted of three acting forces: separation, centrifugal, and the Coriolis force. The
+          centrifugal force directs the particles towards the equator, which then the Coriolis force deflects them in a
+          manner consistent with the Coriolis effect. Without the inclusion of separation, the simulation lacked
+          complexity and appeared static.
+        </p>
+        <p>
+          To address performance constraints, the simulation was designed to accommodate a reduced number of fluid
+          particles. To ensure visual clarity, an option was included to toggle the display of particle trails,
+          providing users with the flexibility to prioritize visibility over particle quantity in the simulation.
+        </p>
+        <p>
+          To compensate for the reduced accuracy resulting from the limited number of particles, I increased the
+          magnitudes of both the centrifugal and Coriolis forces. This adjustment made the effects more pronounced and
+          visually striking, but it also deviated from the realistic behavior of these forces on Earth. In reality, the
+          Coriolis effect is subtle but its influence is remarkable at scale.
+        </p>
+        <p>
+          If the Coriolis forces are exaggerated, the particles will begin to spiral. This phenomenon mirrors the
+          cyclonic spin direction observed in weather systems in the northern and southern hemispheres.
+        </p>
       </section>
     </main>
   )
