@@ -38,7 +38,12 @@ export default function NeonConstellation() {
       <p>
         Neon Constellation isn't simulating anything to do with real world constellations. However, it is simulating the
         perfectly elastic physics of bodies in motion within an indealized enclosed system. In other words, the kinetic
-        energy observable in the simulation remains constant throughout the its lifetime.
+        energy observable in the simulation remains constant until an external interference is applied. It is also
+        simulating the casting of shadows.
+        <br />
+        <br />
+        In this simulation, you are able to drag and throw around the lights and obstacles. You are also able to modify
+        amount of energy lost when an object collides with the edge of the simulation.
       </p>
       <div class='min-h-[480px]'>
         <Show when={!isLoading()} fallback={<CanvasLoader />}>
@@ -54,16 +59,20 @@ export default function NeonConstellation() {
         <br />
         <br />
         Shaders are incredibly powerful, as they allow you to easily parallelize highly optimized renders on the GPU. If
-        you're interested in learning more about what you can do with shaders, I implore you to head over to Shadertoy
+        you're interested in learning more about what you can do with shaders, I implore you to head over to{' '}
+        <A href='https://www.shadertoy.com/browse' class='underline'>
+          Shadertoy
+        </A>{' '}
         to peruse through the works of others, all made using GLSL shaders!
         <br />
         <br />
-        Writing shader code is like magic. There was no direct feedback loop, so it made testing issues incredibly
-        tedious. There were limited debugging capabilities, as code executes on the GPU. Optimizing shader code required
-        knowledge in mathematics for vector and matrix operations. If statements may cause branching, which hinders the
-        rendering performance. I had no idea what I was doing when I was working on this project, and I doubt many do
-        either. But despite all that, this experience was something I definitely don't regret. After all, programming
-        wouldn't be nearly as fun if it wasn't challenging.
+        Despite the visible results, my first experience writing shader code wasn't seamless. There was no direct
+        feedback loop, so it made testing issues incredibly tedious. There were limited debugging capabilities, as code
+        executes on the GPU. Optimizing shader code required knowledge in mathematics for vector and matrix operations.
+        "If" statements may cause branching, which hinders the rendering performance. When I read other people's code,
+        it was like trying to decipher an ancient cryptic text. I had no idea what I was doing when I was working on
+        this curio, and I doubt many would either. But despite all that, this experience was something I definitely
+        don't regret. After all, programming wouldn't be nearly as fun if it wasn't challenging.
       </p>
     </main>
   )
