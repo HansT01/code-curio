@@ -36,9 +36,9 @@ export default function NeonConstellation() {
         </A>
       </div>
       <p>
-        Neon Constellation isn't simulating anything to do with real life constellations. However, it is simulating the
-        physics of bodies of motion within an indealized enclosed system. The kinetic energy obersvable in the
-        simulation remains constant throughout the its lifetime.
+        Neon Constellation isn't simulating anything to do with real world constellations. However, it is simulating the
+        perfectly elastic physics of bodies in motion within an indealized enclosed system. In other words, the kinetic
+        energy observable in the simulation remains constant throughout the its lifetime.
       </p>
       <div class='min-h-[480px]'>
         <Show when={!isLoading()} fallback={<CanvasLoader />}>
@@ -46,23 +46,24 @@ export default function NeonConstellation() {
         </Show>
       </div>
       <p>
-        This curio was my first time writing shader code. In the simulation for the Coriolis effect, I needed to use
-        WebGL for 3D rendering. I noticed that rendering performance in 3D was quite slow, especially when trails were
-        enabled. This was despite the fact that the amount of vertices in the render was miniscule compared to what
+        This curio was my first time in writing shader code. In the simulation for the Coriolis effect, I needed to use
+        WebGL for 3D rendering. I noticed that the rendering performance in 3D was quite slow, especially when trails
+        were enabled. This was despite the fact that the amount of vertices in the render was miniscule compared to what
         modern games demanded. It became apparent to me that if I wanted to take my projects a step further, I would
         need to learn to make use of the GPU myself.
         <br />
         <br />
-        Shaders are incredibly powerful, as they allow you to easily parallelize renders on the GPU. If you're
-        interested in learning more about what you can do with shaders, I implore you to head over to Shadertoy to
-        peruse through the works of others, all made using shaders!
+        Shaders are incredibly powerful, as they allow you to easily parallelize highly optimized renders on the GPU. If
+        you're interested in learning more about what you can do with shaders, I implore you to head over to Shadertoy
+        to peruse through the works of others, all made using GLSL shaders!
         <br />
         <br />
-        Errors were incredibly painful to debug. There was absolutely no context given by the WebGL api, nor the p5.js
-        wrapper. I had spent a good few hours trying to figure out why nothing was rendering, only to realise that it
-        had nothing to do with the shader code. It turned out that I had been trying to import shader code from the
-        wrong directory! An issue I wasn't entirely able to resolve (yet), was to figure out how to clear the buffers
-        when setting uniform variables in the fragment code when dealing with a variable sized input.
+        Writing shader code is like magic. There was no direct feedback loop, so it made testing issues incredibly
+        tedious. There were limited debugging capabilities, as code executes on the GPU. Optimizing shader code required
+        knowledge in mathematics for vector and matrix operations. If statements may cause branching, which hinders the
+        rendering performance. I had no idea what I was doing when I was working on this project, and I doubt many do
+        either. But despite all that, this experience was something I definitely don't regret. After all, programming
+        wouldn't be nearly as fun if it wasn't challenging.
       </p>
     </main>
   )
