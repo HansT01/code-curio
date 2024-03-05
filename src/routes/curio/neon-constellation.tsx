@@ -50,7 +50,7 @@ export default function NeonConstellation() {
         </Show>
       </section>
       <section class='flex flex-col gap-4'>
-        <h2 class='text-4xl font-extralight'>Reflecting Analysis On Writing Shaders</h2>
+        <h2 class='text-4xl font-extralight'>Reflective Analysis On Writing Shaders</h2>
         <p>
           This curio was my first time in writing shader code. In the simulation for the Coriolis effect, I needed to
           use WebGL for 3D rendering. I noticed that the rendering performance in 3D was quite slow, especially when

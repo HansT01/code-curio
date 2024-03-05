@@ -60,7 +60,7 @@ export default function ProgrammingLanguageOverlap() {
         </Show>
       </section>
       <section class='flex flex-col gap-4'>
-        <h2 class='text-4xl font-extralight'>Discussion</h2>
+        <h2 class='text-4xl font-extralight'>Methods</h2>
         <p>
           The data utilized in this visualization consisted of the programming languages they had worked with in the
           past year. Using this data, a co-occurrence matrix was generated and utilized for the visualization, which can
@@ -87,6 +87,9 @@ export default function ProgrammingLanguageOverlap() {
           weight is a coefficient multiplied by 0.81. On the other hand, the repulsion force is inversely proportional
           to the squared distance between two nodes.
         </p>
+      </section>
+      <section class='flex flex-col gap-4'>
+        <h2 class='text-4xl font-extralight'>Results</h2>
         <p>
           One notable observation from the simulation is the tendency for certain groups of languages to navigate
           towards each other despite shuffling. For example, languages like C, C++, and Assembly tend to cluster
@@ -96,8 +99,8 @@ export default function ProgrammingLanguageOverlap() {
         <p>
           By graphing the interconnectedness of programming languages, this visualization can offer insights into the
           factors that shape developers' language choices and specialization paths. Alternatively, it could be used to
-          confirm or challenge the biases and sterotypes about developers of certain languages, as it provides a visual
-          representation of the clustering tendencies based on their real-world usage.
+          confirm or challenge the biases and stereotypes about developers of certain languages, as it provides a visual
+          representation of the clustering tendencies of languages based on their real-world usage.
         </p>
       </section>
     </main>
