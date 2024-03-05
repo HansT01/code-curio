@@ -165,7 +165,7 @@ const DoublePendulumCanvas = () => {
   }
 
   const setup = (p: p5) => {
-    dp = new DoublePendulum(p, config, (3 / 4) * p.PI, (3 / 5) * p.PI)
+    dp = new DoublePendulum(p, config, p.random(p.PI / 2, (3 * p.PI) / 2), p.random(2 * p.PI))
     trails = p.createGraphics(p.width, p.height)
     trails.clear()
     p.background(0)
@@ -215,7 +215,7 @@ const DoublePendulumCanvas = () => {
       </div>
       <div class='flex flex-wrap gap-4'>
         <div class='flex flex-col items-start'>
-          <label for='friction-coefficient'>Friction Coeff.</label>
+          <label for='friction-coefficient'>Friction Coefficient</label>
           <div class='relative mb-5'>
             <input
               id='friction-coefficient'
