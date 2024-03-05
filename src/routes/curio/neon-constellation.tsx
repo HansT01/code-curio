@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/canvas-loader'
+import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -12,7 +12,7 @@ export const info: CurioInfo = {
   tags: ['algorithms', 'animation', 'art', 'interactive', 'p5.js', 'physics', 'simulation', 'shader'],
 }
 
-const NeonConstellationCanvas = clientOnly(() => import('~/components/p5/neon-constellation'))
+const NeonConstellationCanvas = clientOnly(() => import('~/components/curios/neon-constellation'))
 
 export default function NeonConstellation() {
   const [isLoading, setIsLoading] = createSignal(true)

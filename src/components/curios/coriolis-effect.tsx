@@ -3,7 +3,7 @@ import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
-import Canvas from '../canvas'
+import Canvas from './p5/canvas'
 
 class Particle {
   p: p5

@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/canvas-loader'
+import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -12,7 +12,7 @@ export const info: CurioInfo = {
   tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics', 'simulation', '3d'],
 }
 
-const CoriolisEffectCanvas = clientOnly(() => import('~/components/p5/coriolis-effect'))
+const CoriolisEffectCanvas = clientOnly(() => import('~/components/curios/coriolis-effect'))
 
 export default function CoriolisEffect() {
   const [isLoading, setIsLoading] = createSignal(true)

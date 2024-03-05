@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/canvas-loader'
+import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
 
@@ -12,7 +12,7 @@ export const info: CurioInfo = {
   tags: ['ai', 'algorithms', 'animation', 'interactive', 'p5.js', 'simulation'],
 }
 
-const FlockingSimulationCanvas = clientOnly(() => import('~/components/p5/flocking-simulation'))
+const FlockingSimulationCanvas = clientOnly(() => import('~/components/curios/flocking-simulation'))
 
 export default function FlockingSimulation() {
   const [isLoading, setIsLoading] = createSignal(true)

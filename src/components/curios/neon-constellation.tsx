@@ -2,7 +2,7 @@ import { Minus, Plus } from 'lucide-solid'
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import { Quadtree, Rectangle } from '~/util/quadtree'
-import Canvas from '../canvas'
+import Canvas from './p5/canvas'
 
 class Bubble {
   p: p5
