@@ -146,7 +146,7 @@ class DoublePendulum {
 }
 
 const defaultConfig = {
-  gravity: 1,
+  gravity: 0.5,
   frictionCoeff: 0.0,
   radius: 10,
   length1: 100,
@@ -194,6 +194,7 @@ const DoublePendulumCanvas = () => {
 
   const draw = (p: p5) => {
     p.background(0)
+    p.translate(p.width / 2, p.height / 2)
 
     const [_x1, _y1, x2, y2] = dp.positions()
     dp.update()
@@ -282,7 +283,7 @@ const DoublePendulumCanvas = () => {
         </div>
       </div>
       <small>Use the cursor to move the first pendulum.</small>
-      <Canvas setup={setup} draw={draw} width={854} height={480} webgl />
+      <Canvas setup={setup} draw={draw} width={854} height={480} />
     </div>
   )
 }
