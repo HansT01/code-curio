@@ -31,6 +31,14 @@ class DoublePendulum {
     return [x1, -y1, x2, -y2] as const
   }
 
+  drag(x: number, y: number) {
+    const ydir = this.p.createVector(0, 1)
+    const mouse = this.p.createVector(x, y)
+    const angle = mouse.angleBetween(ydir)
+    this.dtheta1 = (angle - this.theta1) / 2
+    this.theta1 = angle
+  }
+
   step(theta1: number, theta2: number, dtheta1: number, dtheta2: number) {
     const sqomega1 = this.config().gravity / this.config().length1
     const sqomega2 = this.config().gravity / this.config().length2
@@ -80,10 +88,27 @@ class DoublePendulum {
     this.dtheta1 += ((k1[2] + 2.0 * k2[2] + 2.0 * k3[2] + k4[2]) * dt) / 6.0
     this.dtheta2 += ((k1[3] + 2.0 * k2[3] + 2.0 * k3[3] + k4[3]) * dt) / 6.0
     this.energy = k1[4]
+
+    const pi = this.p.PI
+    if (this.theta1 > 2.0 * pi) {
+      this.theta1 = this.theta1 - 2.0 * pi
+    }
+    if (this.theta1 < -2.0 * pi) {
+      this.theta1 = this.theta1 + 2.0 * pi
+    }
+    if (this.theta2 > 2.0 * pi) {
+      this.theta2 = this.theta2 - 2.0 * pi
+    }
+    if (this.theta2 < -2.0 * pi) {
+      this.theta2 = this.theta2 + 2.0 * pi
+    }
+    this.dtheta1 = this.p.min(this.p.max(this.dtheta1, -pi), pi)
+    this.dtheta2 = this.p.min(this.p.max(this.dtheta2, -pi), pi)
   }
 
   update() {
     this.rk4(1)
+    console.log(this.theta2, this.dtheta2)
   }
 
   draw() {
@@ -128,21 +153,39 @@ const defaultConfig = {
 
 const DoublePendulumCanvas = () => {
   const [config, setConfig] = createSignal(defaultConfig)
+  let isDragging: boolean = false
   let dp: DoublePendulum
+
+  const mouseInWorld = (p: p5) => {
+    return [p.mouseX - p.width / 2, p.mouseY - p.height / 2]
+  }
 
   const setup = (p: p5) => {
     dp = new DoublePendulum(p, config, (3 / 4) * p.PI, (3 / 5) * p.PI)
+
+    p.mousePressed = () => {
+      const [x, y] = mouseInWorld(p)
+      const [x1, y1] = dp.positions()
+
+      console.log(x, y, x1, y1)
+      let distance = p.dist(x, y, x1, y1)
+      if (distance < p.max(config().radius, 100)) {
+        isDragging = true
+      }
+    }
+    p.mouseReleased = () => {
+      isDragging = false
+    }
   }
 
   const draw = (p: p5) => {
     p.background(50)
-    const [t1, dt1] = [dp.theta1, dp.dtheta1]
     dp.update()
-    // dp.theta1 = t1
-    // dp.dtheta1 = dt1
+    if (isDragging) {
+      const [x, y] = mouseInWorld(p)
+      dp.drag(x, y)
+    }
     dp.draw()
-
-    console.log(dp.energy)
   }
 
   return (
