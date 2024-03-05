@@ -281,6 +281,7 @@ const DoublePendulumCanvas = () => {
           </div>
         </div>
       </div>
+      <small>Use the cursor to move the first pendulum.</small>
       <Canvas setup={setup} draw={draw} width={854} height={480} webgl />
     </div>
   )

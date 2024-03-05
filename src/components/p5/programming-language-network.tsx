@@ -298,8 +298,8 @@ const ProgrammingLanguageOverlap = () => {
         </button>
       </div>
       <small>
-        Use the cursor to reveal the relationship between the language bubbles. Use left click to drag them around, and
-        use right click and scroll wheel for camera controls.
+        Use the cursor to reveal the relationship between the language bubbles. Use left click to move the nodes around,
+        and use right click and scroll wheel for camera controls.
       </small>
       <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} />
     </div>

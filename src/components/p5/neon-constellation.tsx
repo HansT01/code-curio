@@ -353,6 +353,7 @@ const NeonConstellationCanvas = () => {
           </div>
         </div>
       </div>
+      <small>Use the cursor to move the objects.</small>
       <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} webgl />
     </div>
   )
