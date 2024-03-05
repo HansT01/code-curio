@@ -145,7 +145,7 @@ class DoublePendulum {
 
 const defaultConfig = {
   gravity: 1,
-  frictionCoeff: 0.001,
+  frictionCoeff: 0.0,
   radius: 10,
   length1: 100,
   length2: 100,
@@ -155,6 +155,7 @@ const DoublePendulumCanvas = () => {
   const [config, setConfig] = createSignal(defaultConfig)
   let isDragging: boolean = false
   let dp: DoublePendulum
+  let trails: p5.Graphics
 
   const mouseInWorld = (p: p5) => {
     return [p.mouseX - p.width / 2, p.mouseY - p.height / 2]
@@ -162,6 +163,9 @@ const DoublePendulumCanvas = () => {
 
   const setup = (p: p5) => {
     dp = new DoublePendulum(p, config, (3 / 4) * p.PI, (3 / 5) * p.PI)
+    trails = p.createGraphics(p.width, p.height)
+    trails.clear()
+    p.background(0)
 
     p.mousePressed = () => {
       const [x, y] = mouseInWorld(p)
@@ -179,12 +183,24 @@ const DoublePendulumCanvas = () => {
   }
 
   const draw = (p: p5) => {
-    p.background(50)
+    p.background(0)
+
+    const [_x1, _y1, x2, y2] = dp.positions()
+
     dp.update()
     if (isDragging) {
       const [x, y] = mouseInWorld(p)
       dp.drag(x, y)
     }
+
+    const [_x1New, _y1New, x2New, y2New] = dp.positions()
+
+    trails.background(0, 1)
+    trails.stroke(255)
+    trails.strokeWeight(2)
+    trails.line(x2 + p.width / 2, y2 + p.height / 2, x2New + p.width / 2, y2New + p.height / 2)
+    p.image(trails, -p.width / 2, -p.height / 2)
+
     dp.draw()
   }
 
