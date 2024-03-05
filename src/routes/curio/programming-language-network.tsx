@@ -1,6 +1,6 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
-import { Show, createSignal, onMount } from 'solid-js'
+import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
 import CanvasLoader from '~/components/canvas-loader'
 import GithubIcon from '~/components/icons/github'
 import { CurioInfo } from '~/util/curio'
@@ -55,9 +55,11 @@ export default function ProgrammingLanguageOverlap() {
         </p>
       </section>
       <section class='min-h-[480px]'>
-        <Show when={!isLoading()} fallback={<CanvasLoader />}>
-          <ProgrammingLanguageOverlapCanvas />
-        </Show>
+        <ErrorBoundary fallback={(err, reset) => <CanvasLoader error={err} onClick={reset} />}>
+          <Show when={!isLoading()} fallback={<CanvasLoader />}>
+            <ProgrammingLanguageOverlapCanvas />
+          </Show>
+        </ErrorBoundary>
       </section>
       <section class='flex flex-col gap-4'>
         <h2 class='text-4xl font-extralight'>Methods</h2>
