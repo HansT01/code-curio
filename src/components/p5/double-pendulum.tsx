@@ -88,7 +88,9 @@ class DoublePendulum {
     this.dtheta1 += ((k1[2] + 2.0 * k2[2] + 2.0 * k3[2] + k4[2]) * dt) / 6.0
     this.dtheta2 += ((k1[3] + 2.0 * k2[3] + 2.0 * k3[3] + k4[3]) * dt) / 6.0
     this.energy = k1[4]
+  }
 
+  stabilize() {
     const pi = this.p.PI
     if (this.theta1 > 2.0 * pi) {
       this.theta1 = this.theta1 - 2.0 * pi
@@ -108,6 +110,7 @@ class DoublePendulum {
 
   update() {
     this.rk4(1)
+    this.stabilize()
   }
 
   draw() {
@@ -210,7 +213,7 @@ const DoublePendulumCanvas = () => {
           class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
           onClick={() => clearTrails()}
         >
-          Clear Trails
+          Clear Trails.
         </button>
       </div>
       <div class='flex flex-wrap gap-4'>
