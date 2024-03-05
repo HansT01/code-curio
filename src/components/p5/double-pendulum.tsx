@@ -31,9 +31,10 @@ class DoublePendulum {
     return [x1, -y1, x2, -y2] as const
   }
 
-  step(theta1: number, theta2: number, dtheta1: number, dtheta2: number, omega2: number) {
+  step(theta1: number, theta2: number, dtheta1: number, dtheta2: number) {
     const sqomega1 = this.config().gravity / this.config().length1
     const sqomega2 = this.config().gravity / this.config().length2
+
     const sindiff = this.p.sin(theta1 - theta2)
     const cosdiff = this.p.cos(theta1 - theta2)
     const a = 1 / (1 + sindiff * sindiff)
@@ -42,38 +43,37 @@ class DoublePendulum {
     const b = _theta1 * _theta2 * sindiff
     const _dtheta1 = -b - 2 * sqomega1 * this.p.sin(theta1)
     const _dtheta2 = b - sqomega2 * this.p.sin(theta2)
+
     const energy =
-      0.5 * (dtheta1 * _theta1 + dtheta2 * _theta2) - omega2 * (2.0 * this.p.cos(theta1) + this.p.cos(theta2) - 3.0)
+      (dtheta1 * _theta1 + dtheta2 * _theta2) / 2 - sqomega1 * (2 * this.p.cos(theta1)) - sqomega2 * this.p.cos(theta2)
+
     return [_theta1, _theta2, _dtheta1, _dtheta2, energy] as const
   }
 
   rk4(dt: number) {
-    const omega = (2 * this.p.PI) / this.config().period
-    const omega2 = omega * omega
-
     let theta1 = this.theta1
     let theta2 = this.theta2
     let dtheta1 = this.dtheta1
     let dtheta2 = this.dtheta2
-    const k1 = this.step(theta1, theta2, dtheta1, dtheta2, omega2)
+    const k1 = this.step(theta1, theta2, dtheta1, dtheta2)
 
     theta1 = this.theta1 + (k1[0] * dt) / 2
     theta2 = this.theta2 + (k1[1] * dt) / 2
     dtheta1 = this.dtheta1 + (k1[2] * dt) / 2
     dtheta2 = this.dtheta2 + (k1[3] * dt) / 2
-    const k2 = this.step(theta1, theta2, dtheta1, dtheta2, omega2)
+    const k2 = this.step(theta1, theta2, dtheta1, dtheta2)
 
     theta1 = this.theta1 + (k2[0] * dt) / 2
     theta2 = this.theta2 + (k2[1] * dt) / 2
     dtheta1 = this.dtheta1 + (k2[2] * dt) / 2
     dtheta2 = this.dtheta2 + (k2[3] * dt) / 2
-    const k3 = this.step(theta1, theta2, dtheta1, dtheta2, omega2)
+    const k3 = this.step(theta1, theta2, dtheta1, dtheta2)
 
     theta1 = this.theta1 + k3[0] * dt
     theta2 = this.theta2 + k3[1] * dt
     dtheta1 = this.dtheta1 + k3[2] * dt
     dtheta2 = this.dtheta2 + k3[3] * dt
-    const k4 = this.step(theta1, theta2, dtheta1, dtheta2, omega2)
+    const k4 = this.step(theta1, theta2, dtheta1, dtheta2)
 
     this.theta1 += ((k1[0] + 2.0 * k2[0] + 2.0 * k3[0] + k4[0]) * dt) / 6.0
     this.theta2 += ((k1[1] + 2.0 * k2[1] + 2.0 * k3[1] + k4[1]) * dt) / 6.0
@@ -83,7 +83,7 @@ class DoublePendulum {
   }
 
   update() {
-    this.rk4(0.02)
+    this.rk4(1)
   }
 
   draw() {
@@ -119,7 +119,7 @@ class DoublePendulum {
 }
 
 const defaultConfig = {
-  gravity: 9.81,
+  gravity: 1,
   period: 1,
   radius: 10,
   length1: 100,
@@ -138,8 +138,8 @@ const DoublePendulumCanvas = () => {
     p.background(50)
     const [t1, dt1] = [dp.theta1, dp.dtheta1]
     dp.update()
-    dp.theta1 = t1
-    dp.dtheta1 = dt1
+    // dp.theta1 = t1
+    // dp.dtheta1 = dt1
     dp.draw()
 
     console.log(dp.energy)
