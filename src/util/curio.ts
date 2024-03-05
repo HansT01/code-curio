@@ -36,6 +36,7 @@ export const getCurios = async () => {
       return info
     }),
   )
+  info.sort((a, b) => (a.created === b.created ? 0 : a.created > b.created ? -1 : 1))
   cache = info
   return info
 }
