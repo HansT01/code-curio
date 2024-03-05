@@ -4,6 +4,7 @@ import { Accessor, createSignal } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
 import Canvas from './p5/canvas'
+import Slider from './widgets/slider'
 
 class Particle {
   p: p5
@@ -242,51 +243,30 @@ const CoriolisEffectCanvas = () => {
         </button>
       </div>
       <div class='flex flex-wrap gap-4'>
-        <div class='flex flex-col items-start'>
-          <label for='separation-factor' class='mb-2'>
-            Separation Factor
-          </label>
-          <input
-            id='separation-factor'
-            type='range'
-            min={0}
-            max={defaultConfig.separationFactor * 5}
-            value={defaultConfig.separationFactor}
-            step={defaultConfig.separationFactor / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
-          />
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='centrifugal-factor' class='mb-2'>
-            Centrifugal Factor
-          </label>
-          <input
-            id='centrifugal-factor'
-            type='range'
-            min={0}
-            max={defaultConfig.centrifugalFactor * 5}
-            value={defaultConfig.centrifugalFactor}
-            step={defaultConfig.centrifugalFactor / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), centrifugalFactor: parseFloat(e.target.value) })}
-          />
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='coriolis-factor' class='mb-2'>
-            Coriolis Factor
-          </label>
-          <input
-            id='coriolis-factor'
-            type='range'
-            min={0}
-            max={defaultConfig.coriolisFactor * 5}
-            value={defaultConfig.coriolisFactor}
-            step={defaultConfig.coriolisFactor / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), coriolisFactor: parseFloat(e.target.value) })}
-          />
-        </div>
+        <Slider
+          id='separation-factor'
+          label='Separation Factor'
+          min={0}
+          max={defaultConfig.separationFactor * 5}
+          value={defaultConfig.separationFactor}
+          onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
+        />
+        <Slider
+          id='centrifugal-factor'
+          label='Centrifugal Factor'
+          min={0}
+          max={defaultConfig.centrifugalFactor * 5}
+          value={defaultConfig.centrifugalFactor}
+          onChange={(e) => setConfig({ ...config(), centrifugalFactor: parseFloat(e.target.value) })}
+        />
+        <Slider
+          id='coriolis-factor'
+          label='Coriolis Factor'
+          min={0}
+          max={defaultConfig.coriolisFactor * 5}
+          value={defaultConfig.coriolisFactor}
+          onChange={(e) => setConfig({ ...config(), coriolisFactor: parseFloat(e.target.value) })}
+        />
       </div>
       <small>Use the mouse for camera controls.</small>
       <Canvas setup={setup} draw={draw} width={854} height={480} webgl />

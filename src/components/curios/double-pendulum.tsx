@@ -1,6 +1,7 @@
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import Canvas from './p5/canvas'
+import Slider from './widgets/slider'
 
 class DoublePendulum {
   p: p5
@@ -228,57 +229,32 @@ const DoublePendulumCanvas = () => {
         </button>
       </div>
       <div class='flex flex-wrap gap-4'>
-        <div class='flex flex-col items-start'>
-          <label for='friction-coefficient'>Friction Coefficient</label>
-          <div class='relative mb-5'>
-            <input
-              id='friction-coefficient'
-              type='range'
-              min={0}
-              max={0.01}
-              value={defaultConfig.frictionCoeff}
-              step={0.0001}
-              class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-              onChange={(e) => setConfig({ ...config(), frictionCoeff: parseFloat(e.target.value) })}
-            />
-            <span class='absolute -bottom-5 start-0 text-sm'>0</span>
-            <span class='absolute -bottom-5 end-0 text-sm'>0.01</span>
-          </div>
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='length-1'>Length 1</label>
-          <div class='relative mb-5'>
-            <input
-              id='length-1'
-              type='range'
-              min={10}
-              max={defaultConfig.length1}
-              value={defaultConfig.length1}
-              step={1}
-              class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-              onChange={(e) => setConfig({ ...config(), length1: parseFloat(e.target.value) })}
-            />
-            <span class='absolute -bottom-5 start-0 text-sm'>10</span>
-            <span class='absolute -bottom-5 end-0 text-sm'>100</span>
-          </div>
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='length-2'>Length 2</label>
-          <div class='relative mb-5'>
-            <input
-              id='length-2'
-              type='range'
-              min={10}
-              max={defaultConfig.length2}
-              value={defaultConfig.length2}
-              step={1}
-              class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-              onChange={(e) => setConfig({ ...config(), length2: parseFloat(e.target.value) })}
-            />
-            <span class='absolute -bottom-5 start-0 text-sm'>10</span>
-            <span class='absolute -bottom-5 end-0 text-sm'>100</span>
-          </div>
-        </div>
+        <Slider
+          id='length-1'
+          label='Length 1'
+          min={10}
+          max={defaultConfig.length1}
+          value={defaultConfig.length1}
+          step={1}
+          onChange={(e) => setConfig({ ...config(), length1: parseFloat(e.target.value) })}
+        />
+        <Slider
+          id='length-2'
+          label='Length 2'
+          min={10}
+          max={defaultConfig.length2}
+          value={defaultConfig.length2}
+          step={1}
+          onChange={(e) => setConfig({ ...config(), length2: parseFloat(e.target.value) })}
+        />
+        <Slider
+          id='friction-coefficient'
+          label='Friction Coefficient'
+          min={0}
+          max={0.01}
+          value={defaultConfig.frictionCoeff}
+          onChange={(e) => setConfig({ ...config(), frictionCoeff: parseFloat(e.target.value) })}
+        />
       </div>
       <small>Use the cursor to move the first pendulum.</small>
       <Canvas setup={setup} draw={draw} width={854} height={480} />

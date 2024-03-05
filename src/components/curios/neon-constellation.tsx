@@ -3,6 +3,7 @@ import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import { Quadtree, Rectangle } from '~/util/quadtree'
 import Canvas from './p5/canvas'
+import Slider from './widgets/slider'
 
 class Bubble {
   p: p5
@@ -337,23 +338,14 @@ const NeonConstellationCanvas = () => {
         </div>
       </div>
       <div class='flex flex-wrap gap-4'>
-        <div class='flex flex-col items-start'>
-          <label for='edge-bounce-factor'>Edge Bounce Factor</label>
-          <div class='relative mb-5'>
-            <input
-              id='edge-bounce-factor'
-              type='range'
-              min={0.5}
-              max={1}
-              value={defaultConfig.edgeBounceFactor}
-              step={0.01}
-              class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-              onChange={(e) => setConfig({ ...config(), edgeBounceFactor: parseFloat(e.target.value) })}
-            />
-            <span class='absolute -bottom-5 start-0 text-sm'>0.5</span>
-            <span class='absolute -bottom-5 end-0 text-sm'>1.0</span>
-          </div>
-        </div>
+        <Slider
+          id='edge-bounce-factor'
+          label='Edge Bounce Factor'
+          min={0.5}
+          max={1}
+          value={defaultConfig.edgeBounceFactor}
+          onChange={(e) => setConfig({ ...config(), edgeBounceFactor: parseFloat(e.target.value) })}
+        />
       </div>
       <small>Use the cursor to move the objects.</small>
       <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} webgl />

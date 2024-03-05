@@ -3,6 +3,7 @@ import { Accessor, createSignal } from 'solid-js'
 import { isMouseInCanvas } from '~/util/camera'
 import { Quadtree, Rectangle } from '~/util/quadtree'
 import Canvas from './p5/canvas'
+import Slider from './widgets/slider'
 
 class Boid {
   p: p5
@@ -178,51 +179,30 @@ const FlockingSimulationCanvas = () => {
   return (
     <div class='flex w-full flex-col gap-4'>
       <div class='flex flex-wrap gap-4'>
-        <div class='flex flex-col items-start'>
-          <label for='separation-factor' class='mb-2'>
-            Separation Factor
-          </label>
-          <input
-            id='separation-factor'
-            type='range'
-            min={0}
-            max={defaultConfig.separationFactor * 5}
-            value={defaultConfig.separationFactor}
-            step={defaultConfig.separationFactor / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
-          />
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='alignment-factor' class='mb-2'>
-            Alignment Factor
-          </label>
-          <input
-            id='alignment-factor'
-            type='range'
-            min={0}
-            max={defaultConfig.alignmentFactor * 5}
-            value={defaultConfig.alignmentFactor}
-            step={defaultConfig.alignmentFactor / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), alignmentFactor: parseFloat(e.target.value) })}
-          />
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='cohesion-factor' class='mb-2'>
-            Cohesion Factor
-          </label>
-          <input
-            id='cohesion-factor'
-            type='range'
-            min={0}
-            max={defaultConfig.cohesionFactor * 5}
-            value={defaultConfig.cohesionFactor}
-            step={defaultConfig.cohesionFactor / 20}
-            class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
-            onChange={(e) => setConfig({ ...config(), cohesionFactor: parseFloat(e.target.value) })}
-          />
-        </div>
+        <Slider
+          id='separation-factor'
+          label='Separation Factor'
+          min={0}
+          max={defaultConfig.separationFactor * 5}
+          value={defaultConfig.separationFactor}
+          onChange={(e) => setConfig({ ...config(), separationFactor: parseFloat(e.target.value) })}
+        />
+        <Slider
+          id='alignment-factor'
+          label='Alignment Factor'
+          min={0}
+          max={defaultConfig.alignmentFactor * 5}
+          value={defaultConfig.alignmentFactor}
+          onChange={(e) => setConfig({ ...config(), alignmentFactor: parseFloat(e.target.value) })}
+        />
+        <Slider
+          id='cohesion-factor'
+          label='Cohesion Factor'
+          min={0}
+          max={defaultConfig.cohesionFactor * 5}
+          value={defaultConfig.cohesionFactor}
+          onChange={(e) => setConfig({ ...config(), cohesionFactor: parseFloat(e.target.value) })}
+        />
       </div>
       <small>Use the cursor to repel the boids.</small>
       <Canvas setup={setup} draw={draw} width={854} height={480} />
