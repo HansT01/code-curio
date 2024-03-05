@@ -171,8 +171,6 @@ const DoublePendulumCanvas = () => {
   const setup = (p: p5) => {
     dp = new DoublePendulum(p, config, p.random(p.PI / 2, (3 * p.PI) / 2), p.random(2 * p.PI))
     trails = p.createGraphics(p.width, p.height)
-    trails.clear()
-    p.background(0)
 
     p.mousePressed = () => {
       const [x, y] = mouseInWorld(p)
@@ -188,7 +186,7 @@ const DoublePendulumCanvas = () => {
 
     resetSimulation = () => {
       dp = new DoublePendulum(p, config, p.random(p.PI / 2, (3 * p.PI) / 2), p.random(2 * p.PI))
-      trails.clear()
+      clearTrails()
     }
   }
 
