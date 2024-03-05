@@ -75,7 +75,7 @@ class Bubble {
         const correction = distance
           .copy()
           .normalize()
-          .mult(overlap / 2)
+          .mult((overlap / 2) * 1.01)
         const massOffset = this.mass / bubble.mass
         this.position.sub(correction.div(massOffset))
         bubble.position.add(correction.mult(massOffset))
