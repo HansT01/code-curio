@@ -6,13 +6,13 @@ settings:
 
 dependencies:
   '@solidjs/router':
-    specifier: ^0.12.4
-    version: 0.12.4(solid-js@1.8.15)
+    specifier: ^0.12.5
+    version: 0.12.5(solid-js@1.8.15)
   '@solidjs/start':
-    specifier: ^0.6.0
-    version: 0.6.0(solid-js@1.8.15)(vinxi@0.3.9)(vite@5.1.4)
+    specifier: ^0.6.1
+    version: 0.6.1(solid-js@1.8.15)(vinxi@0.3.9)(vite@5.1.4)
   autoprefixer:
-    specifier: ^10.4.14
+    specifier: ^10.4.18
     version: 10.4.18(postcss@8.4.35)
   clsx:
     specifier: ^2.1.0
@@ -1535,8 +1535,8 @@ packages:
     engines: {node: '>=18'}
     dev: false
 
-  /@solidjs/router@0.12.4(solid-js@1.8.15):
-    resolution: {integrity: sha512-2S5QWYmpWSIWn5ei85eoStEMmECERX2BiBkEvmqYDrgX79I8D95YaWVdHbcFGOxISPTY4TP7RxjRiofs/AIFJQ==}
+  /@solidjs/router@0.12.5(solid-js@1.8.15):
+    resolution: {integrity: sha512-UK9GnWPS1RmBf7w35DpWwqNgpVbKhon5eXOl7Xk+edPMTzzHkwPW2RytQKQ0BMRQOHzyM/WRetWLbIAubKdlog==}
     peerDependencies:
       solid-js: ^1.8.6
     dependencies:
@@ -1551,8 +1551,8 @@ packages:
       solid-js: 1.8.15
     dev: false
 
-  /@solidjs/start@0.6.0(solid-js@1.8.15)(vinxi@0.3.9)(vite@5.1.4):
-    resolution: {integrity: sha512-djHVrUCv7AH8q5HOXX+EZ3zdXOibMCQmCG8xNRkOgEbyhB/vp+MtbhCpvoLROgnHm/5pHDLwVKVkYiTsDBUsOA==}
+  /@solidjs/start@0.6.1(solid-js@1.8.15)(vinxi@0.3.9)(vite@5.1.4):
+    resolution: {integrity: sha512-e5kj37jTVCfKhTg14ozvJr7ksZUd8FedRlbJlkPsO+Mbi04fyZ5i+41I5RjLYPF1WukLLuJKUGz9He7NJv6e7A==}
     dependencies:
       '@vinxi/plugin-directives': 0.3.0(vinxi@0.3.9)
       '@vinxi/server-components': 0.3.2(vinxi@0.3.9)
