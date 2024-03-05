@@ -14,6 +14,9 @@ export default function Home() {
         with others, providing a platform where these projects could be experienced firsthand.
         <br />
         <br />
+        For the best experience, please use a mouse.
+        <br />
+        <br />
         Head over to the{' '}
         <A target='_blank' class='underline' href='https://github.com/HansT01/code-curio'>
           GitHub page
