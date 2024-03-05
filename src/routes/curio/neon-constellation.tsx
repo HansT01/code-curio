@@ -43,10 +43,6 @@ export default function NeonConstellation() {
           kinetic energy observable in the simulation remains constant until an external interference is applied. It is
           also simulating the casting of shadows.
         </p>
-        <p>
-          In this simulation, you are able to drag and throw around the lights and obstacles. You are also able to
-          modify amount of energy lost when an object collides with the edge of the simulation.
-        </p>
       </section>
       <section class='min-h-[480px]'>
         <Show when={!isLoading()} fallback={<CanvasLoader />}>
