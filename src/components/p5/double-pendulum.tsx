@@ -49,8 +49,8 @@ class DoublePendulum {
     const _theta1 = a * (dtheta1 - dtheta2 * cosdiff)
     const _theta2 = a * (2 * dtheta2 - dtheta1 * cosdiff)
     const b = _theta1 * _theta2 * sindiff
-    const _dtheta1 = -b - 2 * sqomega1 * this.p.sin(theta1)
-    const _dtheta2 = b - sqomega2 * this.p.sin(theta2)
+    const _dtheta1 = -b - 2 * sqomega1 * this.p.sin(theta1) - this.config().frictionCoeff * dtheta1
+    const _dtheta2 = b - sqomega2 * this.p.sin(theta2) - this.config().frictionCoeff * dtheta2
 
     const energy =
       (dtheta1 * _theta1 + dtheta2 * _theta2) / 2 - sqomega1 * (2 * this.p.cos(theta1)) - sqomega2 * this.p.cos(theta2)
@@ -145,7 +145,7 @@ class DoublePendulum {
 
 const defaultConfig = {
   gravity: 1,
-  period: 1,
+  frictionCoeff: 0.001,
   radius: 10,
   length1: 100,
   length2: 100,
