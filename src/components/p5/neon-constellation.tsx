@@ -129,7 +129,7 @@ const NeonConstellationCanvas = () => {
   const [obstacleCountIndex, setObstacleCountIndex] = createSignal(4)
   const count = [0, 1, 2, 4, 7, 10, 14, 20]
   const bubbles: Bubble[] = []
-  const linePairs: [Bubble, Bubble, number[]][] = []
+  const linePairs: [Bubble, Bubble, [number, number, number]][] = []
 
   let dragging: Bubble | null = null
   let shader: p5.Shader
@@ -172,11 +172,12 @@ const NeonConstellationCanvas = () => {
       }
       for (let i = 0; i < bubbles.length; i++) {
         for (let j = i + 1; j < bubbles.length; j++) {
-          linePairs.push([
-            bubbles[i],
-            bubbles[j],
-            bubbles[i].color!.map((num, index) => (num + bubbles[j].color![index]) / 2),
-          ])
+          const color = bubbles[i].color!.map((num, index) => (num + bubbles[j].color![index]) / 2) as [
+            number,
+            number,
+            number,
+          ]
+          linePairs.push([bubbles[i], bubbles[j], color])
         }
       }
       for (let i = 0; i < count[obstacleCountIndex()]; i++) {
