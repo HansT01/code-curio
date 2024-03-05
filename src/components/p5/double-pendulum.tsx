@@ -158,6 +158,7 @@ const DoublePendulumCanvas = () => {
   let isDragging: boolean = false
   let dp: DoublePendulum
   let trails: p5.Graphics
+  let resetSimulation: () => void
 
   const clearTrails = () => {
     trails.clear()
@@ -184,6 +185,11 @@ const DoublePendulumCanvas = () => {
     p.mouseReleased = () => {
       isDragging = false
     }
+
+    resetSimulation = () => {
+      dp = new DoublePendulum(p, config, p.random(p.PI / 2, (3 * p.PI) / 2), p.random(2 * p.PI))
+      trails.clear()
+    }
   }
 
   const draw = (p: p5) => {
@@ -199,7 +205,7 @@ const DoublePendulumCanvas = () => {
 
     trails.background(0, 1)
     trails.stroke(255)
-    trails.strokeWeight(2)
+    trails.strokeWeight(1)
     trails.line(x2 + p.width / 2, y2 + p.height / 2, x2New + p.width / 2, y2New + p.height / 2)
     p.image(trails, -p.width / 2, -p.height / 2)
 
@@ -211,9 +217,15 @@ const DoublePendulumCanvas = () => {
       <div class='flex flex-wrap gap-4'>
         <button
           class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+          onClick={() => resetSimulation()}
+        >
+          Reset
+        </button>
+        <button
+          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
           onClick={() => clearTrails()}
         >
-          Clear Trails.
+          Clear Trails
         </button>
       </div>
       <div class='flex flex-wrap gap-4'>
