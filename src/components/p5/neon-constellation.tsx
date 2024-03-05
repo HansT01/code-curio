@@ -129,11 +129,11 @@ const NeonConstellationCanvas = () => {
   const [obstacleCountIndex, setObstacleCountIndex] = createSignal(4)
   const count = [0, 1, 2, 4, 7, 10, 14, 20]
   const bubbles: Bubble[] = []
-  const linePairs: [Bubble, Bubble][] = []
+  const linePairs: [Bubble, Bubble, number[]][] = []
 
   let dragging: Bubble | null = null
   let shader: p5.Shader
-  let resetCanvas: () => void
+  let reset: () => void
 
   const mouseInWorld = (p: p5) => {
     return [p.mouseX - p.width / 2, p.height / 2 - p.mouseY]
@@ -164,7 +164,7 @@ const NeonConstellationCanvas = () => {
       dragging = null
     }
 
-    resetCanvas = () => {
+    reset = () => {
       bubbles.length = 0
       linePairs.length = 0
       for (let i = 0; i < count[lightCountIndex()]; i++) {
@@ -172,14 +172,18 @@ const NeonConstellationCanvas = () => {
       }
       for (let i = 0; i < bubbles.length; i++) {
         for (let j = i + 1; j < bubbles.length; j++) {
-          linePairs.push([bubbles[i], bubbles[j]])
+          linePairs.push([
+            bubbles[i],
+            bubbles[j],
+            bubbles[i].color!.map((num, index) => (num + bubbles[j].color![index]) / 2),
+          ])
         }
       }
       for (let i = 0; i < count[obstacleCountIndex()]; i++) {
         bubbles.push(new Bubble(p, config, p.random(10, 60)))
       }
     }
-    resetCanvas()
+    reset()
   }
 
   const draw = (p: p5) => {
@@ -233,7 +237,7 @@ const NeonConstellationCanvas = () => {
     const lineEndPositions: number[] = []
     const lineColors: number[] = []
 
-    for (let [bubble, neighbor] of linePairs) {
+    for (let [bubble, neighbor, color] of linePairs) {
       const distance = p.dist(bubble.position.x, bubble.position.y, neighbor.position.x, neighbor.position.y)
       if (distance > 200) {
         continue
@@ -258,7 +262,7 @@ const NeonConstellationCanvas = () => {
       lineCount++
       lineStartPositions.push(bubble.position.x, bubble.position.y)
       lineEndPositions.push(neighbor.position.x, neighbor.position.y)
-      lineColors.push(...bubble.color!.map((num, index) => (num + neighbor.color![index]) / 2))
+      lineColors.push(...color)
     }
 
     shader.setUniform('u_lineCount', lineCount)
@@ -269,22 +273,22 @@ const NeonConstellationCanvas = () => {
 
   const increaseLightCount = () => {
     setLightCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
-    resetCanvas()
+    reset()
   }
 
   const reduceLightCount = () => {
     setLightCountIndex((index) => (index > 0 ? index - 1 : index))
-    resetCanvas()
+    reset()
   }
 
   const increaseObstacleCount = () => {
     setObstacleCountIndex((index) => (index < count.length - 1 ? index + 1 : index))
-    resetCanvas()
+    reset()
   }
 
   const reduceObstacleCount = () => {
     setObstacleCountIndex((index) => (index > 0 ? index - 1 : index))
-    resetCanvas()
+    reset()
   }
 
   return (
