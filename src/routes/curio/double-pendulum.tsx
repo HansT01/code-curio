@@ -9,7 +9,7 @@ export const info: CurioInfo = {
   id: 'double-pendulum',
   title: 'Double Pendulum',
   created: new Date('2024-02-28'),
-  tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics', 'simulation', '3d'],
+  tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics'],
 }
 
 const DoublePendulumCanvas = clientOnly(() => import('~/components/p5/double-pendulum'))
