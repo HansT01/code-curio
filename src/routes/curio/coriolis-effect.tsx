@@ -60,7 +60,7 @@ export default function CoriolisEffect() {
         </p>
       </section>
       <section class='min-h-[480px]'>
-        <ErrorBoundary fallback={(err, reset) => <CanvasLoader error={err} onClick={reset} />}>
+        <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
           <Show when={!isLoading()} fallback={<CanvasLoader />}>
             <CoriolisEffectCanvas />
           </Show>

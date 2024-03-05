@@ -19,9 +19,13 @@ const CanvasLoader: Component<CanvasLoaderProps> = (props) => {
       <Show
         when={props.error === undefined}
         fallback={
-          <div class='flex flex-col gap-4'>
-            <p>Oops! Something went terribly wrong. Click to retry.</p>
-            <p>Error: {props.error}</p>
+          <div class='flex flex-col gap-4 text-center'>
+            <p>
+              Oops! Something went terribly wrong.
+              <br />
+              Click to retry.
+            </p>
+            <p>{props.error}</p>
           </div>
         }
       >
