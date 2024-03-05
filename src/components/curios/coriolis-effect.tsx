@@ -4,6 +4,7 @@ import { Accessor, createSignal } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
 import { Box, Octree } from '~/util/octree'
 import Canvas from './p5/canvas'
+import Button from './widgets/button'
 import Slider from './widgets/slider'
 
 class Particle {
@@ -229,18 +230,16 @@ const CoriolisEffectCanvas = () => {
         </div>
       </div>
       <div class='flex flex-wrap gap-4'>
-        <button
-          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+        <Button
+          id='toggle-trail'
+          label='Toggle Trail'
           onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
-        >
-          Toggle Trail
-        </button>
-        <button
-          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+        />
+        <Button
+          id='toggle-transparency'
+          label='Toggle Transparency'
           onClick={() => setConfig({ ...config(), transparentSphere: !config().transparentSphere })}
-        >
-          Toggle Transparency
-        </button>
+        />
       </div>
       <div class='flex flex-wrap gap-4'>
         <Slider

@@ -2,6 +2,7 @@ import p5 from 'p5'
 import { Accessor, createSignal, onCleanup, onMount } from 'solid-js'
 import { Camera2D } from '~/util/camera'
 import Canvas from './p5/canvas'
+import Button from './widgets/button'
 
 class Bubble {
   p: p5
@@ -290,12 +291,7 @@ const ProgrammingLanguageOverlap = () => {
   return (
     <div class='flex flex-col items-start gap-4'>
       <div class='flex flex-wrap'>
-        <button
-          class='rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-          onClick={() => shuffle()}
-        >
-          Shuffle
-        </button>
+        <Button id='shuffle' label='Shuffle' onClick={() => shuffle()} />
       </div>
       <small>
         Use the cursor to reveal the relationship between the language bubbles. Use left click to move the nodes around,

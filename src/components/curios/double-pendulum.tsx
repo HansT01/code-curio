@@ -1,6 +1,7 @@
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import Canvas from './p5/canvas'
+import Button from './widgets/button'
 import Slider from './widgets/slider'
 
 class DoublePendulum {
@@ -159,7 +160,7 @@ const DoublePendulumCanvas = () => {
   let isDragging: boolean = false
   let dp: DoublePendulum
   let trails: p5.Graphics
-  let resetSimulation: () => void
+  let reset: () => void
 
   const clearTrails = () => {
     trails.clear()
@@ -185,7 +186,7 @@ const DoublePendulumCanvas = () => {
       isDragging = false
     }
 
-    resetSimulation = () => {
+    reset = () => {
       dp = new DoublePendulum(p, config, p.random(p.PI / 2, (3 * p.PI) / 2), p.random(2 * p.PI))
       clearTrails()
     }
@@ -215,18 +216,8 @@ const DoublePendulumCanvas = () => {
   return (
     <div class='flex w-full flex-col gap-4'>
       <div class='flex flex-wrap gap-4'>
-        <button
-          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-          onClick={() => resetSimulation()}
-        >
-          Reset
-        </button>
-        <button
-          class='cursor-pointer rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-          onClick={() => clearTrails()}
-        >
-          Clear Trails
-        </button>
+        <Button id='reset' label='Reset' onClick={() => reset()} />
+        <Button id='clear-trails' label='Clear Trails' onClick={() => clearTrails()} />
       </div>
       <div class='flex flex-wrap gap-4'>
         <Slider
