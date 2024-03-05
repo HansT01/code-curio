@@ -1,9 +1,9 @@
-import { Minus, Plus } from 'lucide-solid'
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import { Quadtree, Rectangle } from '~/util/quadtree'
 import Canvas from './p5/canvas'
 import Slider from './widgets/slider'
+import Stepper from './widgets/stepper'
 
 class Bubble {
   p: p5
@@ -296,46 +296,20 @@ const NeonConstellationCanvas = () => {
   return (
     <div class='flex w-full flex-col gap-4'>
       <div class='flex flex-wrap gap-4'>
-        <div class='flex flex-col items-start'>
-          <label for='particle-count' class='mb-2'>
-            Light Count
-          </label>
-          <div class='flex' id='particle-count'>
-            <button
-              class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-              onClick={reduceLightCount}
-            >
-              <Minus />
-            </button>
-            <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{count[lightCountIndex()]}</div>
-            <button
-              class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-              onClick={increaseLightCount}
-            >
-              <Plus />
-            </button>
-          </div>
-        </div>
-        <div class='flex flex-col items-start'>
-          <label for='particle-count' class='mb-2'>
-            Obstacle Count
-          </label>
-          <div class='flex' id='particle-count'>
-            <button
-              class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-              onClick={reduceObstacleCount}
-            >
-              <Minus />
-            </button>
-            <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{count[obstacleCountIndex()]}</div>
-            <button
-              class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-              onClick={increaseObstacleCount}
-            >
-              <Plus />
-            </button>
-          </div>
-        </div>
+        <Stepper
+          id='light-count'
+          label='Light Count'
+          value={count[lightCountIndex()]}
+          increment={increaseLightCount}
+          decrement={reduceLightCount}
+        />
+        <Stepper
+          id='obstacle-count'
+          label='Obstacle Count'
+          value={count[obstacleCountIndex()]}
+          increment={increaseObstacleCount}
+          decrement={reduceObstacleCount}
+        />
       </div>
       <div class='flex flex-wrap gap-4'>
         <Slider

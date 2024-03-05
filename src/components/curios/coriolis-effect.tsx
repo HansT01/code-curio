@@ -1,4 +1,3 @@
-import { Minus, Plus } from 'lucide-solid'
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import { CircularQueue } from '~/util/circular-queue'
@@ -6,6 +5,7 @@ import { Box, Octree } from '~/util/octree'
 import Canvas from './p5/canvas'
 import Button from './widgets/button'
 import Slider from './widgets/slider'
+import Stepper from './widgets/stepper'
 
 class Particle {
   p: p5
@@ -209,25 +209,14 @@ const CoriolisEffectCanvas = () => {
 
   return (
     <div class='flex flex-col items-start gap-4'>
-      <div class='flex flex-col items-start'>
-        <label for='particle-count' class='mb-2'>
-          Particle Count
-        </label>
-        <div class='flex' id='particle-count'>
-          <button
-            class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-            onClick={reduceParticles}
-          >
-            <Minus />
-          </button>
-          <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{count[countIndex()]}</div>
-          <button
-            class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
-            onClick={increaseParticles}
-          >
-            <Plus />
-          </button>
-        </div>
+      <div class='flex flex-wrap gap-4'>
+        <Stepper
+          id='particle-count'
+          label='Particle Count'
+          value={count[countIndex()]}
+          increment={increaseParticles}
+          decrement={reduceParticles}
+        />
       </div>
       <div class='flex flex-wrap gap-4'>
         <Button
