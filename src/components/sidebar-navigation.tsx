@@ -212,8 +212,8 @@ const Navigation: Component<NavigationProps> = (props) => {
       <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
-          'fixed -top-[80vh] bottom-0 left-0 overflow-y-auto overflow-x-hidden border-secondary bg-primary px-6 py-4 text-primary-fg transition-[top] duration-200',
-          { 'top-[64px]': isSidebar() || isOpen(), 'h-[80vh] border-b-[9px]': !isSidebar() },
+          'fixed -top-[80svh] bottom-0 left-0 overflow-y-auto overflow-x-hidden border-secondary bg-primary px-6 py-4 text-primary-fg transition-[top] duration-200',
+          { 'top-[64px]': isSidebar() || isOpen(), 'h-[calc(80svh-64px)] border-b-[9px]': !isSidebar() },
         )}
       >
         <CurioList onCurioClick={() => setIsOpen(false)} />
