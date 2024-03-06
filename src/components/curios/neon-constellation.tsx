@@ -73,7 +73,10 @@ class Bubble {
       const distance = p5.Vector.sub(bubble.position, this.position)
       const overlap = bubble.radius + this.radius - distance.mag()
       if (overlap > 0) {
-        const correction = distance.copy().normalize().mult(overlap)
+        const correction = distance
+          .copy()
+          .normalize()
+          .mult(overlap + 5)
         const massOffset = this.mass / (this.mass + bubble.mass)
         this.position.sub(correction.mult(1 - massOffset))
         bubble.position.add(correction.mult(massOffset))
