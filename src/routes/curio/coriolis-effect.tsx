@@ -2,7 +2,7 @@ import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
 import CanvasLoader from '~/components/curios/p5/canvas-loader'
-import GithubIcon from '~/components/icons/github'
+import { GithubIcon } from '~/components/icons'
 import { CurioInfo } from '~/util/curio'
 
 export const info: CurioInfo = {
