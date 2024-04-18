@@ -27,7 +27,7 @@ export default function FlockingSimulation() {
       <div class='flex flex-wrap'>
         <A
           target='_blank'
-          href='https://github.com/HansT01/code-curio/blob/main/src/components/p5/flocking-simulation.tsx'
+          href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/flocking-simulation.tsx`}
         >
           <button class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
             <GithubIcon />

@@ -27,7 +27,7 @@ export default function ProgrammingLanguageOverlap() {
       <div class='flex flex-wrap'>
         <A
           target='_blank'
-          href='https://github.com/HansT01/code-curio/blob/main/src/components/p5/programming-language-network.tsx'
+          href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/programming-language-network.tsx`}
         >
           <button class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
             <GithubIcon />
@@ -69,7 +69,7 @@ export default function ProgrammingLanguageOverlap() {
           be accessed in the{' '}
           <A
             target='_blank'
-            href='https://github.com/HansT01/code-curio/blob/main/public/data/languages-co-occurence.json'
+            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/public/data/languages-co-occurence.json`}
             class='underline'
           >
             public/data
