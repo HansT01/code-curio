@@ -3,7 +3,7 @@ import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
 import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
-import { CurioInfo } from '~/util/curio'
+import { CurioInfo } from '~/utils/curio'
 
 export const info: CurioInfo = {
   id: 'double-pendulum',

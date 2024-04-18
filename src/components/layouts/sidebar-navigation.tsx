@@ -2,8 +2,8 @@ import { A } from '@solidjs/router'
 import dayjs from 'dayjs'
 import { Component, For, JSX, Show, Suspense, createResource, createSignal, onCleanup, onMount } from 'solid-js'
 import { getRequestEvent } from 'solid-js/web'
-import { cn } from '~/util/cn'
-import { Tag, getCurios, validTags } from '~/util/curio'
+import { cn } from '~/utils/cn'
+import { Tag, getCurios, validTags } from '~/utils/curio'
 import { MenuIcon, PencilIcon, XIcon } from '../icons'
 
 interface TagButtonProps {
