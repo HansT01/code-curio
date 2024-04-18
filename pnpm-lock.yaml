@@ -20,9 +20,6 @@ dependencies:
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
-  lucide-solid:
-    specifier: ^0.340.0
-    version: 0.340.0(solid-js@1.8.15)
   p5:
     specifier: ^1.9.1
     version: 1.9.1
@@ -3170,14 +3167,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
-    dev: false
-
-  /lucide-solid@0.340.0(solid-js@1.8.15):
-    resolution: {integrity: sha512-cG+1wdkTmXV5fp+9MGQll968cckj48MB/TG7iJnzlj+DllVpBVJ8HLypntfoGIBV0S7bjGdsgZnQfmSLqtD9Ew==}
-    peerDependencies:
-      solid-js: ^1.4.7
-    dependencies:
-      solid-js: 1.8.15
     dev: false
 
   /magic-string@0.30.8:

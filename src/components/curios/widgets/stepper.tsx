@@ -1,6 +1,6 @@
-import { Minus, Plus } from 'lucide-solid'
 import { Component } from 'solid-js'
 import { JSX } from 'solid-js/web/types/jsx'
+import { MinusIcon, PlusIcon } from '~/components/icons'
 
 interface StepperProps {
   id?: string
@@ -21,14 +21,14 @@ const Stepper: Component<StepperProps> = (props) => {
           class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
           onClick={props.decrement}
         >
-          <Minus />
+          <MinusIcon />
         </button>
         <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{props.value}</div>
         <button
           class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
           onClick={props.increment}
         >
-          <Plus />
+          <PlusIcon />
         </button>
       </div>
     </div>

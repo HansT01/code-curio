@@ -1,10 +1,10 @@
 import { A } from '@solidjs/router'
 import dayjs from 'dayjs'
-import { Menu, Pencil, X } from 'lucide-solid'
 import { Component, For, JSX, Show, Suspense, createResource, createSignal, onCleanup, onMount } from 'solid-js'
 import { getRequestEvent } from 'solid-js/web'
 import { cn } from '~/util/cn'
 import { Tag, getCurios, validTags } from '~/util/curio'
+import { MenuIcon, PencilIcon, XIcon } from '../icons'
 
 interface TagButtonProps {
   onClick?: (e: MouseEvent) => void
@@ -27,7 +27,7 @@ const TagButton: Component<TagButtonProps> = (props) => {
     >
       <small>{props.children}</small>
       <Show when={props.removable}>
-        <X class='-mr-1' size={12} />
+        <XIcon class='-mr-1' size={12} />
       </Show>
     </button>
   )
@@ -68,7 +68,7 @@ const CurioList: Component<CurioListProps> = (props) => {
             class='flex cursor-pointer items-center gap-2 rounded-lg bg-background px-4 py-3 text-background-fg hover:bg-accent hover:text-accent-fg'
             onClick={() => setShowFilters((showFilters) => !showFilters)}
           >
-            <Pencil size={20} />
+            <PencilIcon size={20} />
             Filters
           </button>
         </div>
@@ -248,7 +248,7 @@ const Navigation: Component<NavigationProps> = (props) => {
           })}
           onClick={handleClick}
         >
-          <Menu stroke-width={1} size={32} absoluteStrokeWidth />
+          <MenuIcon stroke-width={1} size={32} />
         </button>
       </div>
     </div>

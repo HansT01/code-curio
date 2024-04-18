@@ -1,5 +1,5 @@
-import { Loader2 } from 'lucide-solid'
 import { Component, Show } from 'solid-js'
+import { LoaderIcon } from '~/components/icons'
 import { cn } from '~/util/cn'
 
 interface CanvasLoaderProps {
@@ -29,7 +29,7 @@ const CanvasLoader: Component<CanvasLoaderProps> = (props) => {
           </div>
         }
       >
-        <Loader2 class='animate-spin' size={36} />
+        <LoaderIcon class='animate-spin' size={36} />
       </Show>
     </div>
   )
