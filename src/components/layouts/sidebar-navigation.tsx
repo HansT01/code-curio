@@ -17,7 +17,7 @@ const TagButton: Component<TagButtonProps> = (props) => {
   return (
     <button
       class={cn(
-        'bg-secondary text-secondary-fg hover:bg-background hover:text-background-fg flex items-center gap-1 rounded-lg px-3 py-1',
+        'bg-secondary text-secondary-fg hover:bg-background hover:text-background-fg flex cursor-pointer items-center gap-1 rounded-lg px-3 py-1',
         {
           'bg-background': props.highlight,
           'text-background-fg': props.highlight,
