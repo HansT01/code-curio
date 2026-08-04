@@ -11,7 +11,7 @@ const CanvasLoader: Component<CanvasLoaderProps> = (props) => {
   return (
     <div
       class={cn(
-        'flex h-[480px] w-full max-w-[854px] items-center justify-center rounded-2xl bg-accent text-accent-fg',
+        'bg-accent text-accent-fg flex h-[480px] w-full max-w-[854px] items-center justify-center rounded-2xl',
         { 'cursor-pointer': props.onClick !== undefined },
       )}
       onClick={props.onClick}

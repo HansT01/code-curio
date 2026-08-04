@@ -21,7 +21,7 @@ const Footer: Component = () => {
   })
 
   return (
-    <footer class='flex w-full justify-center divide-x divide-accent-fg bg-accent py-8 text-accent-fg' ref={footerRef}>
+    <footer class='divide-accent-fg bg-accent text-accent-fg flex w-full justify-center divide-x py-8' ref={footerRef}>
       <div class='flex flex-col items-start justify-center px-8'>
         <h1 class='text-4xl font-extralight'>Code Curio</h1>
         <small class='font-extralight'>©2024 Hans Teh</small>
