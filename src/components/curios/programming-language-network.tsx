@@ -58,10 +58,8 @@ class Bubble {
       }
       const offset = p5.Vector.sub(this.position, bubble.position)
       offset.div(offset.magSq())
-      offset.mult(this.weights[bubble.index])
       totalOffset.add(offset)
     }
-    totalOffset.div(this.weights[this.index])
     totalOffset.mult(this.config().repulsionFactor)
     this.velocity.add(totalOffset)
   }
@@ -139,7 +137,7 @@ class BubbleManager {
 
   constructor(p: p5, bubbles: Bubble[]) {
     this.p = p
-    this.camera = new Camera2D(p, true)
+    this.camera = new Camera2D(p, false)
     this.bubbles = bubbles
     this.hovering = null
     this.isDragging = false
@@ -165,7 +163,7 @@ class BubbleManager {
   dragStart() {
     const touches = this.p.touches as Touch[]
     this.hover()
-    if (this.p.mouseButton === this.p.LEFT || touches.length === 1) {
+    if ((this.p.mouseButton === this.p.LEFT || touches.length === 1) && this.hovering !== null) {
       this.isDragging = true
     }
   }
@@ -207,7 +205,7 @@ class BubbleManager {
 const defaultConfig = {
   weightExponent: 2,
   attractionFactor: 0.1,
-  repulsionFactor: 20,
+  repulsionFactor: 5,
   radialAccelerationFactor: 0.0001,
 }
 
@@ -256,7 +254,11 @@ const ProgrammingLanguageOverlap = () => {
       manager.dragEnd()
     }
     p.mouseMoved = () => manager.hover()
-    p.mouseDragged = () => manager.camera.mouseDragged()
+    p.mouseDragged = () => {
+      if (!manager.isDragging) {
+        manager.camera.mouseDragged()
+      }
+    }
     p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
 
     p.touchStarted = () => {
@@ -294,8 +296,8 @@ const ProgrammingLanguageOverlap = () => {
         <Button id='shuffle' label='Shuffle' onClick={() => shuffle()} />
       </div>
       <small>
-        Use the cursor to reveal the relationship between the language bubbles. Use left click to move the nodes around,
-        and use right click and scroll wheel for camera controls.
+        Hover to reveal the relationships between the language bubbles. Use left click to move the bubbles around or
+        pan. Use the scroll wheel to zoom.
       </small>
       <Canvas preload={preload} setup={setup} draw={draw} width={854} height={480} />
     </div>

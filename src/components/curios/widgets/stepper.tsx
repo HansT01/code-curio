@@ -18,14 +18,14 @@ const Stepper: Component<StepperProps> = (props) => {
       </label>
       <div id={props.id} class='flex'>
         <button
-          class='h-full divide-secondary rounded-l-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+          class='divide-secondary bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg h-full rounded-l-lg px-2 py-3'
           onClick={props.decrement}
         >
           <MinusIcon />
         </button>
-        <div class='h-full w-16 bg-secondary py-3 text-center text-secondary-fg'>{props.value}</div>
+        <div class='bg-secondary text-secondary-fg h-full w-16 py-3 text-center'>{props.value}</div>
         <button
-          class='h-full divide-secondary rounded-r-lg bg-primary px-2  py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'
+          class='divide-secondary bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg h-full rounded-r-lg px-2 py-3'
           onClick={props.increment}
         >
           <PlusIcon />

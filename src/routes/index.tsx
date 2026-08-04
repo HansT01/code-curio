@@ -3,16 +3,18 @@ import { A } from '@solidjs/router'
 export default function Home() {
   return (
     <main class='flex flex-col gap-6 p-8'>
-      <h1 class='text-6xl font-thin'>Welcome to Code Curio!</h1>
+      <header>
+        <h1 class='text-6xl font-thin'>Welcome to Code Curio!</h1>
+      </header>
       <div class='flex flex-col gap-4'>
         <p>
-          Welcome to Code Curio, a digital cabinet of curiosity where you can explore a collection of small, interactive
-          canvas projects.
+          Welcome to Code Curio, a collection of original interactive experiments where I explore ideas in programming,
+          mathematics, and computer graphics through projects I build myself.
         </p>
         <p>
-          This project was created out of a desire to bring to life the captivating visualizations and interactive
+          This website was created out of a desire to bring to life the captivating visualizations and interactive
           projects often only seen as static images or videos online. As a sole developer, I wanted to share my
-          creations with others, providing a platform where these projects could be experienced firsthand.
+          creations with others, providing myself a platform where these projects could be experienced firsthand.
         </p>
         <p>For the best experience, please use a mouse and a browser with hardware acceleration.</p>
         <p>

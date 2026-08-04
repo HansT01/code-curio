@@ -19,6 +19,7 @@ export interface CurioInfo {
   id: string
   title: string
   created: Date
+  updated: Date
   tags: Tag[]
 }
 
@@ -36,7 +37,11 @@ export const getCurios = async () => {
       return info
     }),
   )
-  info.sort((a, b) => (a.created === b.created ? 0 : a.created > b.created ? -1 : 1))
+  info.sort((a, b) => {
+    const aTime = a.updated.getTime()
+    const bTime = b.updated.getTime()
+    return aTime === bTime ? 0 : aTime > bTime ? -1 : 1
+  })
   cache = info
   return info
 }

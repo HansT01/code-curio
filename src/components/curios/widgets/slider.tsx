@@ -22,11 +22,11 @@ const Slider: Component<SliderProps> = (props) => {
           min={props.min}
           max={props.max}
           step={props.step !== undefined ? props.step : (props.max - props.min) / 100}
-          class='h-2 w-40 cursor-pointer appearance-none rounded-lg bg-primary accent-primary-fg'
+          class='bg-primary accent-primary-fg h-2 w-40 cursor-pointer appearance-none rounded-lg'
           onChange={props.onChange}
         />
-        <span class='absolute -bottom-5 start-0 text-sm'>{props.min}</span>
-        <span class='absolute -bottom-5 end-0 text-sm'>{props.max}</span>
+        <span class='absolute start-0 -bottom-5 text-sm'>{props.min}</span>
+        <span class='absolute end-0 -bottom-5 text-sm'>{props.max}</span>
       </div>
     </div>
   )

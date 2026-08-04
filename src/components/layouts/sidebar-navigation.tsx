@@ -17,7 +17,7 @@ const TagButton: Component<TagButtonProps> = (props) => {
   return (
     <button
       class={cn(
-        'flex items-center gap-1 rounded-lg bg-secondary px-3 py-1 text-secondary-fg hover:bg-background hover:text-background-fg',
+        'bg-secondary text-secondary-fg hover:bg-background hover:text-background-fg flex cursor-pointer items-center gap-1 rounded-lg px-3 py-1',
         {
           'bg-background': props.highlight,
           'text-background-fg': props.highlight,
@@ -65,7 +65,7 @@ const CurioList: Component<CurioListProps> = (props) => {
       <div class='flex flex-col gap-4'>
         <div>
           <button
-            class='flex cursor-pointer items-center gap-2 rounded-lg bg-background px-4 py-3 text-background-fg hover:bg-accent hover:text-accent-fg'
+            class='bg-background text-background-fg hover:bg-accent hover:text-accent-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
             onClick={() => setShowFilters((showFilters) => !showFilters)}
           >
             <PencilIcon size={20} />
@@ -100,11 +100,15 @@ const CurioList: Component<CurioListProps> = (props) => {
           {(curio) => (
             <Show when={filteredTags().every((tag) => curio.tags.includes(tag))}>
               <A href={`/curio/${curio.id}`} onClick={props.onCurioClick}>
-                <div class='flex flex-col gap-0 overflow-x-hidden rounded-xl bg-background px-4 py-2 text-background-fg hover:bg-accent hover:text-accent-fg'>
+                <div class='bg-background text-background-fg hover:bg-accent hover:text-accent-fg flex flex-col gap-0 overflow-x-hidden rounded-xl px-4 py-2'>
                   <h2>{curio.title}</h2>
-                  <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
+                  <small>
+                    Created {dayjs(curio.created).format('MMM YYYY')}
+                    {!dayjs(curio.updated).isSame(curio.created, 'date') &&
+                      ` · Updated ${dayjs(curio.updated).format('MMM YYYY')}`}
+                  </small>
                   <Show when={curio.tags.length > 0}>
-                    <div class='my-1 flex flex-wrap gap-2'>
+                    <div class='my-2 flex flex-wrap gap-2'>
                       <For each={curio.tags}>
                         {(tag) => (
                           <TagButton
@@ -194,7 +198,7 @@ const Navigation: Component<NavigationProps> = (props) => {
     <div>
       <div
         style={{ 'left': isSidebar() ? `${sidebarWidth() + 5}px` : '0px' }}
-        class={cn('fixed bottom-0 right-0 top-[64px] overflow-y-auto bg-background text-background-fg', {
+        class={cn('bg-background text-background-fg fixed top-[64px] right-0 bottom-0 overflow-y-auto', {
           'top-0': isSidebar(),
         })}
       >
@@ -212,7 +216,7 @@ const Navigation: Component<NavigationProps> = (props) => {
       <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
-          'fixed -top-[80svh] bottom-0 left-0 overflow-y-auto overflow-x-hidden border-secondary bg-primary px-6 py-4 text-primary-fg transition-[top] duration-200',
+          'border-secondary bg-primary text-primary-fg fixed -top-[80svh] bottom-0 left-0 overflow-x-hidden overflow-y-auto px-6 py-4 transition-[top] duration-200',
           { 'top-[64px]': isSidebar() || isOpen(), 'h-[calc(80svh-64px)] border-b-[9px]': !isSidebar() },
         )}
       >
@@ -223,7 +227,7 @@ const Navigation: Component<NavigationProps> = (props) => {
           style={{
             'left': `${sidebarWidth() - 4}px`,
           }}
-          class='fixed bottom-0 top-0 w-[9px] cursor-col-resize select-none bg-secondary text-secondary-fg'
+          class='bg-secondary text-secondary-fg fixed top-0 bottom-0 w-[9px] cursor-col-resize select-none'
           onMouseDown={handleResizeStart}
           onTouchStart={handleResizeStart}
           onMouseUp={handleResizeEnd}
@@ -233,14 +237,14 @@ const Navigation: Component<NavigationProps> = (props) => {
       <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
-          'fixed left-0 top-0 flex h-[64px] items-center justify-between overflow-hidden border-primary bg-primary px-6 text-primary-fg',
+          'border-primary bg-primary text-primary-fg fixed top-0 left-0 flex h-[64px] items-center justify-between overflow-hidden px-6',
           {
-            'border-b-2 bg-accent text-accent-fg': !isSidebar(),
+            'bg-accent text-accent-fg border-b-2': !isSidebar(),
           },
         )}
       >
         <A href='/'>
-          <h1 class='my-auto whitespace-nowrap text-4xl font-extralight'>Code Curio</h1>
+          <h1 class='my-auto text-4xl font-extralight whitespace-nowrap'>Code Curio</h1>
         </A>
         <button
           class={cn({
