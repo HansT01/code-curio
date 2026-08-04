@@ -139,7 +139,7 @@ class BubbleManager {
 
   constructor(p: p5, bubbles: Bubble[]) {
     this.p = p
-    this.camera = new Camera2D(p, true)
+    this.camera = new Camera2D(p, false)
     this.bubbles = bubbles
     this.hovering = null
     this.isDragging = false
@@ -165,7 +165,7 @@ class BubbleManager {
   dragStart() {
     const touches = this.p.touches as Touch[]
     this.hover()
-    if (this.p.mouseButton === this.p.LEFT || touches.length === 1) {
+    if ((this.p.mouseButton === this.p.LEFT || touches.length === 1) && this.hovering !== null) {
       this.isDragging = true
     }
   }
@@ -256,7 +256,11 @@ const ProgrammingLanguageOverlap = () => {
       manager.dragEnd()
     }
     p.mouseMoved = () => manager.hover()
-    p.mouseDragged = () => manager.camera.mouseDragged()
+    p.mouseDragged = () => {
+      if (!manager.isDragging) {
+        manager.camera.mouseDragged()
+      }
+    }
     p.mouseWheel = (e: WheelEvent) => manager.camera.mouseWheel(e)
 
     p.touchStarted = () => {
