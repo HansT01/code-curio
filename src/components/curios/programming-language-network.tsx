@@ -58,10 +58,8 @@ class Bubble {
       }
       const offset = p5.Vector.sub(this.position, bubble.position)
       offset.div(offset.magSq())
-      offset.mult(Math.pow(this.weights[bubble.index], 0.1))
       totalOffset.add(offset)
     }
-    totalOffset.div(Math.pow(this.weights[this.index], 0.1))
     totalOffset.mult(this.config().repulsionFactor)
     this.velocity.add(totalOffset)
   }
