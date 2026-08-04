@@ -68,13 +68,13 @@ export default function ProgrammingLanguageOverlap() {
             The data utilized in this visualization consisted of the programming languages they had worked with in the
             past year. Using this data, a co-occurrence matrix was generated and utilized for the visualization, which
             can be accessed in the{' '}
-            <A
+            <a
               target='_blank'
               href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/public/data/languages-co-occurence.json`}
               class='underline'
             >
               public/data
-            </A>{' '}
+            </a>{' '}
             directory of the source code.
           </p>
           <p>
