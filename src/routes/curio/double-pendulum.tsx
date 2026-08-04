@@ -9,6 +9,7 @@ export const info: CurioInfo = {
   id: 'double-pendulum',
   title: 'Double Pendulum',
   created: new Date('2024-03-05'),
+  updated: new Date('2024-03-05'),
   tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics'],
 }
 

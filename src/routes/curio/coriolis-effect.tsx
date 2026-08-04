@@ -9,6 +9,7 @@ export const info: CurioInfo = {
   id: 'coriolis-effect',
   title: 'Coriolis Effect',
   created: new Date('2024-02-28'),
+  updated: new Date('2024-02-28'),
   tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics', 'simulation', '3d'],
 }
 

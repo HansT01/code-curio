@@ -102,9 +102,13 @@ const CurioList: Component<CurioListProps> = (props) => {
               <A href={`/curio/${curio.id}`} onClick={props.onCurioClick}>
                 <div class='bg-background text-background-fg hover:bg-accent hover:text-accent-fg flex flex-col gap-0 overflow-x-hidden rounded-xl px-4 py-2'>
                   <h2>{curio.title}</h2>
-                  <small>{dayjs(curio.created).format('DD/MM/YY')}</small>
+                  <small>
+                    Created {dayjs(curio.created).format('MMM YYYY')}
+                    {!dayjs(curio.updated).isSame(curio.created, 'date') &&
+                      ` · Updated ${dayjs(curio.updated).format('MMM YYYY')}`}
+                  </small>
                   <Show when={curio.tags.length > 0}>
-                    <div class='my-1 flex flex-wrap gap-2'>
+                    <div class='my-2 flex flex-wrap gap-2'>
                       <For each={curio.tags}>
                         {(tag) => (
                           <TagButton

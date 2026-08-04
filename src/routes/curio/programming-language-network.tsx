@@ -9,6 +9,7 @@ export const info: CurioInfo = {
   id: 'programming-language-network',
   title: 'Programming Language Network',
   created: new Date('2024-03-01'),
+  updated: new Date('2026-08-04'),
   tags: ['animation', 'data-vis', 'interactive', 'p5.js'],
 }
 
