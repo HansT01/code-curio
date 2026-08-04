@@ -58,10 +58,10 @@ class Bubble {
       }
       const offset = p5.Vector.sub(this.position, bubble.position)
       offset.div(offset.magSq())
-      offset.mult(this.weights[bubble.index])
+      offset.mult(Math.pow(this.weights[bubble.index], 0.1))
       totalOffset.add(offset)
     }
-    totalOffset.div(this.weights[this.index])
+    totalOffset.div(Math.pow(this.weights[this.index], 0.1))
     totalOffset.mult(this.config().repulsionFactor)
     this.velocity.add(totalOffset)
   }
@@ -207,7 +207,7 @@ class BubbleManager {
 const defaultConfig = {
   weightExponent: 2,
   attractionFactor: 0.1,
-  repulsionFactor: 20,
+  repulsionFactor: 5,
   radialAccelerationFactor: 0.0001,
 }
 
