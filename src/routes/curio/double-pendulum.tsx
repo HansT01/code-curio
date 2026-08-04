@@ -36,20 +36,21 @@ export default function DoublePendulum() {
             interest in physics and mathematics.
           </p>
         </section>
-        <section class='flex min-h-120 flex-col gap-6'>
+        <section class='min-h-120'>
           <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
             <Show when={!isLoading()} fallback={<CanvasLoader />}>
               <DoublePendulumCanvas />
             </Show>
           </ErrorBoundary>
+        </section>
+        <section class='flex'>
           <a
             target='_blank'
             href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/double-pendulum.tsx`}
+            class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
           >
-            <button class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'>
-              <GithubIcon />
-              View Source Code
-            </button>
+            <GithubIcon />
+            View Source Code
           </a>
         </section>
         <section class='flex flex-col gap-4'>
@@ -81,9 +82,9 @@ export default function DoublePendulum() {
           </p>
           <p>
             Read more about the Runga-kutta methods{' '}
-            <A target='_blank' href='https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods' class='underline'>
+            <a target='_blank' href='https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods' class='underline'>
               here
-            </A>
+            </a>
             .
           </p>
         </section>
