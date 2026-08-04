@@ -8,10 +8,7 @@ export default defineConfig({
     solidStart(),
     tailwindcss(),
     nitro({
-      preset: 'cloudflare_module',
-      rollupConfig: {
-        external: ['__STATIC_CONTENT_MANIFEST', 'node:async_hooks'],
-      },
+      preset: 'cloudflare-pages',
     }),
   ],
 })
