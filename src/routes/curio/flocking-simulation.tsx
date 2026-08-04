@@ -29,7 +29,7 @@ export default function FlockingSimulation() {
           target='_blank'
           href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/flocking-simulation.tsx`}
         >
-          <button class='flex items-center gap-2 rounded-lg bg-primary px-4 py-3 text-primary-fg hover:bg-secondary hover:text-secondary-fg'>
+          <button class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex items-center gap-2 rounded-lg px-4 py-3'>
             <GithubIcon />
             View Source Code
           </button>
@@ -57,7 +57,7 @@ export default function FlockingSimulation() {
           .
         </p>
       </section>
-      <section class='min-h-[480px]'>
+      <section class='min-h-120'>
         <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
           <Show when={!isLoading()} fallback={<CanvasLoader />}>
             <FlockingSimulationCanvas />

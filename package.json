@@ -1,26 +1,27 @@
 {
-  "name": "example-with-tailwindcss",
+  "name": "code-curio",
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@solidjs/router": "^0.13.1",
-    "@solidjs/start": "^0.7.1",
-    "autoprefixer": "^10.4.18",
+    "@solidjs/router": "^1.0.0",
+    "@solidjs/start": "^2.0.0-rc.6",
+    "@tailwindcss/vite": "^4.0.7",
     "clsx": "^2.1.0",
     "dayjs": "^1.11.10",
+    "nitro": "3.0.260610-beta",
     "p5": "^1.9.1",
-    "postcss": "^8.4.26",
-    "solid-js": "^1.8.15",
-    "tailwind-merge": "^2.2.1",
-    "tailwindcss": "^3.3.3",
-    "vinxi": "^0.3.10"
+    "solid-js": "^1.9.14",
+    "tailwind-merge": "^3.6.0",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.0.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=24"
   },
   "devDependencies": {
     "@types/p5": "^1.7.6",

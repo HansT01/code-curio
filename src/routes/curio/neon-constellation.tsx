@@ -44,7 +44,7 @@ export default function NeonConstellation() {
           also simulating the casting of shadows.
         </p>
       </section>
-      <section class='min-h-[480px]'>
+      <section class='min-h-120'>
         <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
           <Show when={!isLoading()} fallback={<CanvasLoader />}>
             <NeonConstellationCanvas />
@@ -62,11 +62,11 @@ export default function NeonConstellation() {
         </p>
         <p>
           Shaders are incredibly powerful, as they allow you to easily parallelize highly optimized renders on the GPU.
-          If you're interested in learning more about what you can do with shaders, I implore you to head over to{' '}
+          If this topic interests you, head over to{' '}
           <A target='_blank' href='https://www.shadertoy.com/browse' class='underline'>
             Shadertoy
           </A>{' '}
-          to peruse through the works of others, all made using GLSL shaders!
+          to peruse through the works of others, all made using GLSL shaders.
         </p>
         <p>
           Despite the visible results, my first experience writing shader code wasn't seamless. There was no direct
