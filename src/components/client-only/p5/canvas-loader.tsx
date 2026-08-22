@@ -10,10 +10,9 @@ interface CanvasLoaderProps {
 const CanvasLoader: Component<CanvasLoaderProps> = (props) => {
   return (
     <div
-      class={cn(
-        'bg-accent text-accent-fg flex h-[480px] w-full max-w-[854px] items-center justify-center rounded-2xl',
-        { 'cursor-pointer': props.onClick !== undefined },
-      )}
+      class={cn('bg-accent text-accent-fg flex h-120 w-full max-w-213.5 items-center justify-center rounded-2xl', {
+        'cursor-pointer': props.onClick !== undefined,
+      })}
       onClick={props.onClick}
     >
       <Show
