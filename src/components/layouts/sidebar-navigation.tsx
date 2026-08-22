@@ -198,7 +198,7 @@ const Navigation: Component<NavigationProps> = (props) => {
     <div>
       <div
         style={{ 'left': isSidebar() ? `${sidebarWidth() + 5}px` : '0px' }}
-        class={cn('bg-background text-background-fg fixed top-[64px] right-0 bottom-0 overflow-y-auto', {
+        class={cn('bg-background text-background-fg fixed top-16 right-0 bottom-0 overflow-y-auto', {
           'top-0': isSidebar(),
         })}
       >
@@ -216,8 +216,8 @@ const Navigation: Component<NavigationProps> = (props) => {
       <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
-          'border-secondary bg-primary text-primary-fg fixed -top-[80svh] bottom-0 left-0 overflow-x-hidden overflow-y-auto px-6 py-4 transition-[top] duration-200',
-          { 'top-[64px]': isSidebar() || isOpen(), 'h-[calc(80svh-64px)] border-b-[9px]': !isSidebar() },
+          'border-secondary bg-primary text-primary-fg fixed top-[-80svh] bottom-0 left-0 overflow-x-hidden overflow-y-auto px-6 py-4 transition-[top] duration-200',
+          { 'top-16': isSidebar() || isOpen(), 'h-[calc(80svh-64px)] border-b-[9px]': !isSidebar() },
         )}
       >
         <CurioList onCurioClick={() => setIsOpen(false)} />
@@ -227,7 +227,7 @@ const Navigation: Component<NavigationProps> = (props) => {
           style={{
             'left': `${sidebarWidth() - 4}px`,
           }}
-          class='bg-secondary text-secondary-fg fixed top-0 bottom-0 w-[9px] cursor-col-resize select-none'
+          class='bg-secondary text-secondary-fg fixed top-0 bottom-0 w-2.25 cursor-col-resize select-none'
           onMouseDown={handleResizeStart}
           onTouchStart={handleResizeStart}
           onMouseUp={handleResizeEnd}
@@ -237,7 +237,7 @@ const Navigation: Component<NavigationProps> = (props) => {
       <div
         style={{ 'width': isSidebar() ? `${sidebarWidth() - 4}px` : '100vw' }}
         class={cn(
-          'border-primary bg-primary text-primary-fg fixed top-0 left-0 flex h-[64px] items-center justify-between overflow-hidden px-6',
+          'border-primary bg-primary text-primary-fg fixed top-0 left-0 flex h-16 items-center justify-between overflow-hidden px-6',
           {
             'bg-accent text-accent-fg border-b-2': !isSidebar(),
           },
