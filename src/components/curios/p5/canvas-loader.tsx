@@ -1,6 +1,6 @@
 import { Component, Show } from 'solid-js'
 import { LoaderIcon } from '~/components/icons'
-import { cn } from '~/utils/cn'
+import { cn } from '~/lib/cn'
 
 interface CanvasLoaderProps {
   error?: string
