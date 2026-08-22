@@ -46,7 +46,7 @@ export default function NeonConstellation() {
         <section class='flex'>
           <a
             target='_blank'
-            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/neon-constellation.tsx`}
+            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/client-only/neon-constellation.tsx`}
             class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
           >
             <GithubIcon />
