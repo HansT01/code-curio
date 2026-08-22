@@ -1,6 +1,6 @@
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
-import { isMouseInCanvas } from '~/lib/camera'
+import { isMouseInCanvas } from '~/lib/p5/camera'
 import { Quadtree, Rectangle } from '~/lib/data-structures/quadtree'
 import Canvas from './p5/canvas'
 import Slider from './widgets/slider'

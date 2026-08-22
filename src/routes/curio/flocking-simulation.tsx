@@ -3,9 +3,9 @@ import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
 import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
-import { CurioInfo } from '~/lib/curio'
+import { CurioMetadata } from '~/lib/curio/metadata'
 
-export const info: CurioInfo = {
+export const info: CurioMetadata = {
   id: 'flocking-simulation',
   title: 'Flocking Simulation',
   created: new Date('2024-02-27'),

@@ -1,6 +1,6 @@
 import p5 from 'p5'
 import { Accessor, createSignal, onCleanup, onMount } from 'solid-js'
-import { Camera2D } from '~/lib/camera'
+import { Camera2D } from '~/lib/p5/camera'
 import Canvas from './p5/canvas'
 import Button from './widgets/button'
 

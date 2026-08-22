@@ -3,9 +3,9 @@ import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
 import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
-import { CurioInfo } from '~/lib/curio'
+import { CurioMetadata } from '~/lib/curio/metadata'
 
-export const info: CurioInfo = {
+export const info: CurioMetadata = {
   id: 'neon-constellation',
   title: 'Neon Constellation (Shader Render)',
   created: new Date('2024-03-03'),
