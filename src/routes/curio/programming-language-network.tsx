@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/curios/p5/canvas-loader'
+import CanvasLoader from '~/components/client-only/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
 import { CurioMetadata } from '~/lib/curio/metadata'
 
@@ -13,7 +13,9 @@ export const info: CurioMetadata = {
   tags: ['animation', 'data-vis', 'interactive', 'p5.js'],
 }
 
-const ProgrammingLanguageOverlapCanvas = clientOnly(() => import('~/components/curios/programming-language-network'))
+const ProgrammingLanguageOverlapCanvas = clientOnly(
+  () => import('~/components/client-only/programming-language-network'),
+)
 
 export default function ProgrammingLanguageOverlap() {
   const [isLoading, setIsLoading] = createSignal(true)

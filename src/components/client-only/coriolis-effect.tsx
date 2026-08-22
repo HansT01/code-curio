@@ -3,9 +3,9 @@ import { Accessor, createSignal } from 'solid-js'
 import { CircularQueue } from '~/lib/data-structures/circular-queue'
 import { Box, Octree } from '~/lib/data-structures/octree'
 import Canvas from './p5/canvas'
-import Button from './widgets/button'
-import Slider from './widgets/slider'
-import Stepper from './widgets/stepper'
+import Button from '../widgets/button'
+import Slider from '../widgets/slider'
+import Stepper from '../widgets/stepper'
 
 class Particle {
   p: p5

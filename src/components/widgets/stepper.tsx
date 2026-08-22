@@ -1,5 +1,4 @@
-import { Component } from 'solid-js'
-import { JSX } from 'solid-js/web/types/jsx'
+import { Component, JSX } from 'solid-js'
 import { MinusIcon, PlusIcon } from '~/components/icons'
 
 interface StepperProps {

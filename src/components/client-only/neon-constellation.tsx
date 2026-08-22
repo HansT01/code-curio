@@ -2,8 +2,8 @@ import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import { Quadtree, Rectangle } from '~/lib/data-structures/quadtree'
 import Canvas from './p5/canvas'
-import Slider from './widgets/slider'
-import Stepper from './widgets/stepper'
+import Slider from '../widgets/slider'
+import Stepper from '../widgets/stepper'
 
 class Bubble {
   p: p5
