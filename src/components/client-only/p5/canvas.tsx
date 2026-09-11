@@ -1,5 +1,6 @@
 import p5 from 'p5'
 import { Component, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
 import CanvasLoader from './canvas-loader'
 
 export const logFPS = async (p: p5) => {
@@ -53,7 +54,7 @@ const Canvas: Component<CanvasProps> = (props) => {
   const createResize = (ref: HTMLDivElement) => {
     onMount(() => {
       const resize = () => {
-        setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
+        setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, CURIO_CANVAS_WIDTH) })
       }
       resize()
       window.dispatchEvent(new Event('resize'))
