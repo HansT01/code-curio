@@ -116,6 +116,14 @@ export default function P2PGroupChat() {
     })
   }
 
+  // Deterministic id (not random) so every peer who independently witnesses the same leave converges on one entry.
+  const addLeftMessage = (id: string) => {
+    const text = `${peerIdentity(id).name} left the chat`
+    setMessages((prev) =>
+      [...prev, { id: `leave-${id}`, from: 'system', text, timestamp: Date.now() }].slice(-MAX_MESSAGES),
+    )
+  }
+
   const setupChannel = (id: string, channel: RTCDataChannel) => {
     channels.set(id, channel)
 
@@ -203,6 +211,7 @@ export default function P2PGroupChat() {
 
         case 'leave': {
           removePeer(signal.id)
+          addLeftMessage(signal.id)
           break
         }
 
@@ -308,49 +317,58 @@ export default function P2PGroupChat() {
               <For each={messages()}>
                 {(message, index) => {
                   const isMe = message.from === 'me'
-                  const identity = isMe ? (selfId() ? peerIdentity(selfId()!) : null) : peerIdentity(message.from)
+                  const isSystem = message.from === 'system'
+                  const identity = isSystem
+                    ? null
+                    : isMe
+                      ? selfId()
+                        ? peerIdentity(selfId()!)
+                        : null
+                      : peerIdentity(message.from)
                   const previous = messages()[index() - 1]
                   const showMeta = !previous || previous.from !== message.from
 
                   return (
-                    <div
-                      class={cn('flex items-end gap-2', {
-                        'flex-row-reverse': isMe,
-                        'mt-1': showMeta && index() > 0,
-                      })}
-                    >
-                      <div class='w-8 shrink-0'>
-                        <Show when={showMeta && identity}>
-                          <span
-                            class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
-                            style={{ 'background-color': identity!.color }}
-                          >
-                            {identity!.initials}
-                          </span>
-                        </Show>
-                      </div>
-
-                      <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
-                        <Show when={showMeta}>
-                          <span class='flex items-baseline gap-2 px-1'>
-                            <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
-                              {isMe ? 'You' : identity!.name}
+                    <Show when={!isSystem} fallback={<p class='py-1 text-center text-xs opacity-50'>{message.text}</p>}>
+                      <div
+                        class={cn('flex items-end gap-2', {
+                          'flex-row-reverse': isMe,
+                          'mt-1': showMeta && index() > 0,
+                        })}
+                      >
+                        <div class='w-8 shrink-0'>
+                          <Show when={showMeta && identity}>
+                            <span
+                              class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
+                              style={{ 'background-color': identity!.color }}
+                            >
+                              {identity!.initials}
                             </span>
-                            <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
-                          </span>
-                        </Show>
-                        <div
-                          class={cn(
-                            'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
-                            isMe
-                              ? 'bg-primary text-primary-fg rounded-br-sm'
-                              : 'bg-background text-background-fg rounded-bl-sm',
-                          )}
-                        >
-                          {message.text}
+                          </Show>
+                        </div>
+
+                        <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
+                          <Show when={showMeta}>
+                            <span class='flex items-baseline gap-2 px-1'>
+                              <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
+                                {isMe ? 'You' : identity!.name}
+                              </span>
+                              <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
+                            </span>
+                          </Show>
+                          <div
+                            class={cn(
+                              'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
+                              isMe
+                                ? 'bg-primary text-primary-fg rounded-br-sm'
+                                : 'bg-background text-background-fg rounded-bl-sm',
+                            )}
+                          >
+                            {message.text}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Show>
                   )
                 }}
               </For>
