@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import Loader from '~/components/widgets/loader'
+import { cn } from '~/lib/cn'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
 import { CurioMetadata } from '~/lib/curio/metadata'
 
@@ -270,7 +271,10 @@ export default function P2PGroupChat() {
 
                 return (
                   <div
-                    class={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''} ${showMeta && index > 0 ? 'mt-1' : ''}`}
+                    class={cn('flex items-end gap-2', {
+                      'flex-row-reverse': isMe,
+                      'mt-1': showMeta && index > 0,
+                    })}
                   >
                     <div class='w-8 shrink-0'>
                       <Show when={showMeta && identity}>
@@ -283,7 +287,7 @@ export default function P2PGroupChat() {
                       </Show>
                     </div>
 
-                    <div class={`flex max-w-[75%] flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
+                    <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
                       <Show when={showMeta}>
                         <span class='flex items-baseline gap-2 px-1'>
                           <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
@@ -293,11 +297,12 @@ export default function P2PGroupChat() {
                         </span>
                       </Show>
                       <div
-                        class={`rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap ${
+                        class={cn(
+                          'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
                           isMe
                             ? 'bg-primary text-primary-fg rounded-br-sm'
-                            : 'bg-background text-background-fg rounded-bl-sm'
-                        }`}
+                            : 'bg-background text-background-fg rounded-bl-sm',
+                        )}
                       >
                         {message.text}
                       </div>
