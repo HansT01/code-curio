@@ -1,4 +1,4 @@
-import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import Loader from '~/components/widgets/loader'
 import { cn } from '~/lib/cn'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
@@ -27,6 +27,9 @@ type ChannelMessage =
   | { type: 'history'; messages: { id: string; from: string; text: string; timestamp: number }[] }
 
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }]
+
+// Caps both local memory and the size of the history payload exchanged on every new connection.
+const MAX_MESSAGES = 200
 
 // Deterministic "Adjective Animal" name + hue, so every peer sees the same identity for the same id.
 const ADJECTIVES = [
@@ -109,7 +112,7 @@ export default function P2PGroupChat() {
         .filter((m) => !known.has(m.id))
         .map((m) => ({ ...m, from: m.from === selfId() ? 'me' : m.from }))
       if (additions.length === 0) return prev
-      return [...prev, ...additions].sort((a, b) => a.timestamp - b.timestamp)
+      return [...prev, ...additions].sort((a, b) => a.timestamp - b.timestamp).slice(-MAX_MESSAGES)
     })
   }
 
@@ -246,7 +249,7 @@ export default function P2PGroupChat() {
     for (const channel of channels.values()) {
       if (channel.readyState === 'open') channel.send(JSON.stringify(payload))
     }
-    setMessages((prev) => [...prev, message])
+    setMessages((prev) => [...prev, message].slice(-MAX_MESSAGES))
     setInput('')
   }
 
@@ -302,53 +305,55 @@ export default function P2PGroupChat() {
             }
           >
             <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-lg p-4'>
-              {messages().map((message, index) => {
-                const isMe = message.from === 'me'
-                const identity = isMe ? (selfId() ? peerIdentity(selfId()!) : null) : peerIdentity(message.from)
-                const previous = messages()[index - 1]
-                const showMeta = !previous || previous.from !== message.from
+              <For each={messages()}>
+                {(message, index) => {
+                  const isMe = message.from === 'me'
+                  const identity = isMe ? (selfId() ? peerIdentity(selfId()!) : null) : peerIdentity(message.from)
+                  const previous = messages()[index() - 1]
+                  const showMeta = !previous || previous.from !== message.from
 
-                return (
-                  <div
-                    class={cn('flex items-end gap-2', {
-                      'flex-row-reverse': isMe,
-                      'mt-1': showMeta && index > 0,
-                    })}
-                  >
-                    <div class='w-8 shrink-0'>
-                      <Show when={showMeta && identity}>
-                        <span
-                          class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
-                          style={{ 'background-color': identity!.color }}
-                        >
-                          {identity!.initials}
-                        </span>
-                      </Show>
-                    </div>
-
-                    <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
-                      <Show when={showMeta}>
-                        <span class='flex items-baseline gap-2 px-1'>
-                          <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
-                            {isMe ? 'You' : identity!.name}
+                  return (
+                    <div
+                      class={cn('flex items-end gap-2', {
+                        'flex-row-reverse': isMe,
+                        'mt-1': showMeta && index() > 0,
+                      })}
+                    >
+                      <div class='w-8 shrink-0'>
+                        <Show when={showMeta && identity}>
+                          <span
+                            class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
+                            style={{ 'background-color': identity!.color }}
+                          >
+                            {identity!.initials}
                           </span>
-                          <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
-                        </span>
-                      </Show>
-                      <div
-                        class={cn(
-                          'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
-                          isMe
-                            ? 'bg-primary text-primary-fg rounded-br-sm'
-                            : 'bg-background text-background-fg rounded-bl-sm',
-                        )}
-                      >
-                        {message.text}
+                        </Show>
+                      </div>
+
+                      <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
+                        <Show when={showMeta}>
+                          <span class='flex items-baseline gap-2 px-1'>
+                            <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
+                              {isMe ? 'You' : identity!.name}
+                            </span>
+                            <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
+                          </span>
+                        </Show>
+                        <div
+                          class={cn(
+                            'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
+                            isMe
+                              ? 'bg-primary text-primary-fg rounded-br-sm'
+                              : 'bg-background text-background-fg rounded-bl-sm',
+                          )}
+                        >
+                          {message.text}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )
-              })}
+                  )
+                }}
+              </For>
             </section>
           </Show>
 
