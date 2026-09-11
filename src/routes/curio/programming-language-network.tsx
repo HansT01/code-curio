@@ -1,11 +1,12 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
-import { CurioInfo } from '~/utils/curio'
+import Loader from '~/components/widgets/loader'
+import { CURIO_CANVAS_HEIGHT, CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
+import { CurioMetadata } from '~/lib/curio/metadata'
 
-export const info: CurioInfo = {
+export const info: CurioMetadata = {
   id: 'programming-language-network',
   title: 'Programming Language Network',
   created: new Date('2024-03-01'),
@@ -13,7 +14,9 @@ export const info: CurioInfo = {
   tags: ['animation', 'data-vis', 'interactive', 'p5.js'],
 }
 
-const ProgrammingLanguageOverlapCanvas = clientOnly(() => import('~/components/curios/programming-language-network'))
+const ProgrammingLanguageOverlapCanvas = clientOnly(
+  () => import('~/components/client-only/programming-language-network'),
+)
 
 export default function ProgrammingLanguageOverlap() {
   const [isLoading, setIsLoading] = createSignal(true)
@@ -47,8 +50,17 @@ export default function ProgrammingLanguageOverlap() {
           </p>
         </section>
         <section class='min-h-120'>
-          <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
-            <Show when={!isLoading()} fallback={<CanvasLoader />}>
+          <ErrorBoundary
+            fallback={(error, reset) => (
+              <Loader
+                width={CURIO_CANVAS_WIDTH}
+                height={CURIO_CANVAS_HEIGHT}
+                error={error.toString()}
+                onClick={reset}
+              />
+            )}
+          >
+            <Show when={!isLoading()} fallback={<Loader width={CURIO_CANVAS_WIDTH} height={CURIO_CANVAS_HEIGHT} />}>
               <ProgrammingLanguageOverlapCanvas />
             </Show>
           </ErrorBoundary>
@@ -56,7 +68,7 @@ export default function ProgrammingLanguageOverlap() {
         <section class='flex'>
           <a
             target='_blank'
-            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/programming-language-network.tsx`}
+            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/client-only/programming-language-network.tsx`}
             class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
           >
             <GithubIcon />

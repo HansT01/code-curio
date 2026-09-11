@@ -1,11 +1,12 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
-import { CurioInfo } from '~/utils/curio'
+import Loader from '~/components/widgets/loader'
+import { CURIO_CANVAS_HEIGHT, CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
+import { CurioMetadata } from '~/lib/curio/metadata'
 
-export const info: CurioInfo = {
+export const info: CurioMetadata = {
   id: 'coriolis-effect',
   title: 'Coriolis Effect',
   created: new Date('2024-02-28'),
@@ -13,7 +14,7 @@ export const info: CurioInfo = {
   tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'physics', 'simulation', '3d'],
 }
 
-const CoriolisEffectCanvas = clientOnly(() => import('~/components/curios/coriolis-effect'))
+const CoriolisEffectCanvas = clientOnly(() => import('~/components/client-only/coriolis-effect'))
 
 export default function CoriolisEffect() {
   const [isLoading, setIsLoading] = createSignal(true)
@@ -55,8 +56,17 @@ export default function CoriolisEffect() {
           </p>
         </section>
         <section class='min-h-120'>
-          <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
-            <Show when={!isLoading()} fallback={<CanvasLoader />}>
+          <ErrorBoundary
+            fallback={(error, reset) => (
+              <Loader
+                width={CURIO_CANVAS_WIDTH}
+                height={CURIO_CANVAS_HEIGHT}
+                error={error.toString()}
+                onClick={reset}
+              />
+            )}
+          >
+            <Show when={!isLoading()} fallback={<Loader width={CURIO_CANVAS_WIDTH} height={CURIO_CANVAS_HEIGHT} />}>
               <CoriolisEffectCanvas />
             </Show>
           </ErrorBoundary>
@@ -64,7 +74,7 @@ export default function CoriolisEffect() {
         <section class='flex'>
           <a
             target='_blank'
-            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/coriolis-effect.tsx`}
+            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/client-only/coriolis-effect.tsx`}
             class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
           >
             <GithubIcon />

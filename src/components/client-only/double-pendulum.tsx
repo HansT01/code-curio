@@ -1,8 +1,8 @@
 import p5 from 'p5'
 import { Accessor, createSignal } from 'solid-js'
 import Canvas from './p5/canvas'
-import Button from './widgets/button'
-import Slider from './widgets/slider'
+import Button from '../widgets/button'
+import Slider from '../widgets/slider'
 
 class DoublePendulum {
   p: p5

@@ -1,6 +1,6 @@
 import { A } from '@solidjs/router'
 import { Component, createSignal, onCleanup, onMount } from 'solid-js'
-import { cn } from '~/utils/cn'
+import { cn } from '~/lib/cn'
 
 const Footer: Component = () => {
   const [width, setWidth] = createSignal(1080)

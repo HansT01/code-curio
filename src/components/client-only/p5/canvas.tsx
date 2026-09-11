@@ -1,6 +1,7 @@
 import p5 from 'p5'
 import { Component, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
-import CanvasLoader from './canvas-loader'
+import Loader from '~/components/widgets/loader'
+import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
 
 export const logFPS = async (p: p5) => {
   while (p.isLooping()) {
@@ -53,7 +54,7 @@ const Canvas: Component<CanvasProps> = (props) => {
   const createResize = (ref: HTMLDivElement) => {
     onMount(() => {
       const resize = () => {
-        setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, 854) })
+        setDimensions({ ...dimensions(), width: Math.min(ref.clientWidth, CURIO_CANVAS_WIDTH) })
       }
       resize()
       window.dispatchEvent(new Event('resize'))
@@ -79,7 +80,7 @@ const Canvas: Component<CanvasProps> = (props) => {
 
   return (
     <div
-      class='w-full [&>#p5\_loading]:hidden [&>[style*="visibility:_hidden;"]]:hidden [&>canvas]:rounded-2xl'
+      class='w-full *:[[style*="visibility:_hidden;"]]:hidden [&>#p5\_loading]:hidden [&>canvas]:rounded-2xl'
       ref={(ref) => {
         createSketch(ref)
         createResize(ref)
@@ -87,7 +88,7 @@ const Canvas: Component<CanvasProps> = (props) => {
       }}
     >
       <Show when={isLoading()}>
-        <CanvasLoader />
+        <Loader width={props.width} height={props.height} />
       </Show>
     </div>
   )

@@ -1,11 +1,12 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/curios/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
-import { CurioInfo } from '~/utils/curio'
+import Loader from '~/components/widgets/loader'
+import { CURIO_CANVAS_HEIGHT, CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
+import { CurioMetadata } from '~/lib/curio/metadata'
 
-export const info: CurioInfo = {
+export const info: CurioMetadata = {
   id: 'flocking-simulation',
   title: 'Flocking Simulation',
   created: new Date('2024-02-27'),
@@ -13,7 +14,7 @@ export const info: CurioInfo = {
   tags: ['ai', 'algorithms', 'animation', 'interactive', 'p5.js', 'simulation'],
 }
 
-const FlockingSimulationCanvas = clientOnly(() => import('~/components/curios/flocking-simulation'))
+const FlockingSimulationCanvas = clientOnly(() => import('~/components/client-only/flocking-simulation'))
 
 export default function FlockingSimulation() {
   const [isLoading, setIsLoading] = createSignal(true)
@@ -50,8 +51,17 @@ export default function FlockingSimulation() {
           </p>
         </section>
         <section class='min-h-120'>
-          <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
-            <Show when={!isLoading()} fallback={<CanvasLoader />}>
+          <ErrorBoundary
+            fallback={(error, reset) => (
+              <Loader
+                width={CURIO_CANVAS_WIDTH}
+                height={CURIO_CANVAS_HEIGHT}
+                error={error.toString()}
+                onClick={reset}
+              />
+            )}
+          >
+            <Show when={!isLoading()} fallback={<Loader width={CURIO_CANVAS_WIDTH} height={CURIO_CANVAS_HEIGHT} />}>
               <FlockingSimulationCanvas />
             </Show>
           </ErrorBoundary>
@@ -59,7 +69,7 @@ export default function FlockingSimulation() {
         <section class='flex'>
           <a
             target='_blank'
-            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/curios/flocking-simulation.tsx`}
+            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/client-only/flocking-simulation.tsx`}
             class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
           >
             <GithubIcon />

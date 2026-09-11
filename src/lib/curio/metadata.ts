@@ -1,37 +1,23 @@
-export const validTags = [
-  'p5.js',
-  'data-vis',
-  'interactive',
-  'art',
-  'algorithms',
-  'simulation',
-  'game',
-  'animation',
-  'ai',
-  'machine-learning',
-  'physics',
-  '3d',
-  'shader',
-] as const
-export type Tag = (typeof validTags)[number]
+import { CurioTag } from './tag'
 
-export interface CurioInfo {
+export interface CurioMetadata {
   id: string
   title: string
   created: Date
   updated: Date
-  tags: Tag[]
+  tags: CurioTag[]
 }
 
-let cache: CurioInfo[] | null = null
-export const getCurios = async () => {
+let cache: CurioMetadata[] | null = null
+
+export const getAllCurioMetadata = async () => {
   'use server'
   if (cache !== null) {
     return cache
   }
   const context = import.meta.glob('/src/routes/curio/*.tsx')
   const keys = Object.keys(context)
-  const info: CurioInfo[] = await Promise.all(
+  const info: CurioMetadata[] = await Promise.all(
     keys.map(async (key) => {
       const { info } = (await context[key]()) as any
       return info

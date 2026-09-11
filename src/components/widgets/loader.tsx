@@ -1,19 +1,23 @@
 import { Component, Show } from 'solid-js'
 import { LoaderIcon } from '~/components/icons'
-import { cn } from '~/utils/cn'
+import { cn } from '~/lib/cn'
 
-interface CanvasLoaderProps {
+interface LoaderProps {
+  class?: string
+  width: number
+  height: number
+  size?: number
   error?: string
   onClick?: (e: MouseEvent) => void
 }
 
-const CanvasLoader: Component<CanvasLoaderProps> = (props) => {
+const Loader: Component<LoaderProps> = (props) => {
   return (
     <div
-      class={cn(
-        'bg-accent text-accent-fg flex h-[480px] w-full max-w-[854px] items-center justify-center rounded-2xl',
-        { 'cursor-pointer': props.onClick !== undefined },
-      )}
+      class={cn('bg-accent text-accent-fg flex w-full items-center justify-center rounded-2xl', props.class, {
+        'cursor-pointer': props.onClick !== undefined,
+      })}
+      style={{ 'max-width': `${props.width}px`, height: `${props.height}px` }}
       onClick={props.onClick}
     >
       <Show
@@ -29,10 +33,10 @@ const CanvasLoader: Component<CanvasLoaderProps> = (props) => {
           </div>
         }
       >
-        <LoaderIcon class='animate-spin' size={36} />
+        <LoaderIcon class='animate-spin' size={props.size ?? 36} />
       </Show>
     </div>
   )
 }
 
-export default CanvasLoader
+export default Loader

@@ -2,8 +2,8 @@ import { Component, JSX } from 'solid-js'
 
 interface ButtonProps {
   id?: string
-  label: string
-  onClick: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>
+  label?: string
+  onClick?: JSX.EventHandlerUnion<HTMLButtonElement, MouseEvent>
 }
 
 const Button: Component<ButtonProps> = (props) => {

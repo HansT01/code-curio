@@ -2,8 +2,9 @@ import { A } from '@solidjs/router'
 import dayjs from 'dayjs'
 import { Component, For, JSX, Show, Suspense, createResource, createSignal, onCleanup, onMount } from 'solid-js'
 import { getRequestEvent } from 'solid-js/web'
-import { cn } from '~/utils/cn'
-import { Tag, getCurios, validTags } from '~/utils/curio'
+import { cn } from '~/lib/cn'
+import { getAllCurioMetadata } from '~/lib/curio/metadata'
+import { CurioTag, validTags } from '~/lib/curio/tag'
 import { MenuIcon, PencilIcon, XIcon } from '../icons'
 
 interface TagButtonProps {
@@ -39,10 +40,10 @@ interface CurioListProps {
 
 const CurioList: Component<CurioListProps> = (props) => {
   const [showFitlers, setShowFilters] = createSignal(false)
-  const [filteredTags, setFilteredTags] = createSignal<Tag[]>([])
-  const [curios] = createResource(getCurios)
+  const [filteredTags, setFilteredTags] = createSignal<CurioTag[]>([])
+  const [curios] = createResource(getAllCurioMetadata)
 
-  const toggleTag = (tag: Tag) => {
+  const toggleTag = (tag: CurioTag) => {
     if (filteredTags().includes(tag)) {
       unselectTag(tag)
     } else {
@@ -50,13 +51,13 @@ const CurioList: Component<CurioListProps> = (props) => {
     }
   }
 
-  const selectTag = (tag: Tag) => {
+  const selectTag = (tag: CurioTag) => {
     if (!filteredTags().includes(tag)) {
       setFilteredTags((tags) => [...tags, tag])
     }
   }
 
-  const unselectTag = (tag: Tag) => {
+  const unselectTag = (tag: CurioTag) => {
     setFilteredTags((tags) => tags.filter((item) => item !== tag))
   }
 
