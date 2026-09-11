@@ -12,7 +12,7 @@ export const info: CurioMetadata = {
 }
 
 type Signal =
-  | { type: 'peers'; self: string; ids: string[] }
+  | { type: 'peers'; ids: string[] }
   | { type: 'leave'; id: string }
   | { type: 'offer'; from: string; offer: RTCSessionDescriptionInit }
   | { type: 'answer'; from: string; answer: RTCSessionDescriptionInit }
@@ -73,8 +73,10 @@ const formatTime = (timestamp: number) =>
   new Date(timestamp).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 
 export default function P2PGroupChat() {
+  // Chosen locally so our own alias renders immediately, instead of waiting on a server round trip.
   const [selfId, setSelfId] = createSignal<string | null>(null)
   const [peerIds, setPeerIds] = createSignal<string[]>([])
+  const [pendingConnections, setPendingConnections] = createSignal(0)
   const [messages, setMessages] = createSignal<ChatMessage[]>([])
   const [input, setInput] = createSignal('')
 
@@ -87,7 +89,10 @@ export default function P2PGroupChat() {
   const setupChannel = (id: string, channel: RTCDataChannel) => {
     channels.set(id, channel)
 
-    channel.onopen = () => setPeerIds([...channels.keys()])
+    channel.onopen = () => {
+      setPeerIds([...channels.keys()])
+      setPendingConnections((count) => count - 1)
+    }
     channel.onclose = () => {
       channels.delete(id)
       setPeerIds([...channels.keys()])
@@ -100,6 +105,7 @@ export default function P2PGroupChat() {
     let connection = connections.get(id)
     if (connection) return connection
 
+    setPendingConnections((count) => count + 1)
     connection = new RTCPeerConnection({ iceServers: ICE_SERVERS })
     connection.onicecandidate = (event) => {
       if (event.candidate) {
@@ -123,23 +129,31 @@ export default function P2PGroupChat() {
   }
 
   const removePeer = (id: string) => {
+    const wasConnected = channels.has(id)
+
     channels.get(id)?.close()
     channels.delete(id)
     connections.get(id)?.close()
     connections.delete(id)
     setPeerIds([...channels.keys()])
+
+    if (!wasConnected) {
+      setPendingConnections((count) => count - 1)
+    }
   }
 
   onMount(() => {
+    setSelfId(crypto.randomUUID())
+
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
     socket = new WebSocket(`${protocol}//${location.host}/ws`)
+    socket.onopen = () => send({ type: 'hello', id: selfId() })
 
     socket.onmessage = async (event) => {
       const signal: Signal = JSON.parse(event.data)
 
       switch (signal.type) {
         case 'peers': {
-          setSelfId(signal.self)
           // We're the newcomer: initiate a connection to every peer already in the room.
           await Promise.all(signal.ids.map((id) => connectToPeer(id)))
           break
@@ -227,7 +241,18 @@ export default function P2PGroupChat() {
 
           <Show
             when={messages().length > 0 || peerIds().length > 0}
-            fallback={<Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />}
+            fallback={
+              <Show
+                when={pendingConnections() > 0}
+                fallback={
+                  <div class='bg-accent flex h-96 w-full items-center justify-center rounded-2xl'>
+                    <p class='opacity-60'>Waiting for someone to join...</p>
+                  </div>
+                }
+              >
+                <Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />
+              </Show>
+            }
           >
             <section class='bg-accent flex h-96 flex-col gap-3 overflow-y-auto rounded-lg p-4'>
               {messages().map((message, index) => {
