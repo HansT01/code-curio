@@ -29,6 +29,9 @@ export default defineConfig({
       deployConfig: true,
       nodeCompat: true,
       wrangler: {
+        // Without this, nitro auto-derives a name (came out as "hanst01-code-curio"),
+        // giving an uglier *.workers.dev URL than an explicit name does.
+        name: 'code-curio',
         durable_objects: {
           bindings: [{ name: '$DurableObject', class_name: '$DurableObject' }],
         },
