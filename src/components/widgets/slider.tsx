@@ -25,8 +25,8 @@ const Slider: Component<SliderProps> = (props) => {
           class='bg-primary accent-primary-fg h-2 w-40 cursor-pointer appearance-none rounded-lg'
           onChange={props.onChange}
         />
-        <span class='absolute start-0 -bottom-5 text-sm'>{props.min}</span>
-        <span class='absolute end-0 -bottom-5 text-sm'>{props.max}</span>
+        <span class='absolute inset-s-0 -bottom-5 text-sm'>{props.min}</span>
+        <span class='absolute inset-e-0 -bottom-5 text-sm'>{props.max}</span>
       </div>
     </div>
   )
