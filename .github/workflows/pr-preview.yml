@@ -31,7 +31,12 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Baked into the client/SSR bundle at build time - without it, "view source" links and
+      # the homepage's GitHub link resolve to undefined, crashing SSR (solid-router's
+      # resolvePath chokes on an undefined href).
       - run: pnpm run build
+        env:
+          VITE_GITHUB_URL: https://github.com/HansT01/code-curio
       # Deploys to its own Worker name, so it gets its own isolated Durable Object -
       # separate chat/signaling state from production, safe to test against.
       # (pnpm doesn't cleanly forward extra flags through a compound "build && deploy"
