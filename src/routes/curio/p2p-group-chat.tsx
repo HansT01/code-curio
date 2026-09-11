@@ -261,7 +261,7 @@ export default function P2PGroupChat() {
               </Show>
             }
           >
-            <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-0.5 overflow-y-auto rounded-lg p-4'>
+            <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-lg p-4'>
               {messages().map((message, index) => {
                 const isMe = message.from === 'me'
                 const identity = isMe ? null : peerIdentity(message.from)
@@ -270,7 +270,7 @@ export default function P2PGroupChat() {
 
                 return (
                   <div
-                    class={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''} ${showMeta && index > 0 ? 'mt-2' : ''}`}
+                    class={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''} ${showMeta && index > 0 ? 'mt-3' : ''}`}
                   >
                     <div class='w-8 shrink-0'>
                       <Show when={!isMe && showMeta}>
@@ -283,7 +283,7 @@ export default function P2PGroupChat() {
                       </Show>
                     </div>
 
-                    <div class={`flex max-w-[75%] flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+                    <div class={`flex max-w-[75%] flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
                       <Show when={showMeta}>
                         <span class='flex items-baseline gap-2 px-1'>
                           <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
@@ -293,7 +293,7 @@ export default function P2PGroupChat() {
                         </span>
                       </Show>
                       <div
-                        class={`rounded-2xl px-3 py-1.5 wrap-break-word whitespace-pre-wrap ${
+                        class={`rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap ${
                           isMe
                             ? 'bg-primary text-primary-fg rounded-br-sm'
                             : 'bg-background text-background-fg rounded-bl-sm'
