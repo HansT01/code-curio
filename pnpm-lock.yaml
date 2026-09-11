@@ -45,12 +45,21 @@ importers:
       '@types/p5':
         specifier: ^1.7.6
         version: 1.7.7
+      error-stack-parser:
+        specifier: 2.1.4
+        version: 2.1.4
+      html-to-image:
+        specifier: 1.11.13
+        version: 1.11.13
       prettier:
         specifier: ^3.9.6
         version: 3.9.6
       prettier-plugin-tailwindcss:
         specifier: ^0.8.1
         version: 0.8.1(prettier@3.9.6)
+      source-map-js:
+        specifier: 1.2.1
+        version: 1.2.1
 
 packages:
 

@@ -25,7 +25,10 @@
   },
   "devDependencies": {
     "@types/p5": "^1.7.6",
+    "error-stack-parser": "2.1.4",
+    "html-to-image": "1.11.13",
     "prettier": "^3.9.6",
-    "prettier-plugin-tailwindcss": "^0.8.1"
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "source-map-js": "1.2.1"
   }
 }
