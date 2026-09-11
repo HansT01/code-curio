@@ -1,10 +1,11 @@
-import { Component, JSX, Show } from 'solid-js'
+import { Component, Show } from 'solid-js'
 import { LoaderIcon } from '~/components/icons'
 import { cn } from '~/lib/cn'
 
 interface LoaderProps {
   class?: string
-  style?: JSX.CSSProperties
+  width: number
+  height: number
   size?: number
   error?: string
   onClick?: (e: MouseEvent) => void
@@ -13,10 +14,10 @@ interface LoaderProps {
 const Loader: Component<LoaderProps> = (props) => {
   return (
     <div
-      class={cn('bg-accent text-accent-fg flex items-center justify-center rounded-2xl', props.class, {
+      class={cn('bg-accent text-accent-fg flex w-full items-center justify-center rounded-2xl', props.class, {
         'cursor-pointer': props.onClick !== undefined,
       })}
-      style={props.style}
+      style={{ 'max-width': `${props.width}px`, height: `${props.height}px` }}
       onClick={props.onClick}
     >
       <Show

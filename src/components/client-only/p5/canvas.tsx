@@ -1,7 +1,7 @@
 import p5 from 'p5'
 import { Component, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import Loader from '~/components/widgets/loader'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
-import CanvasLoader from './canvas-loader'
 
 export const logFPS = async (p: p5) => {
   while (p.isLooping()) {
@@ -88,7 +88,7 @@ const Canvas: Component<CanvasProps> = (props) => {
       }}
     >
       <Show when={isLoading()}>
-        <CanvasLoader />
+        <Loader width={props.width} height={props.height} />
       </Show>
     </div>
   )

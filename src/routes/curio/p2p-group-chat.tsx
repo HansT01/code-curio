@@ -227,7 +227,7 @@ export default function P2PGroupChat() {
 
           <Show
             when={messages().length > 0 || peerIds().length > 0}
-            fallback={<Loader class='h-96 w-full' size={48} />}
+            fallback={<Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />}
           >
             <section class='bg-accent flex h-96 flex-col gap-3 overflow-y-auto rounded-lg p-4'>
               {messages().map((message, index) => {

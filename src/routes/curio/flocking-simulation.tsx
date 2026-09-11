@@ -1,8 +1,9 @@
 import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
-import CanvasLoader from '~/components/client-only/p5/canvas-loader'
 import { GithubIcon } from '~/components/icons'
+import Loader from '~/components/widgets/loader'
+import { CURIO_CANVAS_HEIGHT, CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
 import { CurioMetadata } from '~/lib/curio/metadata'
 
 export const info: CurioMetadata = {
@@ -50,8 +51,17 @@ export default function FlockingSimulation() {
           </p>
         </section>
         <section class='min-h-120'>
-          <ErrorBoundary fallback={(error, reset) => <CanvasLoader error={error.toString()} onClick={reset} />}>
-            <Show when={!isLoading()} fallback={<CanvasLoader />}>
+          <ErrorBoundary
+            fallback={(error, reset) => (
+              <Loader
+                width={CURIO_CANVAS_WIDTH}
+                height={CURIO_CANVAS_HEIGHT}
+                error={error.toString()}
+                onClick={reset}
+              />
+            )}
+          >
+            <Show when={!isLoading()} fallback={<Loader width={CURIO_CANVAS_WIDTH} height={CURIO_CANVAS_HEIGHT} />}>
               <FlockingSimulationCanvas />
             </Show>
           </ErrorBoundary>
