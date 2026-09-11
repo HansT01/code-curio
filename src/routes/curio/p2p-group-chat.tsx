@@ -283,8 +283,11 @@ export default function P2PGroupChat() {
 
                     <div class={`flex max-w-[75%] flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
                       <Show when={showMeta}>
-                        <span class='px-1 text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
-                          {isMe ? 'You' : identity!.name}
+                        <span class='flex items-baseline gap-2 px-1'>
+                          <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
+                            {isMe ? 'You' : identity!.name}
+                          </span>
+                          <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
                         </span>
                       </Show>
                       <div
@@ -296,7 +299,6 @@ export default function P2PGroupChat() {
                       >
                         {message.text}
                       </div>
-                      <span class='px-1 text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
                     </div>
                   </div>
                 )
