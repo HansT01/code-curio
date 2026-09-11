@@ -1,4 +1,4 @@
-import { Show, createSignal, onCleanup, onMount } from 'solid-js'
+import { Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
 import Loader from '~/components/widgets/loader'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
 import { CurioMetadata } from '~/lib/curio/metadata'
@@ -81,10 +81,17 @@ export default function P2PGroupChat() {
   const [input, setInput] = createSignal('')
 
   let socket: WebSocket | undefined
+  let messageLogRef: HTMLElement | undefined
   const connections = new Map<string, RTCPeerConnection>()
   const channels = new Map<string, RTCDataChannel>()
 
   const send = (signal: object) => socket?.send(JSON.stringify(signal))
+
+  // Keep the log pinned to the latest message whenever the list changes or first mounts.
+  createEffect(() => {
+    messages()
+    messageLogRef?.scrollTo({ top: messageLogRef.scrollHeight })
+  })
 
   const setupChannel = (id: string, channel: RTCDataChannel) => {
     channels.set(id, channel)
@@ -254,7 +261,7 @@ export default function P2PGroupChat() {
               </Show>
             }
           >
-            <section class='bg-accent flex h-96 flex-col gap-3 overflow-y-auto rounded-lg p-4'>
+            <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-3 overflow-y-auto rounded-lg p-4'>
               {messages().map((message, index) => {
                 const isMe = message.from === 'me'
                 const identity = isMe ? null : peerIdentity(message.from)
