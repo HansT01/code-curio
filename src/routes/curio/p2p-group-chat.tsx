@@ -218,7 +218,7 @@ export default function P2PGroupChat() {
           <p class='mt-4'>Messages travel directly between browsers over WebRTC, not through our server.</p>
         </header>
 
-        <div class='flex w-full flex-col gap-6' style={{ 'max-width': `${CURIO_CANVAS_WIDTH}px` }}>
+        <div class='flex w-full flex-col gap-4' style={{ 'max-width': `${CURIO_CANVAS_WIDTH}px` }}>
           <section class='flex flex-wrap items-center gap-2'>
             <div class='bg-accent flex items-center gap-2 rounded-full py-1.5 pr-3 pl-1.5'>
               <span
@@ -261,7 +261,7 @@ export default function P2PGroupChat() {
               </Show>
             }
           >
-            <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-1.5 overflow-y-auto rounded-lg p-3'>
+            <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-0.5 overflow-y-auto rounded-lg p-4'>
               {messages().map((message, index) => {
                 const isMe = message.from === 'me'
                 const identity = isMe ? null : peerIdentity(message.from)
@@ -270,7 +270,7 @@ export default function P2PGroupChat() {
 
                 return (
                   <div
-                    class={`flex items-end gap-1.5 ${isMe ? 'flex-row-reverse' : ''} ${showMeta && previous ? 'mt-1.5' : ''}`}
+                    class={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''} ${showMeta && index > 0 ? 'mt-2' : ''}`}
                   >
                     <div class='w-8 shrink-0'>
                       <Show when={!isMe && showMeta}>
@@ -285,7 +285,7 @@ export default function P2PGroupChat() {
 
                     <div class={`flex max-w-[75%] flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
                       <Show when={showMeta}>
-                        <span class='flex items-baseline gap-1.5 px-1'>
+                        <span class='flex items-baseline gap-2 px-1'>
                           <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
                             {isMe ? 'You' : identity!.name}
                           </span>
@@ -308,20 +308,20 @@ export default function P2PGroupChat() {
             </section>
           </Show>
 
-          <section class='flex gap-2'>
+          <section class='flex gap-4'>
             <input
               type='text'
               value={input()}
               onInput={(event) => setInput(event.currentTarget.value)}
               onKeyDown={(event) => event.key === 'Enter' && sendMessage()}
               disabled={peerIds().length === 0}
-              class='bg-accent flex-1 rounded-lg px-3 py-2 disabled:opacity-50'
+              class='bg-accent flex-1 rounded-lg px-4 py-3 disabled:opacity-50'
               placeholder='Type a message...'
             />
             <button
               onClick={sendMessage}
               disabled={peerIds().length === 0}
-              class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg cursor-pointer rounded-lg px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50'
+              class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg cursor-pointer rounded-lg px-4 py-3 disabled:cursor-not-allowed disabled:opacity-50'
             >
               Send
             </button>
