@@ -19,7 +19,12 @@ type Signal =
   | { type: 'answer'; from: string; answer: RTCSessionDescriptionInit }
   | { type: 'ice'; from: string; candidate: RTCIceCandidateInit }
 
-type ChatMessage = { from: 'me' | string; text: string; timestamp: number }
+type ChatMessage = { id: string; from: 'me' | string; text: string; timestamp: number }
+
+// Wire format sent over the RTCDataChannel; unlike ChatMessage, `from` is always the real sender id.
+type ChannelMessage =
+  | { type: 'message'; id: string; from: string; text: string; timestamp: number }
+  | { type: 'history'; messages: { id: string; from: string; text: string; timestamp: number }[] }
 
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }]
 
@@ -94,19 +99,45 @@ export default function P2PGroupChat() {
     messageLogRef?.scrollTo({ top: messageLogRef.scrollHeight })
   })
 
+  // Own messages are stored as `from: 'me'` locally, but peers need our real id to attribute them.
+  const toWireFrom = (from: string) => (from === 'me' ? selfId()! : from)
+
+  const mergeMessages = (incoming: { id: string; from: string; text: string; timestamp: number }[]) => {
+    setMessages((prev) => {
+      const known = new Set(prev.map((m) => m.id))
+      const additions = incoming
+        .filter((m) => !known.has(m.id))
+        .map((m) => ({ ...m, from: m.from === selfId() ? 'me' : m.from }))
+      if (additions.length === 0) return prev
+      return [...prev, ...additions].sort((a, b) => a.timestamp - b.timestamp)
+    })
+  }
+
   const setupChannel = (id: string, channel: RTCDataChannel) => {
     channels.set(id, channel)
 
     channel.onopen = () => {
       setPeerIds([...channels.keys()])
       setPendingConnections((count) => count - 1)
+      // Catch the other side up on everything we've seen, so a refresh/late join isn't missing history.
+      const history: ChannelMessage = {
+        type: 'history',
+        messages: messages().map((m) => ({ ...m, from: toWireFrom(m.from) })),
+      }
+      channel.send(JSON.stringify(history))
     }
     channel.onclose = () => {
       channels.delete(id)
       setPeerIds([...channels.keys()])
     }
-    channel.onmessage = (event) =>
-      setMessages((prev) => [...prev, { from: id, text: event.data, timestamp: Date.now() }])
+    channel.onmessage = (event) => {
+      const data: ChannelMessage = JSON.parse(event.data)
+      if (data.type === 'history') {
+        mergeMessages(data.messages)
+      } else {
+        mergeMessages([data])
+      }
+    }
   }
 
   const getOrCreateConnection = (id: string) => {
@@ -204,10 +235,18 @@ export default function P2PGroupChat() {
     const text = input().trim()
     if (!text || channels.size === 0) return
 
-    for (const channel of channels.values()) {
-      if (channel.readyState === 'open') channel.send(text)
+    const message: ChatMessage = { id: crypto.randomUUID(), from: 'me', text, timestamp: Date.now() }
+    const payload: ChannelMessage = {
+      type: 'message',
+      id: message.id,
+      from: selfId()!,
+      text,
+      timestamp: message.timestamp,
     }
-    setMessages((prev) => [...prev, { from: 'me', text, timestamp: Date.now() }])
+    for (const channel of channels.values()) {
+      if (channel.readyState === 'open') channel.send(JSON.stringify(payload))
+    }
+    setMessages((prev) => [...prev, message])
     setInput('')
   }
 
