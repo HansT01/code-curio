@@ -218,9 +218,9 @@ export default function P2PGroupChat() {
           <p class='mt-4'>Messages travel directly between browsers over WebRTC, not through our server.</p>
         </header>
 
-        <div class='flex w-full flex-col gap-4' style={{ 'max-width': `${CURIO_CANVAS_WIDTH}px` }}>
-          <section class='flex flex-wrap items-center gap-1.5'>
-            <div class='bg-accent flex items-center gap-1.5 rounded-full py-1 pr-2.5 pl-1'>
+        <div class='flex w-full flex-col gap-6' style={{ 'max-width': `${CURIO_CANVAS_WIDTH}px` }}>
+          <section class='flex flex-wrap items-center gap-2'>
+            <div class='bg-accent flex items-center gap-2 rounded-full py-1.5 pr-3 pl-1.5'>
               <span
                 class='flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white'
                 style={{ 'background-color': selfId() ? peerIdentity(selfId()!).color : '#94a3b8' }}
@@ -233,7 +233,7 @@ export default function P2PGroupChat() {
             {peerIds().map((id) => {
               const identity = peerIdentity(id)
               return (
-                <div class='bg-accent flex items-center gap-1.5 rounded-full py-1 pr-2.5 pl-1'>
+                <div class='bg-accent flex items-center gap-2 rounded-full py-1.5 pr-3 pl-1.5'>
                   <span
                     class='flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white'
                     style={{ 'background-color': identity.color }}
