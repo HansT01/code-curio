@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { GithubIcon } from '~/components/icons'
 import Loader from '~/components/widgets/loader'
 import { cn } from '~/lib/cn'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
@@ -267,8 +268,10 @@ export default function P2PGroupChat() {
       <article class='flex flex-col gap-6 p-8'>
         <header>
           <h1 class='text-6xl font-thin'>P2P Group Chat</h1>
-          <p class='mt-4'>Messages travel directly between browsers over WebRTC, not through our server.</p>
         </header>
+        <section class='flex flex-col gap-4'>
+          <p>Messages travel directly between browsers over WebRTC, not through our server.</p>
+        </section>
 
         <div class='flex w-full flex-col gap-4' style={{ 'max-width': `${CURIO_CANVAS_WIDTH}px` }}>
           <section class='flex flex-wrap items-center gap-2'>
@@ -394,6 +397,17 @@ export default function P2PGroupChat() {
             </button>
           </section>
         </div>
+
+        <section class='flex'>
+          <a
+            target='_blank'
+            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/routes/curio/p2p-group-chat.tsx`}
+            class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
+          >
+            <GithubIcon />
+            View Source Code
+          </a>
+        </section>
       </article>
     </main>
   )
