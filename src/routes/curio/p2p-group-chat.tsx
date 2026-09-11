@@ -264,16 +264,16 @@ export default function P2PGroupChat() {
             <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-lg p-4'>
               {messages().map((message, index) => {
                 const isMe = message.from === 'me'
-                const identity = isMe ? null : peerIdentity(message.from)
+                const identity = isMe ? (selfId() ? peerIdentity(selfId()!) : null) : peerIdentity(message.from)
                 const previous = messages()[index - 1]
                 const showMeta = !previous || previous.from !== message.from
 
                 return (
                   <div
-                    class={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''} ${showMeta && index > 0 ? 'mt-3' : ''}`}
+                    class={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''} ${showMeta && index > 0 ? 'mt-1' : ''}`}
                   >
                     <div class='w-8 shrink-0'>
-                      <Show when={!isMe && showMeta}>
+                      <Show when={showMeta && identity}>
                         <span
                           class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
                           style={{ 'background-color': identity!.color }}
