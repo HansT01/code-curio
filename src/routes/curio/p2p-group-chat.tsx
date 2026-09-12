@@ -14,11 +14,11 @@ export const info: CurioMetadata = {
 }
 
 type Signal =
-  | { type: 'peers'; ids: string[] }
+  | { type: 'peers'; ids: string[]; locations: Record<string, string> }
   | { type: 'leave'; id: string }
-  | { type: 'offer'; from: string; offer: RTCSessionDescriptionInit }
-  | { type: 'answer'; from: string; answer: RTCSessionDescriptionInit }
-  | { type: 'ice'; from: string; candidate: RTCIceCandidateInit }
+  | { type: 'offer'; from: string; location?: string; offer: RTCSessionDescriptionInit }
+  | { type: 'answer'; from: string; location?: string; answer: RTCSessionDescriptionInit }
+  | { type: 'ice'; from: string; location?: string; candidate: RTCIceCandidateInit }
 
 type ChatMessage = { id: string; from: 'me' | string; text: string; timestamp: number }
 
@@ -86,6 +86,9 @@ export default function P2PGroupChat() {
   // Chosen locally so our own alias renders immediately, instead of waiting on a server round trip.
   const [selfId, setSelfId] = createSignal<string | null>(null)
   const [peerIds, setPeerIds] = createSignal<string[]>([])
+  // Keyed by client id, including our own - derived server-side from Cloudflare's request geo
+  // data, never from a browser geolocation prompt. Absent entries just mean no data was available.
+  const [peerLocations, setPeerLocations] = createSignal<Record<string, string>>({})
   const [pendingConnections, setPendingConnections] = createSignal(0)
   const [messages, setMessages] = createSignal<ChatMessage[]>([])
   const [input, setInput] = createSignal('')
@@ -205,6 +208,7 @@ export default function P2PGroupChat() {
 
       switch (signal.type) {
         case 'peers': {
+          setPeerLocations((prev) => ({ ...prev, ...signal.locations }))
           // We're the newcomer: initiate a connection to every peer already in the room.
           await Promise.all(signal.ids.map((id) => connectToPeer(id)))
           break
@@ -213,10 +217,16 @@ export default function P2PGroupChat() {
         case 'leave': {
           removePeer(signal.id)
           addLeftMessage(signal.id)
+          setPeerLocations((prev) => {
+            const next = { ...prev }
+            delete next[signal.id]
+            return next
+          })
           break
         }
 
         case 'offer': {
+          if (signal.location) setPeerLocations((prev) => ({ ...prev, [signal.from]: signal.location! }))
           const connection = getOrCreateConnection(signal.from)
           await connection.setRemoteDescription(signal.offer)
 
@@ -227,6 +237,7 @@ export default function P2PGroupChat() {
         }
 
         case 'answer': {
+          if (signal.location) setPeerLocations((prev) => ({ ...prev, [signal.from]: signal.location! }))
           await connections.get(signal.from)?.setRemoteDescription(signal.answer)
           break
         }
@@ -292,6 +303,9 @@ export default function P2PGroupChat() {
                 {selfId() ? peerIdentity(selfId()!).initials : '·'}
               </span>
               <span class='text-sm font-medium'>You{selfId() ? ` · ${peerIdentity(selfId()!).name}` : ''}</span>
+              <Show when={selfId() && peerLocations()[selfId()!]}>
+                <span class='text-xs opacity-60'>· {peerLocations()[selfId()!]}</span>
+              </Show>
             </div>
 
             {peerIds().map((id) => {
@@ -305,6 +319,9 @@ export default function P2PGroupChat() {
                     {identity.initials}
                   </span>
                   <span class='text-sm font-medium'>{identity.name}</span>
+                  <Show when={peerLocations()[id]}>
+                    <span class='text-xs opacity-60'>· {peerLocations()[id]}</span>
+                  </Show>
                 </div>
               )
             })}
