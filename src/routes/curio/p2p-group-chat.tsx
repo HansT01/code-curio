@@ -173,6 +173,15 @@ export default function P2PGroupChat() {
     )
   }
 
+  // Called only for the peer who finds the room empty on arrival - there's no one to "join", they're
+  // the one starting it, so this is the sole entry any later joiner's synced history begins with.
+  const addStartedMessage = (id: string) => {
+    const text = `${peerIdentity(id).name} started the chat`
+    setMessages((prev) =>
+      [...prev, { id: `start-${id}`, from: 'system', text, timestamp: Date.now() }].slice(-MAX_MESSAGES),
+    )
+  }
+
   const setupChannel = (id: string, channel: RTCDataChannel, isIncoming: boolean) => {
     channels.set(id, channel)
 
@@ -274,6 +283,8 @@ export default function P2PGroupChat() {
       switch (signal.type) {
         case 'peers': {
           setPeerLocations((prev) => ({ ...prev, ...signal.locations }))
+          // Nobody else is here yet - we're starting the room, not joining one.
+          if (signal.ids.length === 0) addStartedMessage(selfId()!)
           // We're the newcomer: initiate a connection to every peer already in the room.
           await Promise.all(signal.ids.map((id) => connectToPeer(id)))
           break
