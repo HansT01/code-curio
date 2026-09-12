@@ -18,7 +18,11 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Baked into the client/SSR bundle at build time - without it, "view source" links and
+      # the homepage's GitHub link resolve to undefined, crashing SSR (solid-router's
+      # resolvePath chokes on an undefined href).
       - run: pnpm run deploy
         env:
+          VITE_GITHUB_URL: https://github.com/HansT01/code-curio
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

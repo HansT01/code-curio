@@ -216,8 +216,12 @@ const DoublePendulumCanvas = () => {
   return (
     <div class='flex w-full flex-col gap-4'>
       <div class='flex flex-wrap gap-4'>
-        <Button id='reset' label='Reset' onClick={() => reset()} />
-        <Button id='clear-trails' label='Clear Trails' onClick={() => clearTrails()} />
+        <Button id='reset' onClick={() => reset()}>
+          Reset
+        </Button>
+        <Button id='clear-trails' onClick={() => clearTrails()}>
+          Clear Trails
+        </Button>
       </div>
       <div class='flex flex-wrap gap-4'>
         <Slider

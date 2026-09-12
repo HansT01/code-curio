@@ -219,16 +219,15 @@ const CoriolisEffectCanvas = () => {
         />
       </div>
       <div class='flex flex-wrap gap-4'>
-        <Button
-          id='toggle-trail'
-          label='Toggle Trail'
-          onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}
-        />
+        <Button id='toggle-trail' onClick={() => setConfig({ ...config(), trailMode: !config().trailMode })}>
+          Toggle Trail
+        </Button>
         <Button
           id='toggle-transparency'
-          label='Toggle Transparency'
           onClick={() => setConfig({ ...config(), transparentSphere: !config().transparentSphere })}
-        />
+        >
+          Toggle Transparency
+        </Button>
       </div>
       <div class='flex flex-wrap gap-4'>
         <Slider

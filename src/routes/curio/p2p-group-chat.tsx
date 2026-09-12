@@ -1,5 +1,7 @@
 import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js'
 import { GithubIcon } from '~/components/icons'
+import Button from '~/components/widgets/button'
+import ButtonLink from '~/components/widgets/button-link'
 import Loader from '~/components/widgets/loader'
 import { cn } from '~/lib/cn'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
@@ -483,25 +485,20 @@ export default function P2PGroupChat() {
               class='bg-accent min-w-0 flex-1 rounded-lg px-4 py-3 disabled:opacity-50'
               placeholder='Type a message...'
             />
-            <button
-              onClick={sendMessage}
-              disabled={peerIds().length === 0}
-              class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg cursor-pointer rounded-lg px-4 py-3 disabled:cursor-not-allowed disabled:opacity-50'
-            >
+            <Button onClick={sendMessage} disabled={peerIds().length === 0}>
               Send
-            </button>
+            </Button>
           </section>
         </div>
 
         <section class='flex'>
-          <a
+          <ButtonLink
             target='_blank'
             href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/routes/curio/p2p-group-chat.tsx`}
-            class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
           >
             <GithubIcon />
             View Source Code
-          </a>
+          </ButtonLink>
         </section>
       </article>
     </main>

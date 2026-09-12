@@ -2,6 +2,7 @@ import { A } from '@solidjs/router'
 import { clientOnly } from '@solidjs/start'
 import { ErrorBoundary, Show, createSignal, onMount } from 'solid-js'
 import { GithubIcon } from '~/components/icons'
+import ButtonLink from '~/components/widgets/button-link'
 import Loader from '~/components/widgets/loader'
 import { CURIO_CANVAS_HEIGHT, CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
 import { CurioMetadata } from '~/lib/curio/metadata'
@@ -54,14 +55,13 @@ export default function NeonConstellation() {
           </ErrorBoundary>
         </section>
         <section class='flex'>
-          <a
+          <ButtonLink
             target='_blank'
             href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/components/client-only/neon-constellation.tsx`}
-            class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg flex cursor-pointer items-center gap-2 rounded-lg px-4 py-3'
           >
             <GithubIcon />
             View Source Code
-          </a>
+          </ButtonLink>
         </section>
         <section class='flex flex-col gap-4'>
           <h2 class='text-4xl font-extralight'>Reflective Analysis On Writing Shaders</h2>
