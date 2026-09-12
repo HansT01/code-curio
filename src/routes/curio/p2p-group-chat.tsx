@@ -124,7 +124,6 @@ export default function P2PGroupChat() {
   // Keyed by client id, including our own - derived server-side from Cloudflare's request geo
   // data, never from a browser geolocation prompt. Absent entries just mean no data was available.
   const [peerLocations, setPeerLocations] = createSignal<Record<string, string>>({})
-  const [pendingConnections, setPendingConnections] = createSignal(0)
   const [messages, setMessages] = createSignal<ChatMessage[]>([])
   const [input, setInput] = createSignal('')
 
@@ -187,7 +186,6 @@ export default function P2PGroupChat() {
 
     channel.onopen = () => {
       setPeerIds([...channels.keys()])
-      setPendingConnections((count) => count - 1)
       // Only the side that received an unsolicited offer witnesses a join - the newcomer itself
       // initiated this connection, so the peer at the other end wasn't the one who just joined.
       if (isIncoming) addJoinedMessage(id)
@@ -216,7 +214,6 @@ export default function P2PGroupChat() {
     let connection = connections.get(id)
     if (connection) return connection
 
-    setPendingConnections((count) => count + 1)
     connection = new RTCPeerConnection({ iceServers: ICE_SERVERS })
     connection.onicecandidate = (event) => {
       if (event.candidate) {
@@ -241,17 +238,11 @@ export default function P2PGroupChat() {
   }
 
   const removePeer = (id: string) => {
-    const wasConnected = channels.has(id)
-
     channels.get(id)?.close()
     channels.delete(id)
     connections.get(id)?.close()
     connections.delete(id)
     setPeerIds([...channels.keys()])
-
-    if (!wasConnected) {
-      setPendingConnections((count) => count - 1)
-    }
   }
 
   onMount(() => {
@@ -405,18 +396,7 @@ export default function P2PGroupChat() {
 
           <Show
             when={messages().length > 0 || peerIds().length > 0}
-            fallback={
-              <Show
-                when={pendingConnections() > 0}
-                fallback={
-                  <div class='bg-accent flex h-96 w-full items-center justify-center rounded-2xl'>
-                    <p class='opacity-60'>Waiting for someone to join...</p>
-                  </div>
-                }
-              >
-                <Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />
-              </Show>
-            }
+            fallback={<Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />}
           >
             <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-lg p-4'>
               <For each={messages()}>
