@@ -500,6 +500,33 @@ export default function P2PGroupChat() {
             View Source Code
           </ButtonLink>
         </section>
+        <section class='flex flex-col gap-4'>
+          <h2 class='text-4xl font-extralight'>Building This With AI</h2>
+          <p>
+            Unlike the other curios on this site, this one was built almost entirely through conversation with an AI
+            coding agent (GitHub Copilot, using Claude). I described what I wanted - a group chat where messages travel
+            directly between browsers over WebRTC instead of through a server - and the agent worked out the signaling
+            protocol, wrote the client and server code, and later migrated the whole thing to run on Cloudflare Workers
+            with Durable Objects so the signaling relay would survive real production traffic instead of just a local
+            dev server.
+          </p>
+          <p>
+            Most of the follow-up work was iterative: I'd try the chat with multiple browser tabs standing in for
+            different peers, notice something I wanted changed - geolocation next to each peer's name, a name and colour
+            that survive a page refresh, join/leave messages that don't clutter the log - and describe it in plain
+            language. The agent would implement it and verify it live across several simulated peers before handing it
+            back. At one point it tracked down a genuinely subtle bug entirely on its own: a batch of "X joined the
+            chat" messages was silently vanishing for some peers in a 3+ person call, which turned out to be a SolidJS
+            reactivity gotcha - a row in a list only recomputes once, not every time the underlying array changes - that
+            took real debugging, not guesswork, to isolate.
+          </p>
+          <p>
+            I still reviewed every change, ran the tests myself, and made the calls on what to build, when to push, and
+            when to merge. But I'd be misrepresenting how this was made if I didn't say plainly that an AI wrote the
+            large majority of the actual code here. Whether that changes how you feel about this curio is up to you - I
+            just didn't want to leave it unsaid.
+          </p>
+        </section>
       </article>
     </main>
   )
