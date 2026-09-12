@@ -385,7 +385,7 @@ export default function P2PGroupChat() {
               onInput={(event) => setInput(event.currentTarget.value)}
               onKeyDown={(event) => event.key === 'Enter' && sendMessage()}
               disabled={peerIds().length === 0}
-              class='bg-accent flex-1 rounded-lg px-4 py-3 disabled:opacity-50'
+              class='bg-accent min-w-0 flex-1 rounded-lg px-4 py-3 disabled:opacity-50'
               placeholder='Type a message...'
             />
             <button
