@@ -503,8 +503,8 @@ export default function P2PGroupChat() {
         <section class='flex flex-col gap-4'>
           <h2 class='text-4xl font-extralight'>Signaling, Durable Objects, and Deployment</h2>
           <p>
-            Most of the code in this curio, client and server, was written by an AI coding agent (GitHub Copilot, using
-            Claude) rather than typed by hand.
+            Unlike the other curios, most of the code, client and server, was written by an AI coding agent (GitHub
+            Copilot, using Claude).
           </p>
           <p>
             The mesh is full: every peer connects directly to every other peer, and a small signaling server just relays
