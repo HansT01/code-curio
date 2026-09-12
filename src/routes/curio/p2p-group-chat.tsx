@@ -1,4 +1,5 @@
 import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import Button from '~/components/widgets/button'
 import Loader from '~/components/widgets/loader'
 import { cn } from '~/lib/cn'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
@@ -385,13 +386,9 @@ export default function P2PGroupChat() {
               class='bg-accent flex-1 rounded-lg px-4 py-3 disabled:opacity-50'
               placeholder='Type a message...'
             />
-            <button
-              onClick={sendMessage}
-              disabled={peerIds().length === 0}
-              class='bg-primary text-primary-fg hover:bg-secondary hover:text-secondary-fg cursor-pointer rounded-lg px-4 py-3 disabled:cursor-not-allowed disabled:opacity-50'
-            >
+            <Button onClick={sendMessage} disabled={peerIds().length === 0}>
               Send
-            </button>
+            </Button>
           </section>
         </div>
       </article>
