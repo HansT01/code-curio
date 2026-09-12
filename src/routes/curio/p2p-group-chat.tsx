@@ -29,6 +29,41 @@ type ChannelMessage =
 
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }]
 
+// Persists selfId across SPA navigation within a tab (sessionStorage) and page reloads, while a
+// Web Lock stops a duplicated tab's copied sessionStorage value from colliding with the tab it
+// was duplicated from - if the id is already claimed elsewhere, we fall back to a fresh one
+// instead. `navigator.locks` gives a definitive yes/no immediately (no polling/timeout needed to
+// be sure nobody else holds it), so this adds no perceptible startup delay.
+// Cached at module scope so repeat mounts in the same tab (e.g. navigating away and back) reuse
+// the already-claimed id instantly without touching sessionStorage/locks again; the lock itself
+// is only ever released when the tab's document is actually torn down (full reload/close), which
+// is exactly when we want the identity slot to free up for a future visit.
+const SELF_ID_STORAGE_KEY = 'p2p-group-chat-self-id'
+let cachedSelfId: string | undefined
+
+const claimId = (id: string) =>
+  new Promise<boolean>((resolveClaim) => {
+    navigator.locks.request(`p2p-group-chat:self-id:${id}`, { ifAvailable: true }, (lock) => {
+      resolveClaim(lock !== null)
+      // Held for as long as this tab's document is alive; the browser releases it automatically
+      // on reload/close, so there's nothing to explicitly clean up here.
+      if (lock) return new Promise(() => {})
+    })
+  })
+
+const resolveSelfId = async () => {
+  if (cachedSelfId) return cachedSelfId
+
+  const stored = sessionStorage.getItem(SELF_ID_STORAGE_KEY)
+  const id = stored && (await claimId(stored)) ? stored : crypto.randomUUID()
+  if (id !== stored) {
+    sessionStorage.setItem(SELF_ID_STORAGE_KEY, id)
+    await claimId(id) // Always succeeds for a fresh id - nobody else could already hold it.
+  }
+  cachedSelfId = id
+  return id
+}
+
 // Caps both local memory and the size of the history payload exchanged on every new connection.
 const MAX_MESSAGES = 200
 
@@ -197,11 +232,27 @@ export default function P2PGroupChat() {
   }
 
   onMount(() => {
-    setSelfId(crypto.randomUUID())
-
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
     socket = new WebSocket(`${protocol}//${location.host}/ws`)
-    socket.onopen = () => send({ type: 'hello', id: selfId() })
+
+    // Opening the socket and resolving/claiming selfId happen in parallel (network latency for
+    // the former dwarfs the latter), so 'hello' is only sent once both are actually ready.
+    let socketOpen = false
+    let idReady = false
+    const sayHelloIfReady = () => {
+      if (socketOpen && idReady) send({ type: 'hello', id: selfId() })
+    }
+
+    socket.onopen = () => {
+      socketOpen = true
+      sayHelloIfReady()
+    }
+
+    resolveSelfId().then((id) => {
+      setSelfId(id)
+      idReady = true
+      sayHelloIfReady()
+    })
 
     socket.onmessage = async (event) => {
       const signal: Signal = JSON.parse(event.data)
