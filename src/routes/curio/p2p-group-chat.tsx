@@ -398,10 +398,7 @@ export default function P2PGroupChat() {
             when={messages().length > 0 || peerIds().length > 0}
             fallback={<Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />}
           >
-            <section
-              ref={messageLogRef}
-              class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-2xl p-4'
-            >
+            <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-lg p-4'>
               <For each={messages()}>
                 {(message, index) => {
                   const isSystem = message.from === 'system'

@@ -14,7 +14,7 @@ interface LoaderProps {
 const Loader: Component<LoaderProps> = (props) => {
   return (
     <div
-      class={cn('bg-accent text-accent-fg flex w-full items-center justify-center rounded-2xl', props.class, {
+      class={cn('bg-accent text-accent-fg flex w-full items-center justify-center rounded-lg', props.class, {
         'cursor-pointer': props.onClick !== undefined,
       })}
       style={{ 'max-width': `${props.width}px`, height: `${props.height}px` }}
