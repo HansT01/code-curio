@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js'
 import { GithubIcon } from '~/components/icons'
 import Loader from '~/components/widgets/loader'
 import { cn } from '~/lib/cn'
@@ -163,12 +163,25 @@ export default function P2PGroupChat() {
     )
   }
 
-  const setupChannel = (id: string, channel: RTCDataChannel) => {
+  // Deterministic id, same reasoning as addLeftMessage. Only called from the perspective of an
+  // already-connected peer witnessing someone else join (see setupChannel's `isIncoming`) - the
+  // newcomer itself never calls this for the peers it connects out to, since they didn't just join.
+  const addJoinedMessage = (id: string) => {
+    const text = `${peerIdentity(id).name} joined the chat`
+    setMessages((prev) =>
+      [...prev, { id: `join-${id}`, from: 'system', text, timestamp: Date.now() }].slice(-MAX_MESSAGES),
+    )
+  }
+
+  const setupChannel = (id: string, channel: RTCDataChannel, isIncoming: boolean) => {
     channels.set(id, channel)
 
     channel.onopen = () => {
       setPeerIds([...channels.keys()])
       setPendingConnections((count) => count - 1)
+      // Only the side that received an unsolicited offer witnesses a join - the newcomer itself
+      // initiated this connection, so the peer at the other end wasn't the one who just joined.
+      if (isIncoming) addJoinedMessage(id)
       // Catch the other side up on everything we've seen, so a refresh/late join isn't missing history.
       const history: ChannelMessage = {
         type: 'history',
@@ -201,8 +214,9 @@ export default function P2PGroupChat() {
         send({ type: 'ice', to: id, candidate: event.candidate.toJSON() })
       }
     }
-    // The non-initiator receives the data channel here instead of creating one.
-    connection.ondatachannel = (event) => setupChannel(id, event.channel)
+    // The non-initiator receives the data channel here instead of creating one - that means the
+    // peer at the other end is the one initiating, i.e. the one who just joined.
+    connection.ondatachannel = (event) => setupChannel(id, event.channel, true)
 
     connections.set(id, connection)
     return connection
@@ -210,7 +224,7 @@ export default function P2PGroupChat() {
 
   const connectToPeer = async (id: string) => {
     const connection = getOrCreateConnection(id)
-    setupChannel(id, connection.createDataChannel('chat'))
+    setupChannel(id, connection.createDataChannel('chat'), false)
 
     const offer = await connection.createOffer()
     await connection.setLocalDescription(offer)
@@ -396,59 +410,72 @@ export default function P2PGroupChat() {
             <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-lg p-4'>
               <For each={messages()}>
                 {(message, index) => {
-                  const isMe = message.from === 'me'
                   const isSystem = message.from === 'system'
-                  const identity = isSystem
-                    ? null
-                    : isMe
-                      ? selfId()
-                        ? peerIdentity(selfId()!)
-                        : null
-                      : peerIdentity(message.from)
-                  const previous = messages()[index() - 1]
-                  const showMeta = !previous || previous.from !== message.from
+
+                  // Consecutive system messages (joins/leaves with no real message between them)
+                  // collapse into a single compact, muted line instead of one row each - only the
+                  // first message in a run renders anything, folding the whole run's text into it.
+                  // These reads must stay reactive (via createMemo) since later-appended messages
+                  // need to retroactively update an earlier run's rendered text.
+                  if (isSystem) {
+                    const isFirstInRun = createMemo(() => messages()[index() - 1]?.from !== 'system')
+                    const runText = createMemo(() => {
+                      const all = messages()
+                      const run: string[] = []
+                      for (let i = index(); i < all.length && all[i].from === 'system'; i++) run.push(all[i].text)
+                      return run.join(' · ')
+                    })
+                    return (
+                      <Show when={isFirstInRun()}>
+                        <p class='py-0.5 text-center text-[11px] opacity-40'>{runText()}</p>
+                      </Show>
+                    )
+                  }
+
+                  const previous = createMemo(() => messages()[index() - 1])
+                  const isMe = message.from === 'me'
+                  const identity = isMe ? (selfId() ? peerIdentity(selfId()!) : null) : peerIdentity(message.from)
+                  const showMeta = createMemo(() => !previous() || previous()!.from !== message.from)
 
                   return (
-                    <Show when={!isSystem} fallback={<p class='py-1 text-center text-xs opacity-50'>{message.text}</p>}>
-                      <div
-                        class={cn('flex items-end gap-2', {
-                          'flex-row-reverse': isMe,
-                          'mt-1': showMeta && index() > 0,
-                        })}
-                      >
-                        <div class='w-8 shrink-0'>
-                          <Show when={showMeta && identity}>
-                            <span
-                              class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
-                              style={{ 'background-color': identity!.color }}
-                            >
-                              {identity!.initials}
-                            </span>
-                          </Show>
-                        </div>
-
-                        <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
-                          <Show when={showMeta}>
-                            <span class='flex items-baseline gap-2 px-1'>
-                              <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
-                                {isMe ? 'You' : identity!.name}
-                              </span>
-                              <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
-                            </span>
-                          </Show>
-                          <div
-                            class={cn(
-                              'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
-                              isMe
-                                ? 'bg-primary text-primary-fg rounded-br-sm'
-                                : 'bg-background text-background-fg rounded-bl-sm',
-                            )}
+                    <div
+                      class={cn('flex items-end gap-2', {
+                        'flex-row-reverse': isMe,
+                        'mt-1': showMeta() && index() > 0,
+                      })}
+                    >
+                      <div class='w-8 shrink-0'>
+                        <Show when={showMeta() && identity}>
+                          <span
+                            class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
+                            style={{ 'background-color': identity!.color }}
                           >
-                            {message.text}
-                          </div>
+                            {identity!.initials}
+                          </span>
+                        </Show>
+                      </div>
+
+                      <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
+                        <Show when={showMeta()}>
+                          <span class='flex items-baseline gap-2 px-1'>
+                            <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
+                              {isMe ? 'You' : identity!.name}
+                            </span>
+                            <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
+                          </span>
+                        </Show>
+                        <div
+                          class={cn(
+                            'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
+                            isMe
+                              ? 'bg-primary text-primary-fg rounded-br-sm'
+                              : 'bg-background text-background-fg rounded-bl-sm',
+                          )}
+                        >
+                          {message.text}
                         </div>
                       </div>
-                    </Show>
+                    </div>
                   )
                 }}
               </For>
