@@ -293,7 +293,9 @@ const ProgrammingLanguageOverlap = () => {
   return (
     <div class='flex flex-col items-start gap-4'>
       <div class='flex flex-wrap'>
-        <Button id='shuffle' label='Shuffle' onClick={() => shuffle()} />
+        <Button id='shuffle' onClick={() => shuffle()}>
+          Shuffle
+        </Button>
       </div>
       <small>
         Hover to reveal the relationships between the language bubbles. Use left click to move the bubbles around or
