@@ -270,7 +270,16 @@ export default function P2PGroupChat() {
           <h1 class='text-6xl font-thin'>P2P Group Chat</h1>
         </header>
         <section class='flex flex-col gap-4'>
-          <p>Messages travel directly between browsers over WebRTC, not through our server.</p>
+          <p>
+            Peer-to-peer (P2P) networking lets devices talk directly to one another instead of routing everything
+            through a central server. WebRTC brings this capability to the browser, letting two tabs exchange data in
+            real time once a connection between them has been established.
+          </p>
+          <p>
+            This curio is a group chat built on WebRTC data channels. A small signaling server helps peers find each
+            other and exchange the connection details needed to get started, but once that handshake is done, messages
+            travel directly between browsers - the server never sees the conversation itself.
+          </p>
         </section>
 
         <div class='flex w-full flex-col gap-4' style={{ 'max-width': `${CURIO_CANVAS_WIDTH}px` }}>
