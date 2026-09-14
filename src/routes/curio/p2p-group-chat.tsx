@@ -24,22 +24,14 @@ type Signal =
 
 type ChatMessage = { id: string; from: 'me' | string; text: string; timestamp: number }
 
-// Wire format sent over the RTCDataChannel; unlike ChatMessage, `from` is always the real sender id.
 type ChannelMessage =
   | { type: 'message'; id: string; from: string; text: string; timestamp: number }
   | { type: 'history'; messages: { id: string; from: string; text: string; timestamp: number }[] }
 
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }]
 
-// Persists selfId across SPA navigation within a tab (sessionStorage) and page reloads, while a
-// Web Lock stops a duplicated tab's copied sessionStorage value from colliding with the tab it
-// was duplicated from - if the id is already claimed elsewhere, we fall back to a fresh one
-// instead. `navigator.locks` gives a definitive yes/no immediately (no polling/timeout needed to
-// be sure nobody else holds it), so this adds no perceptible startup delay.
-// Cached at module scope so repeat mounts in the same tab (e.g. navigating away and back) reuse
-// the already-claimed id instantly without touching sessionStorage/locks again; the lock itself
-// is only ever released when the tab's document is actually torn down (full reload/close), which
-// is exactly when we want the identity slot to free up for a future visit.
+// Web Lock gives an instant yes/no on whether this id is already claimed elsewhere, so a
+// duplicated tab's copied sessionStorage id doesn't collide with the original.
 const SELF_ID_STORAGE_KEY = 'p2p-group-chat-self-id'
 let cachedSelfId: string | undefined
 
@@ -47,8 +39,7 @@ const claimId = (id: string) =>
   new Promise<boolean>((resolveClaim) => {
     navigator.locks.request(`p2p-group-chat:self-id:${id}`, { ifAvailable: true }, (lock) => {
       resolveClaim(lock !== null)
-      // Held for as long as this tab's document is alive; the browser releases it automatically
-      // on reload/close, so there's nothing to explicitly clean up here.
+      // Held until the tab closes/reloads; the browser releases it automatically.
       if (lock) return new Promise(() => {})
     })
   })
@@ -60,16 +51,14 @@ const resolveSelfId = async () => {
   const id = stored && (await claimId(stored)) ? stored : crypto.randomUUID()
   if (id !== stored) {
     sessionStorage.setItem(SELF_ID_STORAGE_KEY, id)
-    await claimId(id) // Always succeeds for a fresh id - nobody else could already hold it.
+    await claimId(id)
   }
   cachedSelfId = id
   return id
 }
 
-// Caps both local memory and the size of the history payload exchanged on every new connection.
 const MAX_MESSAGES = 200
 
-// Deterministic "Adjective Animal" name + hue, so every peer sees the same identity for the same id.
 const ADJECTIVES = [
   'Swift',
   'Calm',
@@ -120,11 +109,8 @@ const formatTime = (timestamp: number) =>
   new Date(timestamp).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 
 export default function P2PGroupChat() {
-  // Chosen locally so our own alias renders immediately, instead of waiting on a server round trip.
   const [selfId, setSelfId] = createSignal<string | null>(null)
   const [peerIds, setPeerIds] = createSignal<string[]>([])
-  // Keyed by client id, including our own - derived server-side from Cloudflare's request geo
-  // data, never from a browser geolocation prompt. Absent entries just mean no data was available.
   const [peerLocations, setPeerLocations] = createSignal<Record<string, string>>({})
   const [messages, setMessages] = createSignal<ChatMessage[]>([])
   const [input, setInput] = createSignal('')
@@ -136,13 +122,11 @@ export default function P2PGroupChat() {
 
   const send = (signal: object) => socket?.send(JSON.stringify(signal))
 
-  // Keep the log pinned to the latest message whenever the list changes or first mounts.
   createEffect(() => {
     messages()
     messageLogRef?.scrollTo({ top: messageLogRef.scrollHeight })
   })
 
-  // Own messages are stored as `from: 'me'` locally, but peers need our real id to attribute them.
   const toWireFrom = (from: string) => (from === 'me' ? selfId()! : from)
 
   const mergeMessages = (incoming: { id: string; from: string; text: string; timestamp: number }[]) => {
@@ -156,7 +140,7 @@ export default function P2PGroupChat() {
     })
   }
 
-  // Deterministic id (not random) so every peer who independently witnesses the same leave converges on one entry.
+  // Deterministic id so every peer that independently witnesses this converges on the same entry.
   const addLeftMessage = (id: string) => {
     const text = `${peerIdentity(id).name} left the chat`
     setMessages((prev) =>
@@ -164,9 +148,8 @@ export default function P2PGroupChat() {
     )
   }
 
-  // Deterministic id, same reasoning as addLeftMessage. Only called from the perspective of an
-  // already-connected peer witnessing someone else join (see setupChannel's `isIncoming`) - the
-  // newcomer itself never calls this for the peers it connects out to, since they didn't just join.
+  // Only call from the side reacting to an unsolicited offer (isIncoming) - the newcomer didn't
+  // just "join" from its own perspective.
   const addJoinedMessage = (id: string) => {
     const text = `${peerIdentity(id).name} joined the chat`
     setMessages((prev) =>
@@ -174,8 +157,7 @@ export default function P2PGroupChat() {
     )
   }
 
-  // Called only for the peer who finds the room empty on arrival - there's no one to "join", they're
-  // the one starting it, so this is the sole entry any later joiner's synced history begins with.
+  // Only for a peer who finds the room empty - there's no one to "join".
   const addStartedMessage = (id: string) => {
     const text = `${peerIdentity(id).name} started the chat`
     setMessages((prev) =>
@@ -188,10 +170,7 @@ export default function P2PGroupChat() {
 
     channel.onopen = () => {
       setPeerIds([...channels.keys()])
-      // Only the side that received an unsolicited offer witnesses a join - the newcomer itself
-      // initiated this connection, so the peer at the other end wasn't the one who just joined.
       if (isIncoming) addJoinedMessage(id)
-      // Catch the other side up on everything we've seen, so a refresh/late join isn't missing history.
       const history: ChannelMessage = {
         type: 'history',
         messages: messages().map((m) => ({ ...m, from: toWireFrom(m.from) })),
@@ -222,8 +201,7 @@ export default function P2PGroupChat() {
         send({ type: 'ice', to: id, candidate: event.candidate.toJSON() })
       }
     }
-    // The non-initiator receives the data channel here instead of creating one - that means the
-    // peer at the other end is the one initiating, i.e. the one who just joined.
+    // ondatachannel firing here means the peer at the other end initiated, i.e. just joined.
     connection.ondatachannel = (event) => setupChannel(id, event.channel, true)
 
     connections.set(id, connection)
@@ -251,8 +229,7 @@ export default function P2PGroupChat() {
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
     socket = new WebSocket(`${protocol}//${location.host}/ws`)
 
-    // Opening the socket and resolving/claiming selfId happen in parallel (network latency for
-    // the former dwarfs the latter), so 'hello' is only sent once both are actually ready.
+    // Socket open and selfId resolution race independently, so 'hello' only fires once both are ready.
     let socketOpen = false
     let idReady = false
     const sayHelloIfReady = () => {
@@ -276,9 +253,7 @@ export default function P2PGroupChat() {
       switch (signal.type) {
         case 'peers': {
           setPeerLocations((prev) => ({ ...prev, ...signal.locations }))
-          // Nobody else is here yet - we're starting the room, not joining one.
           if (signal.ids.length === 0) addStartedMessage(selfId()!)
-          // We're the newcomer: initiate a connection to every peer already in the room.
           await Promise.all(signal.ids.map((id) => connectToPeer(id)))
           break
         }
@@ -405,11 +380,8 @@ export default function P2PGroupChat() {
                 {(message, index) => {
                   const isSystem = message.from === 'system'
 
-                  // Consecutive system messages (joins/leaves with no real message between them)
-                  // collapse into a single compact, muted line instead of one row each - only the
-                  // first message in a run renders anything, folding the whole run's text into it.
-                  // These reads must stay reactive (via createMemo) since later-appended messages
-                  // need to retroactively update an earlier run's rendered text.
+                  // Must stay reactive (createMemo) - a <For> row only runs once, so a plain read
+                  // here would miss later-appended messages in the same consecutive-system run.
                   if (isSystem) {
                     const isFirstInRun = createMemo(() => messages()[index() - 1]?.from !== 'system')
                     const runText = createMemo(() => {
