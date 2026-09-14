@@ -7,11 +7,12 @@ export const validTags = [
   'simulation',
   'game',
   'animation',
-  'ai',
   'machine-learning',
   'physics',
   '3d',
   'shader',
+  'networking',
+  'real-time',
 ] as const
 
 export type CurioTag = (typeof validTags)[number]
