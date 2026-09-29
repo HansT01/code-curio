@@ -12,7 +12,7 @@ export const info: CurioMetadata = {
   title: 'Flocking Simulation',
   created: new Date('2024-02-27'),
   updated: new Date('2024-02-27'),
-  tags: ['ai', 'algorithms', 'animation', 'interactive', 'p5.js', 'simulation'],
+  tags: ['algorithms', 'animation', 'interactive', 'p5.js', 'simulation'],
 }
 
 const FlockingSimulationCanvas = clientOnly(() => import('~/components/client-only/flocking-simulation'))

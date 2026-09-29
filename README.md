@@ -1,5 +1,5 @@
 # Code Curio
 
-Hi there! Check out the website in action at https://code-curio.pages.dev/.
+Hi there! Check out the website in action at https://code-curio.hans-teh.workers.dev/.
 
 This website is built using the SolidStart framework.

@@ -1,5 +1,7 @@
-import { For, Show, createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { For, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js'
+import { GithubIcon } from '~/components/icons'
 import Button from '~/components/widgets/button'
+import ButtonLink from '~/components/widgets/button-link'
 import Loader from '~/components/widgets/loader'
 import { cn } from '~/lib/cn'
 import { CURIO_CANVAS_WIDTH } from '~/lib/curio/dimensions'
@@ -10,29 +12,53 @@ export const info: CurioMetadata = {
   title: 'P2P Group Chat',
   created: new Date('2026-08-22'),
   updated: new Date('2026-09-12'),
-  tags: ['interactive'],
+  tags: ['interactive', 'networking', 'real-time'],
 }
 
 type Signal =
-  | { type: 'peers'; ids: string[] }
+  | { type: 'peers'; ids: string[]; locations: Record<string, string> }
   | { type: 'leave'; id: string }
-  | { type: 'offer'; from: string; offer: RTCSessionDescriptionInit }
-  | { type: 'answer'; from: string; answer: RTCSessionDescriptionInit }
-  | { type: 'ice'; from: string; candidate: RTCIceCandidateInit }
+  | { type: 'offer'; from: string; location?: string; offer: RTCSessionDescriptionInit }
+  | { type: 'answer'; from: string; location?: string; answer: RTCSessionDescriptionInit }
+  | { type: 'ice'; from: string; location?: string; candidate: RTCIceCandidateInit }
 
 type ChatMessage = { id: string; from: 'me' | string; text: string; timestamp: number }
 
-// Wire format sent over the RTCDataChannel; unlike ChatMessage, `from` is always the real sender id.
 type ChannelMessage =
   | { type: 'message'; id: string; from: string; text: string; timestamp: number }
   | { type: 'history'; messages: { id: string; from: string; text: string; timestamp: number }[] }
 
 const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }]
 
-// Caps both local memory and the size of the history payload exchanged on every new connection.
+// Web Lock gives an instant yes/no on whether this id is already claimed elsewhere, so a
+// duplicated tab's copied sessionStorage id doesn't collide with the original.
+const SELF_ID_STORAGE_KEY = 'p2p-group-chat-self-id'
+let cachedSelfId: string | undefined
+
+const claimId = (id: string) =>
+  new Promise<boolean>((resolveClaim) => {
+    navigator.locks.request(`p2p-group-chat:self-id:${id}`, { ifAvailable: true }, (lock) => {
+      resolveClaim(lock !== null)
+      // Held until the tab closes/reloads; the browser releases it automatically.
+      if (lock) return new Promise(() => {})
+    })
+  })
+
+const resolveSelfId = async () => {
+  if (cachedSelfId) return cachedSelfId
+
+  const stored = sessionStorage.getItem(SELF_ID_STORAGE_KEY)
+  const id = stored && (await claimId(stored)) ? stored : crypto.randomUUID()
+  if (id !== stored) {
+    sessionStorage.setItem(SELF_ID_STORAGE_KEY, id)
+    await claimId(id)
+  }
+  cachedSelfId = id
+  return id
+}
+
 const MAX_MESSAGES = 200
 
-// Deterministic "Adjective Animal" name + hue, so every peer sees the same identity for the same id.
 const ADJECTIVES = [
   'Swift',
   'Calm',
@@ -83,10 +109,9 @@ const formatTime = (timestamp: number) =>
   new Date(timestamp).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 
 export default function P2PGroupChat() {
-  // Chosen locally so our own alias renders immediately, instead of waiting on a server round trip.
   const [selfId, setSelfId] = createSignal<string | null>(null)
   const [peerIds, setPeerIds] = createSignal<string[]>([])
-  const [pendingConnections, setPendingConnections] = createSignal(0)
+  const [peerLocations, setPeerLocations] = createSignal<Record<string, string>>({})
   const [messages, setMessages] = createSignal<ChatMessage[]>([])
   const [input, setInput] = createSignal('')
 
@@ -97,13 +122,11 @@ export default function P2PGroupChat() {
 
   const send = (signal: object) => socket?.send(JSON.stringify(signal))
 
-  // Keep the log pinned to the latest message whenever the list changes or first mounts.
   createEffect(() => {
     messages()
     messageLogRef?.scrollTo({ top: messageLogRef.scrollHeight })
   })
 
-  // Own messages are stored as `from: 'me'` locally, but peers need our real id to attribute them.
   const toWireFrom = (from: string) => (from === 'me' ? selfId()! : from)
 
   const mergeMessages = (incoming: { id: string; from: string; text: string; timestamp: number }[]) => {
@@ -117,7 +140,7 @@ export default function P2PGroupChat() {
     })
   }
 
-  // Deterministic id (not random) so every peer who independently witnesses the same leave converges on one entry.
+  // Deterministic id so every peer that independently witnesses this converges on the same entry.
   const addLeftMessage = (id: string) => {
     const text = `${peerIdentity(id).name} left the chat`
     setMessages((prev) =>
@@ -125,13 +148,29 @@ export default function P2PGroupChat() {
     )
   }
 
-  const setupChannel = (id: string, channel: RTCDataChannel) => {
+  // Only call from the side reacting to an unsolicited offer (isIncoming) - the newcomer didn't
+  // just "join" from its own perspective.
+  const addJoinedMessage = (id: string) => {
+    const text = `${peerIdentity(id).name} joined the chat`
+    setMessages((prev) =>
+      [...prev, { id: `join-${id}`, from: 'system', text, timestamp: Date.now() }].slice(-MAX_MESSAGES),
+    )
+  }
+
+  // Only for a peer who finds the room empty - there's no one to "join".
+  const addStartedMessage = (id: string) => {
+    const text = `${peerIdentity(id).name} started the chat`
+    setMessages((prev) =>
+      [...prev, { id: `start-${id}`, from: 'system', text, timestamp: Date.now() }].slice(-MAX_MESSAGES),
+    )
+  }
+
+  const setupChannel = (id: string, channel: RTCDataChannel, isIncoming: boolean) => {
     channels.set(id, channel)
 
     channel.onopen = () => {
       setPeerIds([...channels.keys()])
-      setPendingConnections((count) => count - 1)
-      // Catch the other side up on everything we've seen, so a refresh/late join isn't missing history.
+      if (isIncoming) addJoinedMessage(id)
       const history: ChannelMessage = {
         type: 'history',
         messages: messages().map((m) => ({ ...m, from: toWireFrom(m.from) })),
@@ -156,15 +195,14 @@ export default function P2PGroupChat() {
     let connection = connections.get(id)
     if (connection) return connection
 
-    setPendingConnections((count) => count + 1)
     connection = new RTCPeerConnection({ iceServers: ICE_SERVERS })
     connection.onicecandidate = (event) => {
       if (event.candidate) {
         send({ type: 'ice', to: id, candidate: event.candidate.toJSON() })
       }
     }
-    // The non-initiator receives the data channel here instead of creating one.
-    connection.ondatachannel = (event) => setupChannel(id, event.channel)
+    // ondatachannel firing here means the peer at the other end initiated, i.e. just joined.
+    connection.ondatachannel = (event) => setupChannel(id, event.channel, true)
 
     connections.set(id, connection)
     return connection
@@ -172,7 +210,7 @@ export default function P2PGroupChat() {
 
   const connectToPeer = async (id: string) => {
     const connection = getOrCreateConnection(id)
-    setupChannel(id, connection.createDataChannel('chat'))
+    setupChannel(id, connection.createDataChannel('chat'), false)
 
     const offer = await connection.createOffer()
     await connection.setLocalDescription(offer)
@@ -180,32 +218,42 @@ export default function P2PGroupChat() {
   }
 
   const removePeer = (id: string) => {
-    const wasConnected = channels.has(id)
-
     channels.get(id)?.close()
     channels.delete(id)
     connections.get(id)?.close()
     connections.delete(id)
     setPeerIds([...channels.keys()])
-
-    if (!wasConnected) {
-      setPendingConnections((count) => count - 1)
-    }
   }
 
   onMount(() => {
-    setSelfId(crypto.randomUUID())
-
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
     socket = new WebSocket(`${protocol}//${location.host}/ws`)
-    socket.onopen = () => send({ type: 'hello', id: selfId() })
+
+    // Socket open and selfId resolution race independently, so 'hello' only fires once both are ready.
+    let socketOpen = false
+    let idReady = false
+    const sayHelloIfReady = () => {
+      if (socketOpen && idReady) send({ type: 'hello', id: selfId() })
+    }
+
+    socket.onopen = () => {
+      socketOpen = true
+      sayHelloIfReady()
+    }
+
+    resolveSelfId().then((id) => {
+      setSelfId(id)
+      idReady = true
+      sayHelloIfReady()
+    })
 
     socket.onmessage = async (event) => {
       const signal: Signal = JSON.parse(event.data)
 
       switch (signal.type) {
         case 'peers': {
-          // We're the newcomer: initiate a connection to every peer already in the room.
+          setPeerLocations((prev) => ({ ...prev, ...signal.locations }))
+          if (signal.ids.length === 0) addStartedMessage(selfId()!)
           await Promise.all(signal.ids.map((id) => connectToPeer(id)))
           break
         }
@@ -213,10 +261,16 @@ export default function P2PGroupChat() {
         case 'leave': {
           removePeer(signal.id)
           addLeftMessage(signal.id)
+          setPeerLocations((prev) => {
+            const next = { ...prev }
+            delete next[signal.id]
+            return next
+          })
           break
         }
 
         case 'offer': {
+          if (signal.location) setPeerLocations((prev) => ({ ...prev, [signal.from]: signal.location! }))
           const connection = getOrCreateConnection(signal.from)
           await connection.setRemoteDescription(signal.offer)
 
@@ -227,6 +281,7 @@ export default function P2PGroupChat() {
         }
 
         case 'answer': {
+          if (signal.location) setPeerLocations((prev) => ({ ...prev, [signal.from]: signal.location! }))
           await connections.get(signal.from)?.setRemoteDescription(signal.answer)
           break
         }
@@ -268,8 +323,19 @@ export default function P2PGroupChat() {
       <article class='flex flex-col gap-6 p-8'>
         <header>
           <h1 class='text-6xl font-thin'>P2P Group Chat</h1>
-          <p class='mt-4'>Messages travel directly between browsers over WebRTC, not through our server.</p>
         </header>
+        <section class='flex flex-col gap-4'>
+          <p>
+            Peer-to-peer (P2P) networking lets devices talk directly to one another instead of routing everything
+            through a central server. WebRTC brings this capability to the browser, letting two tabs exchange data in
+            real time once a connection between them has been established.
+          </p>
+          <p>
+            This curio is a group chat built on WebRTC data channels. A small signaling server helps peers find each
+            other and exchange the connection details needed to get started, but once that handshake is done, messages
+            travel directly between browsers - the server never sees the conversation itself.
+          </p>
+        </section>
 
         <div class='flex w-full flex-col gap-4' style={{ 'max-width': `${CURIO_CANVAS_WIDTH}px` }}>
           <section class='flex flex-wrap items-center gap-2'>
@@ -281,6 +347,9 @@ export default function P2PGroupChat() {
                 {selfId() ? peerIdentity(selfId()!).initials : '·'}
               </span>
               <span class='text-sm font-medium'>You{selfId() ? ` · ${peerIdentity(selfId()!).name}` : ''}</span>
+              <Show when={selfId() && peerLocations()[selfId()!]}>
+                <span class='text-xs opacity-60'>· {peerLocations()[selfId()!]}</span>
+              </Show>
             </div>
 
             {peerIds().map((id) => {
@@ -294,6 +363,9 @@ export default function P2PGroupChat() {
                     {identity.initials}
                   </span>
                   <span class='text-sm font-medium'>{identity.name}</span>
+                  <Show when={peerLocations()[id]}>
+                    <span class='text-xs opacity-60'>· {peerLocations()[id]}</span>
+                  </Show>
                 </div>
               )
             })}
@@ -301,75 +373,74 @@ export default function P2PGroupChat() {
 
           <Show
             when={messages().length > 0 || peerIds().length > 0}
-            fallback={
-              <Show
-                when={pendingConnections() > 0}
-                fallback={
-                  <div class='bg-accent flex h-96 w-full items-center justify-center rounded-2xl'>
-                    <p class='opacity-60'>Waiting for someone to join...</p>
-                  </div>
-                }
-              >
-                <Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />
-              </Show>
-            }
+            fallback={<Loader width={CURIO_CANVAS_WIDTH} height={384} size={48} />}
           >
             <section ref={messageLogRef} class='bg-accent flex h-96 flex-col gap-2 overflow-y-auto rounded-lg p-4'>
               <For each={messages()}>
                 {(message, index) => {
-                  const isMe = message.from === 'me'
                   const isSystem = message.from === 'system'
-                  const identity = isSystem
-                    ? null
-                    : isMe
-                      ? selfId()
-                        ? peerIdentity(selfId()!)
-                        : null
-                      : peerIdentity(message.from)
-                  const previous = messages()[index() - 1]
-                  const showMeta = !previous || previous.from !== message.from
+
+                  // Must stay reactive (createMemo) - a <For> row only runs once, so a plain read
+                  // here would miss later-appended messages in the same consecutive-system run.
+                  if (isSystem) {
+                    const isFirstInRun = createMemo(() => messages()[index() - 1]?.from !== 'system')
+                    const runText = createMemo(() => {
+                      const all = messages()
+                      const run: string[] = []
+                      for (let i = index(); i < all.length && all[i].from === 'system'; i++) run.push(all[i].text)
+                      return run.join(' · ')
+                    })
+                    return (
+                      <Show when={isFirstInRun()}>
+                        <p class='py-0.5 text-center text-[11px] opacity-40'>{runText()}</p>
+                      </Show>
+                    )
+                  }
+
+                  const previous = createMemo(() => messages()[index() - 1])
+                  const isMe = message.from === 'me'
+                  const identity = isMe ? (selfId() ? peerIdentity(selfId()!) : null) : peerIdentity(message.from)
+                  const showMeta = createMemo(() => !previous() || previous()!.from !== message.from)
 
                   return (
-                    <Show when={!isSystem} fallback={<p class='py-1 text-center text-xs opacity-50'>{message.text}</p>}>
-                      <div
-                        class={cn('flex items-end gap-2', {
-                          'flex-row-reverse': isMe,
-                          'mt-1': showMeta && index() > 0,
-                        })}
-                      >
-                        <div class='w-8 shrink-0'>
-                          <Show when={showMeta && identity}>
-                            <span
-                              class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
-                              style={{ 'background-color': identity!.color }}
-                            >
-                              {identity!.initials}
-                            </span>
-                          </Show>
-                        </div>
-
-                        <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
-                          <Show when={showMeta}>
-                            <span class='flex items-baseline gap-2 px-1'>
-                              <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
-                                {isMe ? 'You' : identity!.name}
-                              </span>
-                              <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
-                            </span>
-                          </Show>
-                          <div
-                            class={cn(
-                              'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
-                              isMe
-                                ? 'bg-primary text-primary-fg rounded-br-sm'
-                                : 'bg-background text-background-fg rounded-bl-sm',
-                            )}
+                    <div
+                      class={cn('flex items-end gap-2', {
+                        'flex-row-reverse': isMe,
+                        'mt-1': showMeta() && index() > 0,
+                      })}
+                    >
+                      <div class='w-8 shrink-0'>
+                        <Show when={showMeta() && identity}>
+                          <span
+                            class='flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white'
+                            style={{ 'background-color': identity!.color }}
                           >
-                            {message.text}
-                          </div>
+                            {identity!.initials}
+                          </span>
+                        </Show>
+                      </div>
+
+                      <div class={cn('flex max-w-[75%] flex-col gap-1', isMe ? 'items-end' : 'items-start')}>
+                        <Show when={showMeta()}>
+                          <span class='flex items-baseline gap-2 px-1'>
+                            <span class='text-xs font-semibold' style={{ color: isMe ? undefined : identity!.color }}>
+                              {isMe ? 'You' : identity!.name}
+                            </span>
+                            <span class='text-[10px] opacity-50'>{formatTime(message.timestamp)}</span>
+                          </span>
+                        </Show>
+                        <div
+                          class={cn(
+                            'rounded-2xl px-4 py-2 wrap-break-word whitespace-pre-wrap',
+                            isMe
+                              ? 'bg-primary text-primary-fg rounded-br-sm'
+                              : 'bg-background text-background-fg rounded-bl-sm',
+                          )}
+                        >
+                          {message.text}
                         </div>
                       </div>
-                    </Show>
+                    </div>
                   )
                 }}
               </For>
@@ -383,7 +454,7 @@ export default function P2PGroupChat() {
               onInput={(event) => setInput(event.currentTarget.value)}
               onKeyDown={(event) => event.key === 'Enter' && sendMessage()}
               disabled={peerIds().length === 0}
-              class='bg-accent flex-1 rounded-lg px-4 py-3 disabled:opacity-50'
+              class='bg-accent min-w-0 flex-1 rounded-lg px-4 py-3 disabled:opacity-50'
               placeholder='Type a message...'
             />
             <Button onClick={sendMessage} disabled={peerIds().length === 0}>
@@ -391,6 +462,46 @@ export default function P2PGroupChat() {
             </Button>
           </section>
         </div>
+
+        <section class='flex'>
+          <ButtonLink
+            target='_blank'
+            href={`${import.meta.env.VITE_GITHUB_URL}/blob/main/src/routes/curio/p2p-group-chat.tsx`}
+          >
+            <GithubIcon />
+            View Source Code
+          </ButtonLink>
+        </section>
+        <section class='flex flex-col gap-4'>
+          <h2 class='text-4xl font-extralight'>Signaling, Durable Objects, and Deployment</h2>
+          <p>
+            Unlike the other curios, most of the code, client and server, was written by an AI coding agent (GitHub
+            Copilot, using Claude).
+          </p>
+          <p>
+            The mesh is full: every peer connects directly to every other peer, and a small signaling server just relays
+            offers, answers, and ICE candidates by client id so connections can be established. Whoever joins last
+            always initiates - it creates the data channel and sends the offer to everyone already in the room, while
+            existing peers only ever react to an unsolicited offer. That asymmetry avoids offer glare without needing
+            perfect-negotiation logic. Once a data channel opens between two browsers, chat messages travel directly
+            between them - the server only ever sees connection metadata, never the conversation.
+          </p>
+          <p>
+            The signaling server originally ran on Cloudflare Pages, which turned out to be the wrong fit: Pages
+            Functions execute on stateless-per-invocation Worker isolates, so the in-memory map tracking connected peers
+            wasn't reliably shared across concurrent WebSocket connections. Two tabs against the deployed URL would
+            never see each other's offers. The fix was to move the deployment target to Cloudflare Workers with a
+            Durable Object backing that same relay logic, giving every connection one consistent instance to route
+            through. That introduced its own gotcha: a cached reference to a WebSocket peer breaks the moment the
+            Durable Object hibernates and wakes up in a fresh JS context, so the relay re-resolves each target peer on
+            every send instead of holding onto a stale handle.
+          </p>
+          <p>
+            CI/CD mirrors that setup: every pull request gets its own isolated preview Worker with its own Durable
+            Object instance and a URL posted back as a PR comment, so signaling changes can be tested without touching
+            the production room, and a separate workflow deploys to production on merge.
+          </p>
+        </section>
       </article>
     </main>
   )

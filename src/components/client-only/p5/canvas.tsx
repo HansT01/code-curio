@@ -80,7 +80,7 @@ const Canvas: Component<CanvasProps> = (props) => {
 
   return (
     <div
-      class='w-full *:[[style*="visibility:_hidden;"]]:hidden [&>#p5\_loading]:hidden [&>canvas]:rounded-2xl'
+      class='w-full *:[[style*="visibility:_hidden;"]]:hidden [&>#p5\_loading]:hidden [&>canvas]:rounded-lg'
       ref={(ref) => {
         createSketch(ref)
         createResize(ref)
